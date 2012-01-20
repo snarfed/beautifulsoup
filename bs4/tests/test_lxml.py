@@ -250,7 +250,7 @@ class TestLXMLBuilder(SoupTest):
             b'\xea\x82\xcc\x83t\x83@\x83C\x83\x8b\x82\xc5\x82\xb7\x81B'
             b'</pre></body></html>')
         unicode_html = shift_jis_html.decode("shift-jis")
-        soup = self.soup(shift_jis_html)
+        soup = self.soup(unicode_html)
 
         # Make sure the parse tree is correctly encoded to various
         # encodings.
