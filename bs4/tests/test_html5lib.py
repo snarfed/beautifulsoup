@@ -27,7 +27,7 @@ class TestHTML5Builder(TestLXMLBuilder):
         markup = "<p>A <b>bold</b> statement.</p>"
         soup = self.soup(markup,
                          parse_only=strainer)
-        self.assertEquals(
+        self.assertEqual(
             soup.decode(), self.document_for(markup))
 
     def test_bare_string(self):
@@ -60,7 +60,7 @@ class TestHTML5Builder(TestLXMLBuilder):
     def test_literal_in_textarea(self):
         markup = '<textarea>Junk like <b> tags and <&<&amp;</textarea>'
         soup = self.soup(markup)
-        self.assertEquals(
+        self.assertEqual(
             soup.textarea.contents, ["Junk like <b> tags and <&<&"])
 
     def test_collapsed_whitespace(self):
@@ -122,17 +122,17 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
         markup = "<div><![CDATA[foo]]>"
         soup = self.soup(markup)
         data = soup.find(text="[CDATA[foo]]")
-        self.assertEquals(data.__class__, Comment)
+        self.assertEqual(data.__class__, Comment)
 
     def test_nonsensical_declaration(self):
         # Declarations that don't make any sense are turned into comments.
         soup = self.soup('<! Foo = -8><p>a</p>')
-        self.assertEquals(str(soup),
+        self.assertEqual(str(soup),
                           ("<!-- Foo = -8-->"
                            "<html><head></head><body><p>a</p></body></html>"))
 
         soup = self.soup('<p>a</p><! Foo = -8>')
-        self.assertEquals(str(soup),
+        self.assertEqual(str(soup),
                           ("<html><head></head><body><p>a</p>"
                            "<!-- Foo = -8--></body></html>"))
 
@@ -141,7 +141,7 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
         soup = self.soup((
                 '<! DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">'
                 '<p>foo</p>'))
-        self.assertEquals(
+        self.assertEqual(
             str(soup),
             ('<!-- DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"-->'
              '<html><head></head><body><p>foo</p></body></html>'))
@@ -154,70 +154,70 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
         # Let's spell that out a little more explicitly.
         soup = self.soup(markup)
         str1, comment, str2 = soup.body.contents
-        self.assertEquals(str1, 'a')
-        self.assertEquals(comment.__class__, Comment)
-        self.assertEquals(comment, 'b <p')
-        self.assertEquals(str2, 'c')
+        self.assertEqual(str1, 'a')
+        self.assertEqual(comment.__class__, Comment)
+        self.assertEqual(comment, 'b <p')
+        self.assertEqual(str2, 'c')
 
     def test_document_starts_with_bogus_declaration(self):
         soup = self.soup('<! Foo >a')
         # 'Foo' becomes a comment that appears before the HTML.
         comment = soup.contents[0]
         self.assertTrue(isinstance(comment, Comment))
-        self.assertEquals(comment, 'Foo')
+        self.assertEqual(comment, 'Foo')
 
-        self.assertEquals(self.find(text="a") == "a")
+        self.assertEqual(self.find(text="a") == "a")
 
     def test_attribute_value_was_closed_by_subsequent_tag(self):
         markup = """<a href="foo</a>, </a><a href="bar">baz</a>"""
         soup = self.soup(markup)
         # The string between the first and second quotes was interpreted
         # as the value of the 'href' attribute.
-        self.assertEquals(soup.a['href'], 'foo</a>, </a><a href=')
+        self.assertEqual(soup.a['href'], 'foo</a>, </a><a href=')
 
         #The string after the second quote (bar"), was treated as an
         #empty attribute called bar".
-        self.assertEquals(soup.a['bar"'], '')
-        self.assertEquals(soup.a.string, "baz")
+        self.assertEqual(soup.a['bar"'], '')
+        self.assertEqual(soup.a.string, "baz")
 
     def test_document_starts_with_bogus_declaration(self):
         soup = self.soup('<! Foo ><p>a</p>')
         # The declaration becomes a comment.
         comment = soup.contents[0]
         self.assertTrue(isinstance(comment, Comment))
-        self.assertEquals(comment, ' Foo ')
-        self.assertEquals(soup.p.string, 'a')
+        self.assertEqual(comment, ' Foo ')
+        self.assertEqual(soup.p.string, 'a')
 
     def test_document_ends_with_incomplete_declaration(self):
         soup = self.soup('<p>a<!b')
         # This becomes a string 'a'. The incomplete declaration is ignored.
         # Compare html5lib, which turns it into a comment.
         s, comment = soup.p.contents
-        self.assertEquals(s, 'a')
+        self.assertEqual(s, 'a')
         self.assertTrue(isinstance(comment, Comment))
-        self.assertEquals(comment, 'b')
+        self.assertEqual(comment, 'b')
 
     def test_entity_was_not_finished(self):
         soup = self.soup("<p>&lt;Hello&gt")
         # Compare html5lib, which completes the entity.
-        self.assertEquals(soup.p.string, "<Hello>")
+        self.assertEqual(soup.p.string, "<Hello>")
 
     def test_nonexistent_entity(self):
         soup = self.soup("<p>foo&#bar;baz</p>")
-        self.assertEquals(soup.p.string, "foo&#bar;baz")
+        self.assertEqual(soup.p.string, "foo&#bar;baz")
 
         # Compare a real entity.
         soup = self.soup("<p>foo&#100;baz</p>")
-        self.assertEquals(soup.p.string, "foodbaz")
+        self.assertEqual(soup.p.string, "foodbaz")
 
     def test_entity_out_of_range(self):
         # An entity that's out of range will be converted to
         # REPLACEMENT CHARACTER.
         soup = self.soup("<p>&#10000000000000;</p>")
-        self.assertEquals(soup.p.string, u"\N{REPLACEMENT CHARACTER}")
+        self.assertEqual(soup.p.string, u"\N{REPLACEMENT CHARACTER}")
 
         soup = self.soup("<p>&#x1000000000000;</p>")
-        self.assertEquals(soup.p.string, u"\N{REPLACEMENT CHARACTER}")
+        self.assertEqual(soup.p.string, u"\N{REPLACEMENT CHARACTER}")
 
 
 @unittest.skipIf(
@@ -233,7 +233,7 @@ class TestHTML5LibEncodingConversion(TestLXMLBuilderEncodingConversion):
         # Hebrew encoding) to UTF-8.
         soup = self.soup(self.HEBREW_DOCUMENT,
                          from_encoding="iso-8859-8")
-        self.assertEquals(soup.original_encoding, 'iso8859-8')
-        self.assertEquals(
+        self.assertEqual(soup.original_encoding, 'iso8859-8')
+        self.assertEqual(
             soup.encode('utf-8'),
             self.HEBREW_DOCUMENT.decode("iso-8859-8").encode("utf-8"))

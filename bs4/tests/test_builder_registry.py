@@ -12,9 +12,8 @@ from bs4.builder import (
 )
 
 try:
-    from bs4.builder import (
-        HTML5TreeBuilder,
-        )
+    from bs4.builder import HTML5TreeBuilder
+    HTML5LIB_PRESENT = True
 except ImportError:
     HTML5LIB_PRESENT = False
 
@@ -23,37 +22,37 @@ class BuiltInRegistryTest(unittest.TestCase):
     """Test the built-in registry with the default builders registered."""
 
     def test_combination(self):
-        self.assertEquals(registry.lookup('fast', 'html'),
+        self.assertEqual(registry.lookup('fast', 'html'),
                           LXMLTreeBuilder)
-        self.assertEquals(registry.lookup('permissive', 'xml'),
+        self.assertEqual(registry.lookup('permissive', 'xml'),
                           LXMLTreeBuilderForXML)
-        self.assertEquals(registry.lookup('strict', 'html'),
+        self.assertEqual(registry.lookup('strict', 'html'),
                           HTMLParserTreeBuilder)
         if HTML5LIB_PRESENT:
-            self.assertEquals(registry.lookup('permissive', 'html'),
+            self.assertEqual(registry.lookup('permissive', 'html'),
                               HTML5TreeBuilder)
 
     def test_lookup_by_markup_type(self):
         if HTML5LIB_PRESENT:
-            self.assertEquals(registry.lookup('html'), HTML5TreeBuilder)
+            self.assertEqual(registry.lookup('html'), HTML5TreeBuilder)
         else:
-            self.assertEquals(registry.lookup('html'), LXMLTreeBuilder)
-        self.assertEquals(registry.lookup('xml'), LXMLTreeBuilderForXML)
+            self.assertEqual(registry.lookup('html'), LXMLTreeBuilder)
+        self.assertEqual(registry.lookup('xml'), LXMLTreeBuilderForXML)
 
     def test_named_library(self):
-        self.assertEquals(registry.lookup('lxml', 'xml'),
+        self.assertEqual(registry.lookup('lxml', 'xml'),
                           LXMLTreeBuilderForXML)
-        self.assertEquals(registry.lookup('lxml', 'html'),
+        self.assertEqual(registry.lookup('lxml', 'html'),
                           LXMLTreeBuilder)
         if HTML5LIB_PRESENT:
-            self.assertEquals(registry.lookup('html5lib'),
+            self.assertEqual(registry.lookup('html5lib'),
                               HTML5TreeBuilder)
 
-        self.assertEquals(registry.lookup('html.parser'),
+        self.assertEqual(registry.lookup('html.parser'),
                           HTMLParserTreeBuilder)
 
     def test_unimplemented_combinations(self):
-        self.assertEquals(registry.lookup('fast', 'permissive', 'html'),
+        self.assertEqual(registry.lookup('fast', 'permissive', 'html'),
                           None)
 
     def test_beautifulsoup_constructor_does_lookup(self):
@@ -85,28 +84,28 @@ class RegistryTest(unittest.TestCase):
 
         # Since the builder advertises no features, you can't find it
         # by looking up features.
-        self.assertEquals(self.registry.lookup('foo'), None)
+        self.assertEqual(self.registry.lookup('foo'), None)
 
         # But you can find it by doing a lookup with no features, if
         # this happens to be the only registered builder.
-        self.assertEquals(self.registry.lookup(), builder)
+        self.assertEqual(self.registry.lookup(), builder)
 
     def test_register_with_features_makes_lookup_succeed(self):
         builder = self.builder_for_features('foo', 'bar')
-        self.assertEquals(self.registry.lookup('foo'), builder)
-        self.assertEquals(self.registry.lookup('bar'), builder)
+        self.assertEqual(self.registry.lookup('foo'), builder)
+        self.assertEqual(self.registry.lookup('bar'), builder)
 
     def test_lookup_fails_when_no_builder_implements_feature(self):
         builder = self.builder_for_features('foo', 'bar')
-        self.assertEquals(self.registry.lookup('baz'), None)
+        self.assertEqual(self.registry.lookup('baz'), None)
 
     def test_lookup_gets_most_recent_registration_when_no_feature_specified(self):
         builder1 = self.builder_for_features('foo')
         builder2 = self.builder_for_features('bar')
-        self.assertEquals(self.registry.lookup(), builder2)
+        self.assertEqual(self.registry.lookup(), builder2)
 
     def test_lookup_fails_when_no_tree_builders_registered(self):
-        self.assertEquals(self.registry.lookup(), None)
+        self.assertEqual(self.registry.lookup(), None)
 
     def test_lookup_gets_most_recent_builder_supporting_all_features(self):
         has_one = self.builder_for_features('foo')
@@ -118,14 +117,14 @@ class RegistryTest(unittest.TestCase):
 
         # There are two builders featuring 'foo' and 'bar', but
         # the one that also features 'quux' was registered later.
-        self.assertEquals(self.registry.lookup('foo', 'bar'),
+        self.assertEqual(self.registry.lookup('foo', 'bar'),
                           has_both_late)
 
         # There is only one builder featuring 'foo', 'bar', and 'baz'.
-        self.assertEquals(self.registry.lookup('foo', 'bar', 'baz'),
+        self.assertEqual(self.registry.lookup('foo', 'bar', 'baz'),
                           has_both_early)
 
     def test_lookup_fails_when_cannot_reconcile_requested_features(self):
         builder1 = self.builder_for_features('foo', 'bar')
         builder2 = self.builder_for_features('foo', 'baz')
-        self.assertEquals(self.registry.lookup('bar', 'baz'), None)
+        self.assertEqual(self.registry.lookup('bar', 'baz'), None)

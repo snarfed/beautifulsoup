@@ -30,4 +30,4 @@ class SoupTest(unittest.TestCase):
         if compare_parsed_to is None:
             compare_parsed_to = to_parse
 
-        self.assertEquals(obj.decode(), self.document_for(compare_parsed_to))
+        self.assertEqual(obj.decode(), self.document_for(compare_parsed_to))

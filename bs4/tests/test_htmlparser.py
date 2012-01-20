@@ -27,7 +27,7 @@ class TestHTMLParserTreeBuilder(TestLXMLBuilder):
         self.assertSoupEquals(markup)
         soup = self.soup(markup)
         string = soup.svg.string
-        self.assertEquals(string, "foobar")
+        self.assertEqual(string, "foobar")
         self.assertTrue(isinstance(string, CData))
 
     # These are tests that could be 'fixed' by improving the
@@ -51,27 +51,27 @@ class TestHTMLParserTreeBuilder(TestLXMLBuilder):
         text = '<x t="pi&#241ata">'
         expected = u"pi\N{LATIN SMALL LETTER N WITH TILDE}ata"
         soup = self.soup(text)
-        self.assertEquals(soup.x['t'], "pi&#241ata")
+        self.assertEqual(soup.x['t'], "pi&#241ata")
 
         text = '<x t="pi&#241;ata">'
         expected = u"pi\N{LATIN SMALL LETTER N WITH TILDE}ata"
         soup = self.soup(text)
-        self.assertEquals(soup.x['t'], u"pi\xf1ata")
+        self.assertEqual(soup.x['t'], u"pi\xf1ata")
 
         text = '<x t="pi&#xf1;ata">'
         soup = self.soup(text)
-        self.assertEquals(soup.x['t'], expected)
+        self.assertEqual(soup.x['t'], expected)
 
         text = '<x t="sacr&eacute; bleu">'
         soup = self.soup(text)
-        self.assertEquals(
+        self.assertEqual(
             soup.x['t'],
             u"sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu")
 
         # This can cause valid HTML to become invalid.
         valid_url = '<a href="http://example.org?a=1&amp;b=2;3">foo</a>'
         soup = self.soup(valid_url)
-        self.assertEquals(soup.a['href'], "http://example.org?a=1&b=2;3")
+        self.assertEqual(soup.a['href'], "http://example.org?a=1&b=2;3")
 
     # I think it would be very difficult to 'fix' these tests, judging
     # from my experience with previous versions of Beautiful Soup.
@@ -79,7 +79,7 @@ class TestHTMLParserTreeBuilder(TestLXMLBuilder):
         # Ampersands are treated as entities.
         text = "<p>AT&T</p>"
         soup = self.soup(text)
-        self.assertEquals(soup.p.string, "AT&T;")
+        self.assertEqual(soup.p.string, "AT&T;")
 
     def test_literal_in_textarea(self):
         # Anything inside a <textarea> is supposed to be treated as
@@ -88,10 +88,10 @@ class TestHTMLParserTreeBuilder(TestLXMLBuilder):
         # best to parse the contents of a <textarea> as HTML.
         text = '<textarea>Junk like <b> tags and <&<&amp;</textarea>'
         soup = self.soup(text)
-        self.assertEquals(len(soup.textarea.contents), 2)
-        self.assertEquals(soup.textarea.contents[0], u"Junk like ")
-        self.assertEquals(soup.textarea.contents[1].name, 'b')
-        self.assertEquals(soup.textarea.b.string, u" tags and <&<&")
+        self.assertEqual(len(soup.textarea.contents), 2)
+        self.assertEqual(soup.textarea.contents[0], u"Junk like ")
+        self.assertEqual(soup.textarea.contents[1].name, 'b')
+        self.assertEqual(soup.textarea.b.string, u" tags and <&<&")
 
     def test_literal_in_script(self):
         # The contents of a <script> tag are supposed to be treated as
@@ -100,7 +100,7 @@ class TestHTMLParserTreeBuilder(TestLXMLBuilder):
         # pain.
         javascript = 'if (i < 2) { alert("<b>foo</b>"); }'
         soup = self.soup('<script>%s</script>' % javascript)
-        self.assertEquals(soup.script.contents,
+        self.assertEqual(soup.script.contents,
                           ['if (i < 2) { alert("<b>foo',
                            '"); }'])
 

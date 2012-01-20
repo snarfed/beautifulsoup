@@ -55,7 +55,7 @@ class TestLXMLBuilder(SoupTest):
 
         soup = self.soup(markup)
         comment = soup.find(text="foobar")
-        self.assertEquals(comment.__class__, Comment)
+        self.assertEqual(comment.__class__, Comment)
 
     def test_nested_inline_elements(self):
         # Inline tags can be nested indefinitely.
@@ -138,28 +138,28 @@ class TestLXMLBuilder(SoupTest):
         # best to parse the contents of a <textarea> as HTML.
         text = '<textarea>Junk like <b> tags and <&<&amp;</textarea>'
         soup = self.soup(text)
-        self.assertEquals(len(soup.textarea.contents), 2)
-        self.assertEquals(soup.textarea.contents[0], u"Junk like ")
-        self.assertEquals(soup.textarea.contents[1].name, 'b')
-        self.assertEquals(soup.textarea.b.string, u" tags and ")
+        self.assertEqual(len(soup.textarea.contents), 2)
+        self.assertEqual(soup.textarea.contents[0], u"Junk like ")
+        self.assertEqual(soup.textarea.contents[1].name, 'b')
+        self.assertEqual(soup.textarea.b.string, u" tags and ")
 
     def test_literal_in_script(self):
         # The contents of a <script> tag are treated as a literal string,
         # even if that string contains HTML.
         javascript = 'if (i < 2) { alert("<b>foo</b>"); }'
         soup = self.soup('<script>%s</script>' % javascript)
-        self.assertEquals(soup.script.string, javascript)
+        self.assertEqual(soup.script.string, javascript)
 
     def test_naked_ampersands(self):
         # Ampersands are left alone.
         text = "<p>AT&T</p>"
         soup = self.soup(text)
-        self.assertEquals(soup.p.string, "AT&T")
+        self.assertEqual(soup.p.string, "AT&T")
 
         # Even if they're in attribute values.
         invalid_url = '<a href="http://example.org?a=1&b=2;3">foo</a>'
         soup = self.soup(invalid_url)
-        self.assertEquals(soup.a['href'], "http://example.org?a=1&b=2;3")
+        self.assertEqual(soup.a['href'], "http://example.org?a=1&b=2;3")
 
     def test_entities_in_strings_converted_during_parsing(self):
         # Both XML and HTML entities are converted to Unicode characters
@@ -173,13 +173,13 @@ class TestLXMLBuilder(SoupTest):
         # parsing.
         quote = b"<p>\x91Foo\x92</p>"
         soup = self.soup(quote)
-        self.assertEquals(
+        self.assertEqual(
             soup.p.string,
             u"\N{LEFT SINGLE QUOTATION MARK}Foo\N{RIGHT SINGLE QUOTATION MARK}")
 
     def test_non_breaking_spaces_converted_on_the_way_in(self):
         soup = self.soup("<a>&nbsp;&nbsp;</a>")
-        self.assertEquals(soup.a.string, u"\N{NO-BREAK SPACE}" * 2)
+        self.assertEqual(soup.a.string, u"\N{NO-BREAK SPACE}" * 2)
 
     def test_cdata_where_its_ok(self):
         # lxml strips CDATA sections, no matter where they occur.
@@ -192,13 +192,13 @@ class TestLXMLBuilder(SoupTest):
         markup = doctype_str + '<p>foo</p>'
         soup = self.soup(markup)
         doctype = soup.contents[0]
-        self.assertEquals(doctype.__class__, Doctype)
-        self.assertEquals(doctype, doctype_fragment)
-        self.assertEquals(str(soup)[:len(doctype_str)], doctype_str)
+        self.assertEqual(doctype.__class__, Doctype)
+        self.assertEqual(doctype, doctype_fragment)
+        self.assertEqual(str(soup)[:len(doctype_str)], doctype_str)
 
         # Make sure that the doctype was correctly associated with the
         # parse tree and that the rest of the document parsed.
-        self.assertEquals(soup.p.contents[0], 'foo')
+        self.assertEqual(soup.p.contents[0], 'foo')
 
     def test_doctype(self):
         # Test a normal HTML doctype you'll commonly see in a real document.
@@ -238,7 +238,7 @@ class TestLXMLBuilder(SoupTest):
         expected = expected.encode("utf-8")
 
         # Ta-da!
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_real_shift_jis_document(self):
         # Smoke test to make sure the parser can handle a document in
@@ -254,8 +254,8 @@ class TestLXMLBuilder(SoupTest):
 
         # Make sure the parse tree is correctly encoded to various
         # encodings.
-        self.assertEquals(soup.encode("utf-8"), unicode_html.encode("utf-8"))
-        self.assertEquals(soup.encode("euc_jp"), unicode_html.encode("euc_jp"))
+        self.assertEqual(soup.encode("utf-8"), unicode_html.encode("utf-8"))
+        self.assertEqual(soup.encode("euc_jp"), unicode_html.encode("euc_jp"))
 
     # Tests below this line need work.
 
@@ -275,9 +275,9 @@ class TestLXMLBuilder(SoupTest):
         # Parse the document, and the charset is replaced with a
         # generic value.
         parsed_meta = soup.find('meta', {'http-equiv': 'Content-type'})
-        self.assertEquals(parsed_meta['content'],
+        self.assertEqual(parsed_meta['content'],
                           'text/html; charset=%SOUP-ENCODING%')
-        self.assertEquals(parsed_meta.contains_substitutions, True)
+        self.assertEqual(parsed_meta.contains_substitutions, True)
 
         # For the rest of the story, see TestSubstitutions in
         # test_tree.py.
@@ -287,25 +287,25 @@ class TestLXMLBuilder(SoupTest):
         expected = u"&lt;&lt;sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;".encode("utf-8")
         soup = self.soup(text)
         str = soup.p.string
-        #self.assertEquals(str.encode("utf-8"), expected)
+        #self.assertEqual(str.encode("utf-8"), expected)
 
     def test_br_tag_is_empty_element(self):
         """A <br> tag is designated as an empty-element tag."""
         soup = self.soup("<br></br>")
         self.assertTrue(soup.br.is_empty_element)
-        self.assertEquals(str(soup.br), "<br />")
+        self.assertEqual(str(soup.br), "<br />")
 
     def test_p_tag_is_not_empty_element(self):
         """A <p> tag is not designated as an empty-element tag."""
         soup = self.soup("<p />")
         self.assertFalse(soup.p.is_empty_element)
-        self.assertEquals(str(soup.p), "<p></p>")
+        self.assertEqual(str(soup.p), "<p></p>")
 
     def test_soupstrainer(self):
         strainer = SoupStrainer("b")
         soup = self.soup("A <b>bold</b> <meta /> <i>statement</i>",
                          parse_only=strainer)
-        self.assertEquals(soup.decode(), "<b>bold</b>")
+        self.assertEqual(soup.decode(), "<b>bold</b>")
 
 
 class TestLXMLBuilderInvalidMarkup(SoupTest):
@@ -348,7 +348,7 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
 
     def test_boolean_attribute_with_no_value_gets_empty_value(self):
         soup = self.soup("<table><td nowrap>foo</td></table>")
-        self.assertEquals(soup.table.td['nowrap'], '')
+        self.assertEqual(soup.table.td['nowrap'], '')
 
     def test_incorrectly_nested_tables(self):
         self.assertSoupEquals(
@@ -359,7 +359,7 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
         markup = self.soup("<p>this is the definition:"
                            "<dl><dt>first case</dt>")
         # The <p> tag is closed before the <dl> tag begins.
-        self.assertEquals(markup.p.contents, ["this is the definition:"])
+        self.assertEqual(markup.p.contents, ["this is the definition:"])
 
     def test_empty_element_tag_with_contents(self):
         self.assertSoupEquals("<br>foo</br>", "<br />foo")
@@ -391,7 +391,7 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
     def test_attribute_value_never_got_closed(self):
         markup = '<a href="http://foo.com/</a> and blah and blah'
         soup = self.soup(markup)
-        self.assertEquals(
+        self.assertEqual(
             soup.a['href'], "http://foo.com/</a> and blah and blah")
 
     def test_attribute_value_was_closed_by_subsequent_tag(self):
@@ -399,28 +399,28 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
         soup = self.soup(markup)
         # The string between the first and second quotes was interpreted
         # as the value of the 'href' attribute.
-        self.assertEquals(soup.a['href'], 'foo</a>, </a><a href=')
+        self.assertEqual(soup.a['href'], 'foo</a>, </a><a href=')
 
         #The string after the second quote (bar"), was treated as an
         #empty attribute called bar.
-        self.assertEquals(soup.a['bar'], '')
-        self.assertEquals(soup.a.string, "baz")
+        self.assertEqual(soup.a['bar'], '')
+        self.assertEqual(soup.a.string, "baz")
 
     def test_unquoted_attribute_value(self):
         soup = self.soup('<a style={height:21px;}></a>')
-        self.assertEquals(soup.a['style'], '{height:21px;}')
+        self.assertEqual(soup.a['style'], '{height:21px;}')
 
     def test_attribute_value_with_embedded_brackets(self):
         soup = self.soup('<a b="<a>">')
-        self.assertEquals(soup.a['b'], '<a>')
+        self.assertEqual(soup.a['b'], '<a>')
 
     def test_nonexistent_entity(self):
         soup = self.soup("<p>foo&#bar;baz</p>")
-        self.assertEquals(soup.p.string, "foobar;baz")
+        self.assertEqual(soup.p.string, "foobar;baz")
 
         # Compare a real entity.
         soup = self.soup("<p>foo&#100;baz</p>")
-        self.assertEquals(soup.p.string, "foodbaz")
+        self.assertEqual(soup.p.string, "foodbaz")
 
         # Also compare html5lib, which preserves the &# before the
         # entity name.
@@ -428,27 +428,27 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
     def test_entity_out_of_range(self):
         # An entity that's out of range will be ignored.
         soup = self.soup("<p>&#10000000000000;</p>")
-        self.assertEquals(soup.p.string, None)
+        self.assertEqual(soup.p.string, None)
 
         soup = self.soup("<p>&#x1000000000000;</p>")
-        self.assertEquals(soup.p.string, None)
+        self.assertEqual(soup.p.string, None)
 
 
     def test_entity_was_not_finished(self):
         soup = self.soup("<p>&lt;Hello&gt")
         # Compare html5lib, which completes the entity.
-        self.assertEquals(soup.p.string, "<Hello&gt")
+        self.assertEqual(soup.p.string, "<Hello&gt")
 
     def test_document_ends_with_incomplete_declaration(self):
         soup = self.soup('<p>a<!b')
         # This becomes a string 'a'. The incomplete declaration is ignored.
         # Compare html5lib, which turns it into a comment.
-        self.assertEquals(soup.p.contents, ['a'])
+        self.assertEqual(soup.p.contents, ['a'])
 
     def test_document_starts_with_bogus_declaration(self):
         soup = self.soup('<! Foo ><p>a</p>')
         # The declaration is ignored altogether.
-        self.assertEquals(soup.encode(), b"<html><body><p>a</p></body></html>")
+        self.assertEqual(soup.encode(), b"<html><body><p>a</p></body></html>")
 
     def test_tag_name_contains_unicode(self):
         # Unicode characters in tag names are stripped.
@@ -475,28 +475,28 @@ class TestLXMLBuilderEncodingConversion(SoupTest):
         soup_from_ascii = self.soup(ascii)
         unicode_output = soup_from_ascii.decode()
         self.assertTrue(isinstance(unicode_output, unicode))
-        self.assertEquals(unicode_output, self.document_for(ascii.decode()))
-        self.assertEquals(soup_from_ascii.original_encoding, "ascii")
+        self.assertEqual(unicode_output, self.document_for(ascii.decode()))
+        self.assertEqual(soup_from_ascii.original_encoding, "ascii")
 
     def test_unicode_in_unicode_out(self):
         # Unicode input is left alone. The original_encoding attribute
         # is not set.
         soup_from_unicode = self.soup(self.unicode_data)
-        self.assertEquals(soup_from_unicode.decode(), self.unicode_data)
-        self.assertEquals(soup_from_unicode.foo.string, u'Sacr\xe9 bleu!')
-        self.assertEquals(soup_from_unicode.original_encoding, None)
+        self.assertEqual(soup_from_unicode.decode(), self.unicode_data)
+        self.assertEqual(soup_from_unicode.foo.string, u'Sacr\xe9 bleu!')
+        self.assertEqual(soup_from_unicode.original_encoding, None)
 
     def test_utf8_in_unicode_out(self):
         # UTF-8 input is converted to Unicode. The original_encoding
         # attribute is set.
         soup_from_utf8 = self.soup(self.utf8_data)
-        self.assertEquals(soup_from_utf8.decode(), self.unicode_data)
-        self.assertEquals(soup_from_utf8.foo.string, u'Sacr\xe9 bleu!')
+        self.assertEqual(soup_from_utf8.decode(), self.unicode_data)
+        self.assertEqual(soup_from_utf8.foo.string, u'Sacr\xe9 bleu!')
 
     def test_utf8_out(self):
         # The internal data structures can be encoded as UTF-8.
         soup_from_unicode = self.soup(self.unicode_data)
-        self.assertEquals(soup_from_unicode.encode('utf-8'), self.utf8_data)
+        self.assertEqual(soup_from_unicode.encode('utf-8'), self.utf8_data)
 
     HEBREW_DOCUMENT = b'<html><head><title>Hebrew (ISO 8859-8) in Visual Directionality</title></head><body><h1>Hebrew (ISO 8859-8) in Visual Directionality</h1>\xed\xe5\xec\xf9</body></html>'
 
@@ -505,8 +505,8 @@ class TestLXMLBuilderEncodingConversion(SoupTest):
         # Hebrew encoding) to UTF-8.
         soup = self.soup(self.HEBREW_DOCUMENT,
                          from_encoding="iso-8859-8")
-        self.assertEquals(soup.original_encoding, 'iso-8859-8')
-        self.assertEquals(
+        self.assertEqual(soup.original_encoding, 'iso-8859-8')
+        self.assertEqual(
             soup.encode('utf-8'),
             self.HEBREW_DOCUMENT.decode("iso-8859-8").encode("utf-8"))
 
@@ -539,7 +539,7 @@ class TestLXMLXMLBuilder(SoupTest):
         markup = "<foo><![CDATA[iamcdata]]></foo>"
         soup = self.soup(markup)
         cdata = soup.foo.contents[0]
-        self.assertEquals(cdata.__class__.__name__, 'NavigableString')
+        self.assertEqual(cdata.__class__.__name__, 'NavigableString')
 
 
     def test_can_handle_invalid_xml(self):
@@ -562,20 +562,20 @@ class TestLXMLXMLBuilder(SoupTest):
         self.assertTrue(soup.bar.is_empty_element)
         soup.bar.insert(1, "Contents")
         self.assertFalse(soup.bar.is_empty_element)
-        self.assertEquals(str(soup), self.document_for("<bar>Contents</bar>"))
+        self.assertEqual(str(soup), self.document_for("<bar>Contents</bar>"))
 
     def test_designated_empty_element_tag_has_no_closing_tag(self):
         builder = LXMLTreeBuilderForXML(empty_element_tags=['bar'])
         soup = BeautifulSoup(builder=builder, markup="<bar></bar>")
         self.assertTrue(soup.bar.is_empty_element)
-        self.assertEquals(str(soup), self.document_for("<bar />"))
+        self.assertEqual(str(soup), self.document_for("<bar />"))
 
     def test_empty_tag_not_in_empty_element_tag_list_has_closing_tag(self):
         builder = LXMLTreeBuilderForXML(empty_element_tags=['bar'])
 
         soup = BeautifulSoup(builder=builder, markup="<foo />")
         self.assertFalse(soup.foo.is_empty_element)
-        self.assertEquals(str(soup), self.document_for("<foo></foo>"))
+        self.assertEqual(str(soup), self.document_for("<foo></foo>"))
 
     def test_designated_empty_element_tag_does_not_change_parser_behavior(self):
         # The designated list of empty-element tags only affects how
@@ -583,4 +583,4 @@ class TestLXMLXMLBuilder(SoupTest):
         # parsed--that's the parser's job.
         builder = LXMLTreeBuilderForXML(empty_element_tags=['bar'])
         soup = BeautifulSoup(builder=builder, markup="<bar>contents</bar>")
-        self.assertEquals(str(soup), self.document_for("<bar>contents</bar>"))
+        self.assertEqual(str(soup), self.document_for("<bar>contents</bar>"))
