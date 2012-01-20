@@ -64,8 +64,9 @@ so bad that it barely worked at all. Beautiful Soup 4 works with
 Python 3, and since its parser is pluggable, you don't sacrifice
 quality.
 
-Special thanks to Thomas Kluyver for getting Python 3 support to the
-finish line.
+Special thanks to Thomas Kluyver and Ezio Melotti for getting Python 3
+support to the finish line. Ezio Melotti is also to thank for greatly
+improving the HTML parser that comes with Python 3.2.
 
 == Better method names ==
 
@@ -95,17 +96,21 @@ Methods have been renamed for compatibility with Python 3.
    (This was misleading, anyway, because has_key() looked at
    a tag's attributes and __in__ looked at a tag's contents.)
 
-Some attributes have also been renamed:
+Some attributes have also been renamed, mostly to avoid using words
+that have meaning to Python, like "unicode" and "next":
 
- * Tag.isSelfClosing -> Tag.is_empty_element
+ * Tag.isSelfClosing -> Tag.is_empty_element (backwards compatible)
  * UnicodeDammit.unicode -> UnicodeDammit.unicode_markup
- * Tag.next -> Tag.next_element
- * Tag.previous -> Tag.previous_element
+   (not backwards compatible)
+ * Tag.next -> Tag.next_element (not backwards compatible)
+ * Tag.previous -> Tag.previous_element (not backwards compatible)
 
-So have some arguments to popular methods:
+So have some arguments to the Beautiful Soup constructor:
 
  * BeautifulSoup(parseOnlyThese=...) -> BeautifulSoup(parse_only=...)
  * BeautifulSoup(fromEncoding=...) -> BeautifulSoup(from_encoding=...)
+
+ You can use the old names, but you'll get a DeprecationError.
 
 == Generators are now properties ==
 
@@ -208,4 +213,5 @@ Here's how to do it with Python 3.2:
  $ cd python3.2/bs4
  $ python3.2 -m unittest discover -s bs4
 
-The script test-all-versions will run the tests twice.
+The script test-all-versions will run the tests twice, once on Python
+2.7 and once on Python 3.2.
