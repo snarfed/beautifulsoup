@@ -15,15 +15,16 @@ class TestDeprecatedConstructorArguments(SoupTest):
         msg = str(w[0].message)
         self.assertTrue("parseOnlyThese" in msg)
         self.assertTrue("parse_only" in msg)
-        self.assertEquals("<b></b>", soup.encode())
+        self.assertEquals(b"<b></b>", soup.encode())
 
     def test_fromEncoding_renamed_to_from_encoding(self):
         with warnings.catch_warnings(record=True) as w:
-            soup = self.soup("<a>", fromEncoding=("shift_jis"))
+            utf8 = b"\xc3\xa9"
+            soup = self.soup(utf8, fromEncoding="utf8")
         msg = str(w[0].message)
         self.assertTrue("fromEncoding" in msg)
         self.assertTrue("from_encoding" in msg)
-        self.assertEquals("shift_jis", soup.original_encoding)
+        self.assertEquals("utf8", soup.original_encoding)
 
     def test_unrecognized_keyword_argument(self):
         self.assertRaises(

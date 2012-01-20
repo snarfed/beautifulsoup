@@ -200,14 +200,12 @@ parser, you can set it manually.
 Here's how to run the tests on Python 2.7:
 
  $ cd bs4
- $ python2.7 -m unittest discover
+ $ python2.7 -m unittest discover -s bs4
 
 Here's how to do it with Python 3.2:
 
  $ ./convert-python3.2
  $ cd python3.2/bs4
- $ python3.2 -m unittest discover
+ $ python3.2 -m unittest discover -s bs4
 
-
-
-
+The script test-all-versions will run the tests twice.
