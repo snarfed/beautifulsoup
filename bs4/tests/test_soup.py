@@ -5,7 +5,29 @@ import unittest
 from bs4.element import SoupStrainer
 from bs4.dammit import EntitySubstitution, UnicodeDammit
 from bs4.testing import SoupTest
+import warnings
 
+class TestDeprecatedConstructorArguments(SoupTest):
+
+    def test_parseOnlyThese_renamed_to_parse_only(self):
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup("<a><b></b></a>", parseOnlyThese=SoupStrainer("b"))
+        msg = str(w[0].message)
+        self.assertTrue("parseOnlyThese" in msg)
+        self.assertTrue("parse_only" in msg)
+        self.assertEquals("<b></b>", soup.encode())
+
+    def test_fromEncoding_renamed_to_from_encoding(self):
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup("<a>", fromEncoding=("shift_jis"))
+        msg = str(w[0].message)
+        self.assertTrue("fromEncoding" in msg)
+        self.assertTrue("from_encoding" in msg)
+        self.assertEquals("shift_jis", soup.original_encoding)
+
+    def test_unrecognized_keyword_argument(self):
+        self.assertRaises(
+            TypeError, self.soup, "<a>", no_such_argument=True)
 
 class TestSelectiveParsing(SoupTest):
 

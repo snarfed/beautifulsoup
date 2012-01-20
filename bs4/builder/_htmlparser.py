@@ -65,7 +65,13 @@ class HTMLParserTreeBuilder(HTMLParser, HTMLTreeBuilder):
         self.soup.handle_data(data)
 
     def handle_charref(self, name):
-        self.handle_data(unichr(int(name)))
+        # XXX workaround for a bug in HTMLParser. Remove this once
+        # it's fixed.
+        if name.startswith('x'):
+            data = unichr(int(name.lstrip('x'), 16))
+        else:
+            data = unichr(int(name))
+        self.handle_data(data)
 
     def handle_entityref(self, name):
         character = EntitySubstitution.HTML_ENTITY_TO_CHARACTER.get(name)

@@ -44,6 +44,10 @@ class TestHTMLParserTreeBuilder(TestLXMLBuilder):
         self.assertSoupEquals(
             "<p>Foo<br/>bar</p>", "<p>Foo<br />bar</p>")
 
+    def test_hex_entities_in_text(self):
+        # XXX This tests a workaround for a bug in HTMLParser.
+        self.assertSoupEquals("&#xf1;", u"\xf1")
+
     def test_entities_in_attribute_values_converted_during_parsing(self):
 
         # The numeric entity isn't recognized without the closing

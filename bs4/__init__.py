@@ -25,11 +25,23 @@ __license__ = "MIT"
 __all__ = ['BeautifulSoup']
 
 import re
+import warnings
 
 from .builder import builder_registry
 from .dammit import UnicodeDammit
-from .element import DEFAULT_OUTPUT_ENCODING, NavigableString, Tag
-
+from .element import (
+    CData,
+    Comment,
+    DEFAULT_OUTPUT_ENCODING,
+    Declaration,
+    Doctype,
+    NavigableString,
+    PageElement,
+    ProcessingInstruction,
+    ResultSet,
+    SoupStrainer,
+    Tag,
+    )
 
 class BeautifulSoup(Tag):
     """
@@ -66,10 +78,66 @@ class BeautifulSoup(Tag):
     STRIP_ASCII_SPACES = {9: None, 10: None, 12: None, 13: None, 32: None, }
 
     def __init__(self, markup="", features=None, builder=None,
-                 parse_only=None, from_encoding=None):
+                 parse_only=None, from_encoding=None, **kwargs):
         """The Soup object is initialized as the 'root tag', and the
         provided markup (which can be a string or a file-like object)
         is fed into the underlying parser."""
+
+        if 'convertEntities' in kwargs:
+            warnings.warn(
+                "BS4 does not respect the convertEntities argument to the "
+                "BeautifulSoup constructor. Entities are always converted "
+                "to Unicode characters.")
+
+        if 'markupMassage' in kwargs:
+            del kwargs['markupMassage']
+            warnings.warn(
+                "BS4 does not respect the markupMassage argument to the "
+                "BeautifulSoup constructor. The tree builder is responsible "
+                "for any necessary markup massage.")
+
+        if 'smartQuotesTo' in kwargs:
+            del kwargs['smartQuotesTo']
+            warnings.warn(
+                "BS4 does not respect the smartQuotesTo argument to the "
+                "BeautifulSoup constructor. Smart quotes are always converted "
+                "to Unicode characters.")
+
+        if 'selfClosingTags' in kwargs:
+            del kwargs['selfClosingTags']
+            warnings.warn(
+                "BS4 does not respect the selfClosingTags argument to the "
+                "BeautifulSoup constructor. The tree builder is responsible "
+                "for understanding self-closing tags.")
+
+        if 'isHTML' in kwargs:
+            del kwargs['isHTML']
+            warnings.warn(
+                "BS4 does not respect the isHTML argument to the "
+                "BeautifulSoup constructor. You can pass in features='html' "
+                "or features='xml' to get a builder capable of handling "
+                "one or the other.")
+
+        def deprecated_argument(old_name, new_name):
+            if old_name in kwargs:
+                warnings.warn(
+                    'The "%s" argument to the BeautifulSoup constructor '
+                    'has been renamed to "%s."' % (old_name, new_name))
+                value = kwargs[old_name]
+                del kwargs[old_name]
+                return value
+            return None
+
+        parse_only = parse_only or deprecated_argument(
+            "parseOnlyThese", "parse_only")
+
+        from_encoding = from_encoding or deprecated_argument(
+            "fromEncoding", "from_encoding")
+
+        if len(kwargs) > 0:
+            arg = kwargs.keys().pop()
+            raise TypeError(
+                "__init__() got an unexpected keyword argument '%s'" % arg)
 
         if builder is None:
             if isinstance(features, basestring):
