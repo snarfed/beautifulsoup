@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Run all the tests in /tests/.
-# Don't run the test superclasses in /beautifulsoup/.
-unit2 discover -t . -s bs4.tests

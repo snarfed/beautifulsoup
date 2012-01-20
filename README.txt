@@ -194,3 +194,20 @@ string:
 The ['lxml', 'xml'] tree builder sets .is_xml to True; the other tree
 builders set it to False. If you want to parse XHTML with an HTML
 parser, you can set it manually.
+
+= Running the unit tests =
+
+Here's how to run the tests on Python 2.7:
+
+ $ cd bs4
+ $ python2.7 -m unittest discover
+
+Here's how to do it with Python 3.2:
+
+ $ ./convert-python3.2
+ $ cd python3.2/bs4
+ $ python3.2 -m unittest discover
+
+
+
+

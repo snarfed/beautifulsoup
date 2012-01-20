@@ -4,7 +4,12 @@ __all__ = [
     'HTMLParserTreeBuilder',
     ]
 
-from HTMLParser import HTMLParser
+try:
+    from html.parser import HTMLParser
+    CONSTRUCTOR_TAKES_STRICT = True
+except ImportError, e:
+    from HTMLParser import HTMLParser
+    CONSTRUCTOR_TAKES_STRICT = False
 from bs4.element import (
     CData,
     Comment,
@@ -27,6 +32,11 @@ class HTMLParserTreeBuilder(HTMLParser, HTMLTreeBuilder):
 
     is_xml = False
     features = [HTML, STRICT, HTMLPARSER]
+
+    def __init__(self, *args, **kwargs):
+        if CONSTRUCTOR_TAKES_STRICT:
+            kwargs['strict'] = True
+        return super(HTMLParserTreeBuilder, self).__init__(*args, **kwargs)
 
     def prepare_markup(self, markup, user_specified_encoding=None,
                        document_declared_encoding=None):

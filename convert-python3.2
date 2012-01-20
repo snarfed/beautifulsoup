@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# The Python 2 source is the definitive source. This script uses 2to3-3.2 to
+# create a new python3/bs4 source tree that works under Python 3.
+rm -rf python3.2
+mkdir python3.2
+cp -r bs4 python3.2
+2to3-3.2 -w python3.2

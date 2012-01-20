@@ -1,11 +1,19 @@
-from bs4.builder import HTML5TreeBuilder
+try:
+    from bs4.builder import HTML5TreeBuilder
+    HTML5LIB_PRESENT = True
+except ImportError, e:
+    HTML5LIB_PRESENT = False
 from bs4.element import Comment, SoupStrainer
 from test_lxml import (
     TestLXMLBuilder,
     TestLXMLBuilderInvalidMarkup,
     TestLXMLBuilderEncodingConversion,
     )
+import unittest
 
+@unittest.skipIf(
+    not HTML5LIB_PRESENT,
+    "html5lib seems not to be present, not testing its tree builder.")
 class TestHTML5Builder(TestLXMLBuilder):
     """See `BuilderSmokeTest`."""
 
@@ -73,7 +81,9 @@ class TestHTML5Builder(TestLXMLBuilder):
         # get a CData object.
         self.assertSoupEquals(markup, "<svg><!--[CDATA[foobar]]--></svg>")
 
-
+@unittest.skipIf(
+    not HTML5LIB_PRESENT,
+    "html5lib seems not to be present, not testing it on invalid markup.")
 class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
     """See `BuilderInvalidMarkupSmokeTest`."""
 
@@ -210,6 +220,9 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
         self.assertEquals(soup.p.string, u"\N{REPLACEMENT CHARACTER}")
 
 
+@unittest.skipIf(
+    not HTML5LIB_PRESENT,
+    "html5lib seems not to be present, not testing encoding conversion.")
 class TestHTML5LibEncodingConversion(TestLXMLBuilderEncodingConversion):
     @property
     def default_builder(self):

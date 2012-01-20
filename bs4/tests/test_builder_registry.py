@@ -5,13 +5,18 @@ import unittest
 from bs4 import BeautifulSoup
 from bs4.builder import (
     builder_registry as registry,
+    HTMLParserTreeBuilder,
     LXMLTreeBuilderForXML,
     LXMLTreeBuilder,
     TreeBuilderRegistry,
-    HTML5TreeBuilder,
-    HTMLParserTreeBuilder,
 )
 
+try:
+    from bs4.builder import (
+        HTML5TreeBuilder,
+        )
+except ImportError:
+    HTML5LIB_PRESENT = False
 
 
 class BuiltInRegistryTest(unittest.TestCase):
@@ -24,11 +29,15 @@ class BuiltInRegistryTest(unittest.TestCase):
                           LXMLTreeBuilderForXML)
         self.assertEquals(registry.lookup('strict', 'html'),
                           HTMLParserTreeBuilder)
-        self.assertEquals(registry.lookup('permissive', 'html'),
-                          HTML5TreeBuilder)
+        if HTML5LIB_PRESENT:
+            self.assertEquals(registry.lookup('permissive', 'html'),
+                              HTML5TreeBuilder)
 
     def test_lookup_by_markup_type(self):
-        self.assertEquals(registry.lookup('html'), HTML5TreeBuilder)
+        if HTML5LIB_PRESENT:
+            self.assertEquals(registry.lookup('html'), HTML5TreeBuilder)
+        else:
+            self.assertEquals(registry.lookup('html'), LXMLTreeBuilder)
         self.assertEquals(registry.lookup('xml'), LXMLTreeBuilderForXML)
 
     def test_named_library(self):
@@ -36,8 +45,9 @@ class BuiltInRegistryTest(unittest.TestCase):
                           LXMLTreeBuilderForXML)
         self.assertEquals(registry.lookup('lxml', 'html'),
                           LXMLTreeBuilder)
-        self.assertEquals(registry.lookup('html5lib'),
-                          HTML5TreeBuilder)
+        if HTML5LIB_PRESENT:
+            self.assertEquals(registry.lookup('html5lib'),
+                              HTML5TreeBuilder)
 
         self.assertEquals(registry.lookup('html.parser'),
                           HTMLParserTreeBuilder)
@@ -50,7 +60,7 @@ class BuiltInRegistryTest(unittest.TestCase):
         # You can pass in a string.
         BeautifulSoup("", features="html")
         # Or a list of strings.
-        BeautifulSoup("", features=["html", "permissive"])
+        BeautifulSoup("", features=["html", "fast"])
 
         # You'll get an exception if BS can't find an appropriate
         # builder.
