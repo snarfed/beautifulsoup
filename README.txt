@@ -209,9 +209,9 @@ Here's how to run the tests on Python 2.7:
 
 Here's how to do it with Python 3.2:
 
- $ ./convert-python3.2
- $ cd python3.2/bs4
- $ python3.2 -m unittest discover -s bs4
+ $ ./convert-py3k
+ $ cd py3k/bs4
+ $ python3 -m unittest discover -s bs4
 
 The script test-all-versions will run the tests twice, once on Python
-2.7 and once on Python 3.2.
+2.7 and once on Python 3.
