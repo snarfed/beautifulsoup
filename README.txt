@@ -141,6 +141,13 @@ You can write this:
 
 (But the old code will still work.)
 
+Some of the generators used to yield None after they were done, and
+then stop. That was a bug. Now, the generators just stop.
+
+There are two new generators, .strings and .stripped_strings. .strings
+yields NavigableString objects, and .stripped_strings yields Python
+strings that have had whitespace stripped.
+
 == tag.string is recursive ==
 
 tag.string now operates recursively. If tag A contains a single tag B

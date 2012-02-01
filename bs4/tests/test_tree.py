@@ -2,7 +2,7 @@
 """Tests for Beautiful Soup's tree traversal methods.
 
 The tree traversal methods are the main advantage of using Beautiful
-Soup over other parsers.
+Soup over just using a parser.
 
 Different parsers will build different Beautiful Soup trees given the
 same markup, but all Beautiful Soup trees can be traversed with the
@@ -12,6 +12,7 @@ methods tested here.
 import copy
 import pickle
 import re
+import warnings
 from bs4 import BeautifulSoup
 from bs4.builder import builder_registry
 from bs4.element import CData, SoupStrainer, Tag
@@ -778,14 +779,20 @@ class TestElementObjects(SoupTest):
         self.assertEqual(len(soup.top.contents), 3)
 
     def test_member_access_invokes_find(self):
-        """Accessing a Python member .foo or .fooTag invokes find('foo')"""
+        """Accessing a Python member .foo invokes find('foo')"""
         soup = self.soup('<b><i></i></b>')
         self.assertEqual(soup.b, soup.find('b'))
-        self.assertEqual(soup.bTag, soup.find('b'))
         self.assertEqual(soup.b.i, soup.find('b').find('i'))
-        self.assertEqual(soup.bTag.iTag, soup.find('b').find('i'))
         self.assertEqual(soup.a, None)
-        self.assertEqual(soup.aTag, None)
+
+    def test_deprecated_member_access(self):
+        soup = self.soup('<b><i></i></b>')
+        with warnings.catch_warnings(record=True) as w:
+            tag = soup.bTag
+        self.assertEqual(soup.b, tag)
+        self.assertEqual(
+            '.bTag is deprecated, use .find("b") instead.',
+            str(w[0].message))
 
     def test_has_attr(self):
         """has_attr() checks for the presence of an attribute.

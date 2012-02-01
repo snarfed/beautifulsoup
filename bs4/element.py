@@ -1,6 +1,7 @@
 import collections
 import re
 import sys
+import warnings
 from bs4.dammit import EntitySubstitution
 
 DEFAULT_OUTPUT_ENCODING = "utf-8"
@@ -618,7 +619,12 @@ class Tag(PageElement):
     def __getattr__(self, tag):
         #print "Getattr %s.%s" % (self.__class__, tag)
         if len(tag) > 3 and tag.endswith('Tag'):
-            return self.find(tag[:-3])
+            # BS3: soup.aTag -> "soup.find("a")
+            tag_name = tag[:-3]
+            warnings.warn(
+                '.%sTag is deprecated, use .find("%s") instead.' % (
+                    tag_name, tag_name))
+            return self.find(tag_name)
         # We special case contents to avoid recursion.
         elif not tag.startswith("__") and not tag=="contents":
             return self.find(tag)
