@@ -302,38 +302,38 @@ class PageElement(object):
     #NavigableStrings and Tags.
     @property
     def next_elements(self):
-        i = self
+        i = self.next_element
         while i is not None:
-            i = i.next_element
             yield i
+            i = i.next_element
 
     @property
     def next_siblings(self):
-        i = self
+        i = self.next_sibling
         while i is not None:
-            i = i.next_sibling
             yield i
+            i = i.next_sibling
 
     @property
     def previous_elements(self):
-        i = self
+        i = self.previous_element
         while i is not None:
-            i = i.previous_element
             yield i
+            i = i.previous_element
 
     @property
     def previous_siblings(self):
-        i = self
+        i = self.previous_sibling
         while i is not None:
-            i = i.previous_sibling
             yield i
+            i = i.previous_sibling
 
     @property
     def parents(self):
-        i = self
+        i = self.parent
         while i is not None:
-            i = i.parent
             yield i
+            i = i.parent
 
     # Old non-property versions of the generators, for backwards
     # compatibility with BS3.

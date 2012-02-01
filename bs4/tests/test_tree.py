@@ -357,15 +357,9 @@ class TestNextOperations(ProximityTest):
         start = self.tree.find(text="Two")
         successors = [node for node in start.next_elements]
         # There are two successors: the final <b> tag and its text contents.
-        # Then we go off the end.
-        tag, contents, none = successors
+        tag, contents = successors
         self.assertEqual(tag['id'], '3')
         self.assertEqual(contents, "Three")
-        self.assertEqual(none, None)
-
-        # XXX Should next_elements really return None? Seems like it
-        # should just stop.
-
 
 class TestPreviousOperations(ProximityTest):
 
@@ -410,16 +404,12 @@ class TestPreviousOperations(ProximityTest):
         predecessors = [node for node in start.previous_elements]
 
         # There are four predecessors: the <b> tag containing "One"
-        # the <body> tag, the <head> tag, and the <html> tag. Then we
-        # go off the end.
-        b, body, head, html, none = predecessors
+        # the <body> tag, the <head> tag, and the <html> tag.
+        b, body, head, html = predecessors
         self.assertEqual(b['id'], '1')
         self.assertEqual(body.name, "body")
         self.assertEqual(head.name, "head")
         self.assertEqual(html.name, "html")
-        self.assertEqual(none, None)
-
-        # Again, we shouldn't be returning None.
 
 
 class SiblingTest(TreeTest):
