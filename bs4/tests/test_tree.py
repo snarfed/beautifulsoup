@@ -540,7 +540,7 @@ class TestTagCreation(SoupTest):
         soup = self.soup("")
         new_tag = soup.new_tag("foo", bar="baz")
         self.assertTrue(isinstance(new_tag, Tag))
-        self.assertEqual("foo", new_tag)
+        self.assertEqual("foo", new_tag.name)
         self.assertEqual(dict(bar="baz"), new_tag.attrs)
         self.assertEqual(None, new_tag.parent)
 

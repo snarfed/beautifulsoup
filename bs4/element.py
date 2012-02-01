@@ -440,13 +440,18 @@ class Tag(PageElement):
 
     """Represents a found HTML tag with its attributes and contents."""
 
-    def __init__(self, parser, builder, name, attrs=None, parent=None,
-                 previous=None):
+    def __init__(self, parser=None, builder=None, name=None, attrs=None,
+                 parent=None, previous=None):
         "Basic constructor."
 
-        # We don't actually store the parser object: that lets extracted
-        # chunks be garbage-collected.
-        self.parser_class = parser.__class__
+        if parser is None:
+            self.parser_class = None
+        else:
+            # We don't actually store the parser object: that lets extracted
+            # chunks be garbage-collected.
+            self.parser_class = parser.__class__
+        if name is None:
+            raise ValueError("No value provided for new tag's name.")
         self.name = name
         if attrs is None:
             attrs = {}
@@ -458,9 +463,13 @@ class Tag(PageElement):
         self.hidden = False
 
         # Set up any substitutions, such as the charset in a META tag.
-        self.contains_substitutions = builder.set_up_substitutions(self)
+        if builder is not None:
+            self.contains_substitutions = builder.set_up_substitutions(self)
 
-        self.can_be_empty_element = builder.can_be_empty_element(name)
+            self.can_be_empty_element = builder.can_be_empty_element(name)
+        else:
+            self.contains_substitutions = False
+            self.can_be_empty_element = False
 
     parserClass = _alias("parser_class")  # BS3
 
