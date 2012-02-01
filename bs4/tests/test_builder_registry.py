@@ -51,10 +51,6 @@ class BuiltInRegistryTest(unittest.TestCase):
         self.assertEqual(registry.lookup('html.parser'),
                           HTMLParserTreeBuilder)
 
-    def test_unimplemented_combinations(self):
-        self.assertEqual(registry.lookup('fast', 'permissive', 'html'),
-                          None)
-
     def test_beautifulsoup_constructor_does_lookup(self):
         # You can pass in a string.
         BeautifulSoup("", features="html")
