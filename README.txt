@@ -42,12 +42,16 @@ code and plug in any HTML or XML parser you want.
 
 Beautiful Soup 4.0 comes with glue code for four parsers:
 
- * Python's standard HTMLParser
+ * Python's standard HTMLParser (html.parser in Python 3)
  * lxml's HTML and XML parsers
  * html5lib's HTML parser
 
 HTMLParser is the default, but I recommend you install one of the
 other parsers, or you'll have problems handling real-world markup.
+
+For complete documentation, see the Sphinx documentation in
+docs/source. What follows is a summary of the changes from Beautiful
+Soup 3.
 
 == The module name has changed ==
 
@@ -122,7 +126,7 @@ names, and turned into properties:
  * nextSiblingGenerator() -> next_siblings
  * previousGenerator() -> previous_elements
  * previousSiblingGenerator() -> previous_siblings
- * recursiveChildGenerator() -> recursive_children
+ * recursiveChildGenerator() -> descendants
  * parentGenerator() -> parents
 
 So instead of this:

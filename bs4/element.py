@@ -271,11 +271,11 @@ class PageElement(object):
         if isinstance(name, SoupStrainer):
             strainer = name
         elif text is None and not limit and not attrs and not kwargs:
-            # findAll*(True)
+            # Optimization to find all tags.
             if name is True or name is None:
                 return [element for element in generator
                         if isinstance(element, Tag)]
-            # findAll*('tag-name')
+            # Optimization to find all tags with a given name.
             elif isinstance(name, basestring):
                 return [element for element in generator
                         if isinstance(element, Tag) and element.name == name]

@@ -1,3 +1,9 @@
+soup.new_tar("<br>") should create an empty-element tag if the soup
+was created with an HTML-aware builder, but not otherwise. This
+requires keeping around information about the builder.
+
+Is whitespace being processed correctly?
+
 if len(tag) > 3 and tag.endswith('Tag'): -> endswith('_tag')
 markup_attr_map can be optimized since it's always a map now.
 Can we get rid of isList?
