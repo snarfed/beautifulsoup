@@ -534,6 +534,17 @@ class TestPreviousSibling(SiblingTest):
         self.assertEqual(start.find_previous_sibling(text="nonesuch"), None)
 
 
+class TestTagCreation(SoupTest):
+    """Test the ability to create new tags."""
+    def test_new_tag(self):
+        soup = self.soup("")
+        new_tag = soup.new_tag("foo", bar="baz")
+        self.assertTrue(isinstance(new_tag, Tag))
+        self.assertEqual("foo", new_tag)
+        self.assertEqual(dict(bar="baz"), new_tag.attrs)
+        self.assertEqual(None, new_tag.parent)
+
+
 class TestTreeModification(SoupTest):
 
     def test_attribute_modification(self):

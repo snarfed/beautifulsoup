@@ -193,6 +193,10 @@ class BeautifulSoup(Tag):
         self.tagStack = []
         self.pushTag(self)
 
+    def new_tag(self, name, **attrs):
+        """Create a new tag associated with this soup."""
+        return Tag(None, None, name, attrs)
+
     def popTag(self):
         tag = self.tagStack.pop()
         #print "Pop", tag.name

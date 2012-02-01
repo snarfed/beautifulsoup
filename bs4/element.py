@@ -76,7 +76,7 @@ class PageElement(object):
         #Find the two elements that would be next to each other if
         #this element (and any children) hadn't been parsed. Connect
         #the two.
-        last_child = self._last_recursive_child()
+        last_child = self._last_descendant()
         next_element = last_child.next_element
 
         if self.previous_element:
@@ -94,14 +94,14 @@ class PageElement(object):
         self.previous_sibling = self.next_sibling = None
         return self
 
-    def _last_recursive_child(self):
+    def _last_descendant(self):
         "Finds the last element beneath this object to be parsed."
         last_child = self
         while hasattr(last_child, 'contents') and last_child.contents:
             last_child = last_child.contents[-1]
         return last_child
     # BS3: Not part of the API!
-    _lastRecursiveChild = _last_recursive_child
+    _lastRecursiveChild = _last_descendant
 
     def insert(self, position, new_child):
         if (isinstance(new_child, basestring)
@@ -130,11 +130,11 @@ class PageElement(object):
             previous_child = self.contents[position - 1]
             new_child.previous_sibling = previous_child
             new_child.previous_sibling.next_sibling = new_child
-            new_child.previous_element = previous_child._last_recursive_child()
+            new_child.previous_element = previous_child._last_descendant()
         if new_child.previous:
             new_child.previous_element.next_element = new_child
 
-        new_childs_last_element = new_child._last_recursive_child()
+        new_childs_last_element = new_child._last_descendant()
 
         if position >= len(self.contents):
             new_child.next_sibling = None
@@ -504,20 +504,29 @@ class Tag(PageElement):
         self.clear()
         self.append(string)
 
-    def get_text(self, separator=u"", strip=False):
-        """
-        Get all child strings, concatenated using the given separator
-        """
-        if strip:
-            return separator.join(string.strip()
-                for string in self.recursive_children
-                if isinstance(string, NavigableString) and string.strip())
-        else:
-            return separator.join(string
-                for string in self.recursive_children
-                if isinstance(string, NavigableString))
-    getText = get_text
+    def _all_strings(self, strip=False):
+        """Yield all child strings, possibly stripping them."""
+        for descendant in self.descendants:
+            if not isinstance(descendant, NavigableString):
+                continue
+            if strip:
+                descendant = descendant.strip()
+                if len(descendant) == 0:
+                    continue
+            yield descendant
+    strings = property(_all_strings)
 
+    @property
+    def stripped_strings(self):
+        for string in self._all_strings(True):
+            yield string
+
+    def get_text(self, separator="", strip=False):
+        """
+        Get all child strings, concatenated using the given separator.
+        """
+        return separator.join([s for s in self._all_strings(strip)])
+    getText = get_text
     text = property(get_text)
 
     def decompose(self):
@@ -774,7 +783,7 @@ class Tag(PageElement):
         callable that takes a string and returns whether or not the
         string matches for some custom definition of 'matches'. The
         same is true of the tag name."""
-        generator = self.recursive_children
+        generator = self.descendants
         if not recursive:
             generator = self.children
         return self._find_all(name, attrs, text, limit, generator, **kwargs)
@@ -788,10 +797,10 @@ class Tag(PageElement):
         return iter(self.contents)  # XXX This seems to be untested.
 
     @property
-    def recursive_children(self):
+    def descendants(self):
         if not len(self.contents):
             return
-        stopNode = self._last_recursive_child().next_element
+        stopNode = self._last_descendant().next_element
         current = self.contents[0]
         while current is not stopNode:
             yield current
@@ -802,7 +811,7 @@ class Tag(PageElement):
         return self.children
 
     def recursiveChildGenerator(self):
-        return self.recursive_children
+        return self.descendants
 
     # This was kind of misleading because has_key() (attributes) was
     # different from __in__ (contents). has_key() is gone in Python 3,
