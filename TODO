@@ -6,6 +6,9 @@ Bugs
 * Characters like & < > should always be converted to HTML entities on
   output, even if substitute_html_entities is False.
 
+* html5lib doesn't support SoupStrainers, which is OK, but there
+  should be a warning about it.
+
 Big features
 ------------
 

@@ -96,7 +96,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
 
 class LXMLTreeBuilder(HTMLTreeBuilder, LXMLTreeBuilderForXML):
 
-    features = [LXML, HTML, FAST]
+    features = [LXML, HTML, FAST, PERMISSIVE]
     is_xml = False
 
     @property
