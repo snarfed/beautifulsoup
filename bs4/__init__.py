@@ -69,7 +69,7 @@ class BeautifulSoup(Tag):
 
     # If the end-user gives no indication which tree builder they
     # want, look for one with these features.
-    DEFAULT_BUILDER_FEATURES = ['html']
+    DEFAULT_BUILDER_FEATURES = ['html', 'fast']
 
     # Used when determining whether a text node is all whitespace and
     # can be replaced with a single space. A text node that contains
