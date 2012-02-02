@@ -6,10 +6,10 @@ except ImportError:
     # 2.x
     from distutils.command.build_py import build_py
 
-setup(name="BeautifulSoup4",
+setup(name="beautifulsoup4",
     version="4.0b3",
     author="Leonard Richardson",
-    url="http://www.crummy.com/software/BeautifulSoup/",
+    url="http://www.crummy.com/software/BeautifulSoup/bs4/",
     packages=['bs4', 'bs4.builder', 'bs4.tests'],
     cmdclass = {'build_py':build_py},
     classifiers=[

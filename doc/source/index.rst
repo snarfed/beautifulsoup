@@ -140,25 +140,22 @@ Installing Beautiful Soup
 =========================
 
 Beautiful Soup 4 is published through PyPi, so you can install it with
-`easy_install`. If you're on the Python 2 series, the package name
-is `beautifulsoup4`.
+``easy_install``. The package name is ``beautifulsoup4``, and the same
+package works on Python 2 and Python 3.
 
 :kbd:`$ easy_install beautifulsoup4`
 
-If you're using the Python 3 series, the package name is `beautifulsoup4py3k`.
-
-:kbd:`$ easy_install-3.2 install beautifulsoup4py3k`
-
-(The `beautifulsoup` package is probably `not` what you want. That's
+(The ``BeautifulSoup`` package is probably `not` what you want. That's
 the previous major release, `Beautiful Soup 3`_. Lots of software uses
 BS3, so it's still available, but if you're writing new code you
-should install `beautifulsoup4`.)
+should install ``beautifulsoup4``.)
 
 You can also `download the Beautiful Soup 4 source tarball
-<http://www.crummy.com/software/BeautifulSoup/download/BeautifulSoup.tar.gz>`_,
-which includes both the Python 2 and Python 3 versions. The license
-for Beautiful Soup allows you to package the entire library with your
-application, and that might be the easiest thing for you to do.
+<http://www.crummy.com/software/BeautifulSoup/download/BeautifulSoup.tar.gz>`_
+and install it with ``setup.py``. The license for Beautiful Soup
+allows you to package the entire library with your application, so you
+can also download the tarball and insert the ``bs4`` directory into
+your application's codebase.
 
 I use Python 2.7 and Python 3.2 to develop Beautiful Soup, but it
 should work with other recent versions.
@@ -178,18 +175,16 @@ built-in parser.
 
 Depending on your setup, you might install lxml with one of these commands:
 
-:kbd:`$ sudo apt-get install python-lxml`
+:kbd:`$ apt-get install python-lxml`
 
 :kbd:`$ easy_install lxml`
-
-:kbd:`$ easy_install-3.2 lxml`
 
 If you're using Python 2, another alternative is the pure-Python
 `html5lib parser <http://code.google.com/p/html5lib/>`_, which parses
 HTML the way a web browser does. Depending on your setup, you might
 install html5lib with one of these commands:
 
-:kbd:`$ sudo apt-get install python-html5lib`
+:kbd:`$ apt-get install python-html5lib`
 
 :kbd:`$ easy_install html5lib`
 
@@ -2098,25 +2093,24 @@ Beautiful Soup 3.2.0 is the old version, the last release of the
 Beautiful Soup 3 series. It's currently the version packaged with all
 major Linux distributions::
 
- $ sudo apt-get install python-beautifulsoup
- $ [XXX need syntax for RPM]
+ $ apt-get install python-beautifulsoup
 
-It's also published through PyPi as `beautifulsoup`.::
+It's also published through PyPi as `BeautifulSoup`.::
 
- $ easy_install beautifulsoup
+ $ easy_install BeautifulSoup
 
 You can also `download a tarball of Beautiful Soup 3.2.0
-<http://www.crummy.com/software/BeautifulSoup/download/3.x/BeautifulSoup-3.2.0.tar.gz>`_.
+<http://www.crummy.com/software/BeautifulSoup/bs3/download/3.x/BeautifulSoup-3.2.0.tar.gz>`_.
 
-If you ran ``easy_install beautifulsoup`` but your code doesn't work,
-you installed Beautiful Soup 3 by mistake. You need to run
-``easy_install beautifulsoup4``.
+If you ran ``easy_install beautifulsoup`` or ``easy_install
+BeautifulSoup``, but your code doesn't work, you installed Beautiful
+Soup 3 by mistake. You need to run ``easy_install beautifulsoup4``.
 
 `The documentation for Beautiful Soup 3 is archived online
-<http://www.crummy.com/software/BeautifulSoup/documentation.3.html>`_. If
+<http://www.crummy.com/software/BeautifulSoup/bs3/documentation.html>`_. If
 your first language is Chinese, it might be easier for you to read
 `the Chinese translation of the Beautiful Soup 3 documentation
-<http://www.crummy.com/software/BeautifulSoup/documentation.3.zh.html>`_,
+<http://www.crummy.com/software/BeautifulSoup/bs3/documentation.zh.html>`_,
 then read this document to find out about the changes made in
 Beautiful Soup 4.
 
@@ -2144,7 +2138,7 @@ Beautiful Soup 3 installed.
 Although BS4 is almost entirely backwards-compatible with BS3, most of
 its methods have been deprecated and given new names for PEP 8
 compliance. There are numerous other renames and changes, a few of
-which break backwards compatibility. 
+which break backwards compatibility.
 
 Here are the changes:
 
