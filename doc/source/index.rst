@@ -19,6 +19,18 @@ violates your expectations.
 The examples in this documentation should work the same way in Python
 2.7 and Python 3.2.
 
+You might be looking for the documentation for `Beautiful Soup 3
+<http://www.crummy.com/software/BeautifulSoup/bs3/documentation.html>`_. If
+you want to learn about the differences between Beautiful Soup 3 and
+Beautiful Soup 4, see `Porting code to BS4`_.
+
+Getting help
+------------
+
+If you have questions about Beautiful Soup, or run into problems,
+`send mail to the discussion group
+<http://groups.google.com/group/beautifulsoup/>`_.
+
 Quick Start
 ===========
 
@@ -151,7 +163,7 @@ BS3, so it's still available, but if you're writing new code you
 should install ``beautifulsoup4``.)
 
 You can also `download the Beautiful Soup 4 source tarball
-<http://www.crummy.com/software/BeautifulSoup/download/BeautifulSoup.tar.gz>`_
+<http://www.crummy.com/software/BeautifulSoup/download/beautifulsoup4.tar.gz>`_
 and install it with ``setup.py``. The license for Beautiful Soup
 allows you to package the entire library with your application, so you
 can also download the tarball and insert the ``bs4`` directory into
@@ -1951,7 +1963,7 @@ entities::
  # u'<p>I just &#x201C;love&#x201D; Microsoft Word</p>'
 
 You might find this feature useful, but Beautiful Soup doesn't use
-it. Beautiful Soup prefers the default behavior, which is toconvert
+it. Beautiful Soup prefers the default behavior, which is to convert
 Microsoft smart quotes to Unicode characters along with everything
 else::
 
@@ -2073,7 +2085,7 @@ you're not using lxml as the underlying parser, my advice is to
 :ref:`start <parser-installation>`. Beautiful Soup parses documents
 significantly faster using lxml than using html.parser or html5lib.
 
-Sometimes `Unicode, Dammit` can only detect the encoding of a file by
+Sometimes `Unicode, Dammit`_ can only detect the encoding of a file by
 doing a byte-by-byte examination of the file. This slows Beautiful
 Soup to a crawl. My tests indicate that this only happened on 2.x
 versions of Python, and that it happened most often with documents
@@ -2127,20 +2139,30 @@ becomes this::
 
   from bs4 import BeautifulSoup
 
-If you get the ``ImportError`` "No module named BeautifulSoup", your
-problem is that you're trying to run Beautiful Soup 3 code, but you
-only have Beautiful Soup 4 installed.
+* If you get the ``ImportError`` "No module named BeautifulSoup", your
+  problem is that you're trying to run Beautiful Soup 3 code, but you
+  only have Beautiful Soup 4 installed.
 
-If you get the ``ImportError`` "No module named bs4", your problem is
-that you're trying to run Beautiful Soup 4 code, but you only have
-Beautiful Soup 3 installed.
+* If you get the ``ImportError`` "No module named bs4", your problem
+  is that you're trying to run Beautiful Soup 4 code, but you only
+  have Beautiful Soup 3 installed.
 
-Although BS4 is almost entirely backwards-compatible with BS3, most of
-its methods have been deprecated and given new names for PEP 8
-compliance. There are numerous other renames and changes, a few of
-which break backwards compatibility.
+Although BS4 is mostly backwards-compatible with BS3, most of its
+methods have been deprecated and given new names for `PEP 8 compliance
+<http://www.python.org/dev/peps/pep-0008/>`_. There are numerous other
+renames and changes, and a few of them break backwards compatibility.
 
-Here are the changes:
+Here's what you'll need to know to convert your BS3 code and habits to BS4:
+
+You need a parser
+^^^^^^^^^^^^^^^^^
+
+Beautiful Soup 3 used Python's ``SGMLParser``, a module that was
+deprecated and removed in Python 3.0. Beautiful Soup 4 uses
+``html.parser`` by default, but you can plug in lxml or html5lib and
+use that instead. Until ``html.parser`` is improved to handle
+real-world HTML better, that's what I recommend you do. See `Be sure
+to install a good parser!`_
 
 Method names
 ^^^^^^^^^^^^
@@ -2210,7 +2232,7 @@ You can write this::
 
 (But the old code will still work.)
 
-Some of the generators used to yield None after they were done, and
+Some of the generators used to yield ``None`` after they were done, and
 then stop. That was a bug. Now the generators just stop.
 
 There are two new generators, :ref:`.strings and
@@ -2235,6 +2257,22 @@ Beautiful Soup considers any empty tag to be an empty-element tag. If
 you add a child to an empty-element tag, it stops being an
 empty-element tag.
 
+Entities
+^^^^^^^^
+
+An incoming HTML or XML entity is always converted into the
+corresponding Unicode character. Beautiful Soup 3 had a number of
+overlapping ways of dealing with entities, which have been
+removed. The ``BeautifulSoup`` constructor no longer recognizes the
+``smartQuotesTo`` or ``convertEntities`` arguments. (`Unicode,
+Dammit`_ still has ``smart_quotes_to``, but its default is now to turn
+smart quotes into Unicode.)
+
+If you want to turn those Unicode characters back into HTML entities
+on output, rather than turning them into UTF-8 characters, you need to
+use ``.encode``, as described in `Substituting HTML entities`. This
+may change before the final release.
+
 Miscellaneous
 ^^^^^^^^^^^^^
 
@@ -2242,12 +2280,11 @@ Miscellaneous
 contains a single tag B and nothing else, then A.string is the same as
 B.string. (Previously, it was None.)
 
-An incoming HTML or XML entity is always converted into the
-corresponding Unicode character. The ``BeautifulSoup`` constructor no
-longer recognizes the ``smartQuotesTo`` or ``convertEntities``
-arguments. (`Unicode, Dammit`_ still has ``smart_quotes_to``, but its
-default is now to turn smart quotes into Unicode.)
-
 The ``BeautifulSoup`` constructor no longer recognizes the
 `markupMassage` argument. It's now the parser's responsibility to
 handle markup correctly.
+
+The rarely-used alternate parser classes like
+``ICantBelieveItsBeautifulSoup`` and ``BeautifulSOAP`` have been
+removed. It's now the parser's decision how to handle ambiguous
+markup.

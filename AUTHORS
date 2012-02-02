@@ -3,16 +3,18 @@ Behold, mortal, the origins of Beautiful Soup...
 
 Leonard Richardson is the primary programmer.
 
-Sam Ruby helps with a lot of edge cases.
+Aaron DeVore is awesome.
 
 Mark Pilgrim provided the encoding detection code that forms the base
 of UnicodeDammit.
 
+Thomas Kluyver and Ezio Melotti finished the work of getting Beautiful
+Soup 4 working under Python 3.
+
+Sam Ruby helped with a lot of edge cases.
+
 Jonathan Ellis was awarded the prestigous Beau Potage D'Or for his
 work in solving the nestable tags conundrum.
-
-Thomas Kluyver finished the work of getting Beautiful Soup 4 working
-under Python 3.
 
 The following people have contributed patches to Beautiful Soup:
 
