@@ -47,6 +47,8 @@ class PageElement(object):
     def replace_with(self, replace_with):
         if replace_with is self:
             return
+        if replace_with is self.parent:
+            raise ValueError("Cannot replace a Tag with its parent.")
         old_parent = self.parent
         my_index = self.parent.index(self)
         if (hasattr(replace_with, 'parent')
@@ -59,6 +61,7 @@ class PageElement(object):
                 my_index -= 1
         self.extract()
         old_parent.insert(my_index, replace_with)
+        return self
     replaceWith = replace_with  # BS3
 
     def replace_with_children(self):
@@ -67,6 +70,7 @@ class PageElement(object):
         self.extract()
         for child in reversed(self.contents[:]):
             my_parent.insert(my_index, child)
+        return self
     replaceWithChildren = replace_with_children  # BS3
 
     def extract(self):
@@ -105,6 +109,8 @@ class PageElement(object):
     _lastRecursiveChild = _last_descendant
 
     def insert(self, position, new_child):
+        if new_child == self:
+            raise ValueError("Cannot insert a tag into itself.")
         if (isinstance(new_child, basestring)
             and not isinstance(new_child, NavigableString)):
             new_child = NavigableString(new_child)

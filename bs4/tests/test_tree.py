@@ -577,12 +577,36 @@ class TestTreeModification(SoupTest):
                 '<p id="1">Don\'t leave me .</p>\n'
                 '<p id="2">Don\'t leave!<b>here</b></p>'))
 
+    def test_replace_with_returns_thing_that_was_replaced(self):
+        text = "<a></a><b><c></c></b>"
+        soup = self.soup(text)
+        a = soup.a
+        new_a = a.replace_with(soup.c)
+        self.assertEqual(a, new_a)
+
+    def test_replace_with_children_returns_thing_that_was_replaced(self):
+        text = "<a><b></b><c></c></a>"
+        soup = self.soup(text)
+        a = soup.a
+        new_a = a.replace_with_children()
+        self.assertEqual(a, new_a)
+
     def test_replace_tag_with_itself(self):
         text = "<a><b></b><c>Foo<d></d></c></a><a><e></e></a>"
         soup = self.soup(text)
         c = soup.c
         soup.c.replace_with(c)
         self.assertEqual(soup.decode(), self.document_for(text))
+
+    def test_replace_tag_with_its_parent_raises_exception(self):
+        text = "<a><b></b></a>"
+        soup = self.soup(text)
+        self.assertRaises(ValueError, soup.b.replace_with, soup.a)
+
+    def test_insert_tag_into_itself_raises_exception(self):
+        text = "<a><b></b></a>"
+        soup = self.soup(text)
+        self.assertRaises(ValueError, soup.a.insert, 0, soup.a)
 
     def test_replace_final_node(self):
         soup = self.soup("<b>Argh!</b>")
