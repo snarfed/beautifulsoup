@@ -163,7 +163,7 @@ BS3, so it's still available, but if you're writing new code you
 should install ``beautifulsoup4``.)
 
 You can also `download the Beautiful Soup 4 source tarball
-<http://www.crummy.com/software/BeautifulSoup/download/beautifulsoup4.tar.gz>`_
+<http://www.crummy.com/software/BeautifulSoup/download/4.x/beautifulsoup4-4.0.0b3.tar.gz>`_
 and install it with ``setup.py``. The license for Beautiful Soup
 allows you to package the entire library with your application, so you
 can also download the tarball and insert the ``bs4`` directory into
@@ -1588,7 +1588,8 @@ and replaces it with the tag or string of your choice::
   a_tag
   # <a href="http://example.com/">I linked to <b>example.net</b></a>
 
-The removed tag or string is gone forever.
+``replace_with()`` returns the tag or string that was replaced, so
+that you can examine it or add it back to another part of the tree.
 
 ``replace_with_children()``
 ---------------------------
@@ -1604,6 +1605,8 @@ that tag. It's good for stripping out markup::
   a_tag
   # <a href="http://example.com/">I linked to example.com</a>
 
+Like ``replace_with()``, ``replace_with_children()`` returns the tag
+that was replaced.
 
 Output
 ======
@@ -2198,7 +2201,7 @@ I renamed one attribute to use more accurate terminology:
 * ``Tag.isSelfClosing`` -> ``Tag.is_empty_element``
 
 I renamed three attributes to avoid using words that have special
-meaning to Python. Unlike the others, these changs are *not backwards
+meaning to Python. Unlike the others, these changes are *not backwards
 compatible.* If you used these attributes in BS3, your code will break
 on BS4 until you change them.
 
