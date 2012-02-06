@@ -4,12 +4,22 @@ __all__ = [
     'HTMLParserTreeBuilder',
     ]
 
-try:
-    from html.parser import HTMLParser
-    CONSTRUCTOR_TAKES_STRICT = True
-except ImportError, e:
-    from HTMLParser import HTMLParser
-    CONSTRUCTOR_TAKES_STRICT = False
+from HTMLParser import HTMLParser
+import sys
+
+# Starting in Python 3.2, the HTMLParser constructor takes a 'strict'
+# argument, which we'd like to set to False. Unfortunately,
+# http://bugs.python.org/issue13273 makes strict=True a better bet
+# before Python 3.2.3.
+#
+# At the end of this file, we monkeypatch HTMLParser so that
+# strict=True works well on Python 3.2.2.
+major, minor, release = sys.version_info[:3]
+CONSTRUCTOR_TAKES_STRICT = (
+    major > 3
+    or (major == 3 and minor > 2)
+    or (major == 3 and minor == 2 and release >= 3))
+
 from bs4.element import (
     CData,
     Comment,
@@ -35,7 +45,7 @@ class HTMLParserTreeBuilder(HTMLParser, HTMLTreeBuilder):
 
     def __init__(self, *args, **kwargs):
         if CONSTRUCTOR_TAKES_STRICT:
-            kwargs['strict'] = True
+            kwargs['strict'] = False
         return super(HTMLParserTreeBuilder, self).__init__(*args, **kwargs)
 
     def prepare_markup(self, markup, user_specified_encoding=None,
@@ -108,3 +118,96 @@ class HTMLParserTreeBuilder(HTMLParser, HTMLTreeBuilder):
         self.soup.handle_data(data)
         self.soup.endData(ProcessingInstruction)
 
+# Patch 3.2 versions of HTMLParser earlier than 3.2.3 to use some
+# 3.2.3 code. This ensures they don't treat markup like <p></p> as a
+# string.
+#
+# XXX This code can be removed once most Python 3 users are on 3.2.3.
+if major == 3 and minor == 2 and not CONSTRUCTOR_TAKES_STRICT:
+    import re
+    attrfind_tolerant = re.compile(
+        r'\s*((?<=[\'"\s])[^\s/>][^\s/=>]*)(\s*=+\s*'
+        r'(\'[^\']*\'|"[^"]*"|(?![\'"])[^>\s]*))?')
+    HTMLParserTreeBuilder.attrfind_tolerant = attrfind_tolerant
+
+    locatestarttagend = re.compile(r"""
+  <[a-zA-Z][-.a-zA-Z0-9:_]*          # tag name
+  (?:\s+                             # whitespace before attribute name
+    (?:[a-zA-Z_][-.:a-zA-Z0-9_]*     # attribute name
+      (?:\s*=\s*                     # value indicator
+        (?:'[^']*'                   # LITA-enclosed value
+          |\"[^\"]*\"                # LIT-enclosed value
+          |[^'\">\s]+                # bare value
+         )
+       )?
+     )
+   )*
+  \s*                                # trailing whitespace
+""", re.VERBOSE)
+    HTMLParserTreeBuilder.locatestarttagend = locatestarttagend
+
+    from html.parser import tagfind, attrfind
+
+    def parse_starttag(self, i):
+        self.__starttag_text = None
+        endpos = self.check_for_whole_start_tag(i)
+        if endpos < 0:
+            return endpos
+        rawdata = self.rawdata
+        self.__starttag_text = rawdata[i:endpos]
+
+        # Now parse the data between i+1 and j into a tag and attrs
+        attrs = []
+        match = tagfind.match(rawdata, i+1)
+        assert match, 'unexpected call to parse_starttag()'
+        k = match.end()
+        self.lasttag = tag = rawdata[i+1:k].lower()
+        while k < endpos:
+            if self.strict:
+                m = attrfind.match(rawdata, k)
+            else:
+                m = attrfind_tolerant.match(rawdata, k)
+            if not m:
+                break
+            attrname, rest, attrvalue = m.group(1, 2, 3)
+            if not rest:
+                attrvalue = None
+            elif attrvalue[:1] == '\'' == attrvalue[-1:] or \
+                 attrvalue[:1] == '"' == attrvalue[-1:]:
+                attrvalue = attrvalue[1:-1]
+            if attrvalue:
+                attrvalue = self.unescape(attrvalue)
+            attrs.append((attrname.lower(), attrvalue))
+            k = m.end()
+
+        end = rawdata[k:endpos].strip()
+        if end not in (">", "/>"):
+            lineno, offset = self.getpos()
+            if "\n" in self.__starttag_text:
+                lineno = lineno + self.__starttag_text.count("\n")
+                offset = len(self.__starttag_text) \
+                         - self.__starttag_text.rfind("\n")
+            else:
+                offset = offset + len(self.__starttag_text)
+            if self.strict:
+                self.error("junk characters in start tag: %r"
+                           % (rawdata[k:endpos][:20],))
+            self.handle_data(rawdata[i:endpos])
+            return endpos
+        if end.endswith('/>'):
+            # XHTML-style empty tag: <span attr="value" />
+            self.handle_startendtag(tag, attrs)
+        else:
+            self.handle_starttag(tag, attrs)
+            if tag in self.CDATA_CONTENT_ELEMENTS:
+                self.set_cdata_mode(tag)
+        return endpos
+
+    def set_cdata_mode(self, elem):
+        self.cdata_elem = elem.lower()
+        self.interesting = re.compile(r'</\s*%s\s*>' % self.cdata_elem, re.I)
+
+    HTMLParserTreeBuilder.parse_starttag = parse_starttag
+    HTMLParserTreeBuilder.set_cdata_mode = set_cdata_mode
+
+    CONSTRUCTOR_TAKES_STRICT = True

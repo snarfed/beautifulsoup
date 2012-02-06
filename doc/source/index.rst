@@ -1520,8 +1520,8 @@ say. It works just like ``.insert()`` on a Python list::
 ``extract()``
 -------------
 
-``PageElement.extract()`` removes a tag or string from the tree, and
-returns it::
+``PageElement.extract()`` removes a tag or string from the tree. It
+returns the tag or string that was extracted::
 
   markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
   soup = BeautifulSoup(markup)

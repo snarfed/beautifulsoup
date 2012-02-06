@@ -1,3 +1,14 @@
+Tag.insert_before() and Tag.insert_after()
+
+Also, I think you can avoid the variable altogether by having repr
+return the version without substituting the html entities. This seems
+fine because a truly canonical representation of the object itself
+would not be all that useful compared to the unicode
+representation. Of course, this breaks anything
+
+---------------------
+
+
 Bugs
 ----
 
