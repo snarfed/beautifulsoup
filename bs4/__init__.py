@@ -197,6 +197,12 @@ class BeautifulSoup(Tag):
         """Create a new tag associated with this soup."""
         return Tag(None, None, name, attrs)
 
+    def new_string(self, s):
+        """Create a new NavigableString associated with this soup."""
+        navigable = NavigableString(s)
+        navigable.setup()
+        return navigable
+
     def popTag(self):
         tag = self.tagStack.pop()
         #print "Pop", tag.name

@@ -1,21 +1,7 @@
-Tag.insert_before() and Tag.insert_after()
-
-Also, I think you can avoid the variable altogether by having repr
-return the version without substituting the html entities. This seems
-fine because a truly canonical representation of the object itself
-would not be all that useful compared to the unicode
-representation. Of course, this breaks anything
-
----------------------
-
-
 Bugs
 ----
 
 * I think whitespace may not be processed correctly.
-
-* Characters like & < > should always be converted to HTML entities on
-  output, even if substitute_html_entities is False.
 
 * html5lib doesn't support SoupStrainers, which is OK, but there
   should be a warning about it.

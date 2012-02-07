@@ -190,6 +190,34 @@ class PageElement(object):
         """Appends the given tag to the contents of this tag."""
         self.insert(len(self.contents), tag)
 
+    def insert_before(self, successor):
+        """Makes this element the immediate predecessor of the given element.
+
+        The two elements will have the same parent, and this element
+        will be immediately before the given one.
+        """
+        parent = successor.parent
+        if parent is None:
+            raise ValueError(
+                "Destination has no parent, so 'before' has no meaning.")
+        self.extract()
+        index = parent.index(successor)
+        parent.insert(index, self)
+
+    def insert_after(self, predecessor):
+        """Makes this element the immediate successor of the given element.
+
+        The two elements will have the same parent, and this element
+        will be immediately after the given one.
+        """
+        parent = predecessor.parent
+        if parent is None:
+            raise ValueError(
+                "Destination has no parent, so 'after' has no meaning.")
+        self.extract()
+        index = parent.index(predecessor)
+        parent.insert(index+1, self)
+
     def find_next(self, name=None, attrs={}, text=None, **kwargs):
         """Returns the first item that matches the given criteria and
         appears after this Tag in the document."""

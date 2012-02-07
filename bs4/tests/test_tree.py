@@ -678,6 +678,40 @@ class TestTreeModification(SoupTest):
         soup.br.insert(1, "Contents")
         self.assertEqual(str(soup.br), "<br>Contents</br>")
 
+    def test_insert_before(self):
+        soup = self.soup("<a>foo</a><b>bar</b>")
+        soup.new_string("BAZ").insert_before(soup.b)
+        soup.new_string("QUUX").insert_before(soup.a)
+        self.assertEquals(
+            soup.decode(), self.document_for("QUUX<a>foo</a>BAZ<b>bar</b>"))
+
+        soup.b.insert_before(soup.a)
+        self.assertEquals(
+            soup.decode(), self.document_for("QUUX<b>bar</b><a>foo</a>BAZ"))
+
+
+    def test_insert_after(self):
+        soup = self.soup("<a>foo</a><b>bar</b>")
+        soup.new_string("BAZ").insert_after(soup.b)
+        soup.new_string("QUUX").insert_after(soup.a)
+        self.assertEquals(
+            soup.decode(), self.document_for("<a>foo</a>QUUX<b>bar</b>BAZ"))
+        soup.a.insert_after(soup.b)
+        self.assertEquals(
+            soup.decode(), self.document_for("QUUX<b>bar</b><a>foo</a>BAZ"))
+
+    def test_insert_after_raises_valueerror_if_after_has_no_meaning(self):
+        soup = self.soup("")
+        tag = soup.new_tag("a")
+        string = soup.new_string("")
+        self.assertRaises(ValueError, string.insert_after, tag)
+
+    def test_insert_before_raises_valueerror_if_before_has_no_meaning(self):
+        soup = self.soup("")
+        tag = soup.new_tag("a")
+        string = soup.new_string("")
+        self.assertRaises(ValueError, string.insert_before, tag)
+
     def test_replace_with(self):
         soup = self.soup(
                 "<p>There's <b>no</b> business like <b>show</b> business</p>")
