@@ -934,12 +934,57 @@ class TestPersistence(SoupTest):
 
 class TestSubstitutions(SoupTest):
 
-    def test_html_entity_substitution(self):
-        soup = self.soup(
-            u"<b>Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!</b>")
-        decoded = soup.decode(substitute_html_entities=True)
+    def test_default_formatter_is_minimal(self):
+        markup = u"<b>&lt;&lt;Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;</b>"
+        soup = self.soup(markup)
+        decoded = soup.decode(formatter="minimal")
+        # The < is converted back into &lt; but the e-with-acute is left alone.
+        self.assertEqual(
+            decoded,
+            self.document_for(
+                u"<b>&lt;&lt;Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;</b>"))
+
+    def test_formatter_html(self):
+        markup = u"<b>&lt;&lt;Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;</b>"
+        soup = self.soup(markup)
+        decoded = soup.decode(formatter="html")
+        self.assertEqual(
+            decoded,
+            self.document_for("<b>&lt;&lt;Sacr&eacute; bleu!&gt;&gt;</b>"))
+
+    def test_formatter_minimal(self):
+        markup = u"<b>&lt;&lt;Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;</b>"
+        soup = self.soup(markup)
+        decoded = soup.decode(formatter="minimal")
+        # The < is converted back into &lt; but the e-with-acute is left alone.
+        self.assertEqual(
+            decoded,
+            self.document_for(
+                u"<b>&lt;&lt;Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;</b>"))
+
+    def test_formatter_null(self):
+        markup = u"<b>&lt;&lt;Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;</b>"
+        soup = self.soup(markup)
+        decoded = soup.decode(formatter=None)
+        # Neither the angle brackets nor the e-with-acute are converted.
+        # This is not valid HTML, but it's what the user wanted.
         self.assertEqual(decoded,
-                          self.document_for("<b>Sacr&eacute; bleu!</b>"))
+                          self.document_for(u"<b><<Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!>></b>"))
+
+    def test_formatter_custom(self):
+        markup = u"<b>&lt;foo&gt;</b><b>bar</b>"
+        soup = self.soup(markup)
+        decoded = soup.decode(formatter = lambda x: x.upper())
+        # Instead of normal entity conversion code, the custom
+        # callable is called on every string.
+        self.assertEqual(
+            decoded,
+            self.document_for(u"<b><FOO></b><b>BAR</b>"))
+
+    def test_prettify_accepts_formatter(self):
+        soup = BeautifulSoup("<html><body>foo</body></html>")
+        pretty = soup.prettify(formatter = lambda x: x.upper())
+        self.assertTrue(b"FOO" in pretty)
 
     def test_html_entity_substitution_off_by_default(self):
         markup = u"<b>Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!</b>"
@@ -983,7 +1028,6 @@ class TestSubstitutions(SoupTest):
         strainer = SoupStrainer('pre')
         soup = self.soup(markup, parse_only=strainer)
         self.assertEqual(soup.contents[0].name, 'pre')
-
 
 class TestEncoding(SoupTest):
     """Test the ability to encode objects into strings."""

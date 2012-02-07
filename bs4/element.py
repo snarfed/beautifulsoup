@@ -29,6 +29,24 @@ class PageElement(object):
     """Contains the navigational information for some part of the page
     (either a tag or a piece of text)"""
 
+    # There are five possible values for the "formatter" argument passed in
+    # to methods like encode() and prettify():
+    #
+    # "html" - All Unicode characters with corresponding HTML entities
+    #   are converted to those entities on output.
+    # "minimal" - Bare ampersands and angle brackets are converted to
+    #   XML entities: &amp; &lt; &gt;
+    # None - The null formatter. Unicode characters are never
+    #   converted to entities.  This is not recommended, but it's
+    #   faster than "minimal".
+    # A function - This function will be called on every string that
+    #  needs to undergo entity substition
+    FORMATTERS = {
+        "html" : EntitySubstitution.substitute_html,
+        "minimal" : EntitySubstitution.substitute_xml,
+        None : None
+        }
+
     def setup(self, parent=None, previous_element=None):
         """Sets up the initial relations between this element and
         other elements."""
@@ -396,11 +414,15 @@ class NavigableString(unicode, PageElement):
                 "'%s' object has no attribute '%s'" % (
                     self.__class__.__name__, attr))
 
-    def output_ready(self, substitute_html_entities=False):
-        if substitute_html_entities:
-            output = EntitySubstitution.substitute_html(self)
+    def output_ready(self, formatter="minimal"):
+        if not callable(formatter):
+            formatter = self.FORMATTERS.get(
+                formatter, EntitySubstitution.substitute_xml)
+        if formatter is None:
+            output = self
         else:
-            output = EntitySubstitution.substitute_xml(self)
+            output = formatter(self)
+
         return self.PREFIX + output + self.SUFFIX
 
 
@@ -673,13 +695,13 @@ class Tag(PageElement):
         __str__ = __repr__ = __unicode__
 
     def encode(self, encoding=DEFAULT_OUTPUT_ENCODING,
-               indent_level=None, substitute_html_entities=False):
+               indent_level=None, formatter="minimal"):
         return self.decode(indent_level, encoding,
-                           substitute_html_entities).encode(encoding)
+                           formatter).encode(encoding)
 
     def decode(self, indent_level=None,
                eventual_encoding=DEFAULT_OUTPUT_ENCODING,
-               substitute_html_entities=False):
+               formatter="minimal"):
         """Returns a Unicode representation of this tag and its contents.
 
         :param eventual_encoding: The tag is destined to be
@@ -720,7 +742,7 @@ class Tag(PageElement):
             space = ''
             indent_contents = None
         contents = self.decode_contents(
-            indent_contents, eventual_encoding, substitute_html_entities)
+            indent_contents, eventual_encoding, formatter)
 
         if self.hidden:
             # This is the 'document root' object.
@@ -746,12 +768,13 @@ class Tag(PageElement):
             s = ''.join(s)
         return s
 
-    def prettify(self, encoding=DEFAULT_OUTPUT_ENCODING):
-        return self.encode(encoding, True)
+    def prettify(self, encoding=DEFAULT_OUTPUT_ENCODING,
+                 formatter="minimal"):
+        return self.encode(encoding, True, formatter)
 
     def decode_contents(self, indent_level=None,
                        eventual_encoding=DEFAULT_OUTPUT_ENCODING,
-                       substitute_html_entities=False):
+                       formatter="minimal"):
         """Renders the contents of this tag as a Unicode string.
 
         :param eventual_encoding: The tag is destined to be
@@ -766,10 +789,10 @@ class Tag(PageElement):
         for c in self:
             text = None
             if isinstance(c, NavigableString):
-                text = c.output_ready(substitute_html_entities)
+                text = c.output_ready(formatter)
             elif isinstance(c, Tag):
                 s.append(c.decode(indent_level, eventual_encoding,
-                                  substitute_html_entities))
+                                  formatter))
             if text and indent_level:
                 text = text.strip()
             if text:

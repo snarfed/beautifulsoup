@@ -297,9 +297,10 @@ class BeautifulSoup(Tag):
 
     def decode(self, pretty_print=False,
                eventual_encoding=DEFAULT_OUTPUT_ENCODING,
-               substitute_html_entities=False):
+               formatter="minimal"):
         """Returns a string or Unicode representation of this document.
         To get Unicode, pass None for encoding."""
+
         if self.is_xml:
             # Print the XML declaration
             encoding_part = ''
@@ -313,8 +314,7 @@ class BeautifulSoup(Tag):
         else:
             indent_level = 0
         return prefix + super(BeautifulSoup, self).decode(
-            indent_level, eventual_encoding,
-            substitute_html_entities)
+            indent_level, eventual_encoding, formatter)
 
 
 class StopParsing(Exception):
