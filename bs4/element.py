@@ -109,7 +109,7 @@ class PageElement(object):
     _lastRecursiveChild = _last_descendant
 
     def insert(self, position, new_child):
-        if new_child == self:
+        if new_child is self:
             raise ValueError("Cannot insert a tag into itself.")
         if (isinstance(new_child, basestring)
             and not isinstance(new_child, NavigableString)):

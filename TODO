@@ -1,6 +1,3 @@
-html5lib frequently raises the "cannot insert a tag into itself"
-error, which makes me think there's a bug in the treebuilder.
-
 Tag.insert_before() and Tag.insert_after()
 
 Also, I think you can avoid the variable altogether by having repr
