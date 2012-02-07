@@ -165,7 +165,7 @@ class TestLXMLBuilder(SoupTest):
         # Both XML and HTML entities are converted to Unicode characters
         # during parsing.
         text = "<p>&lt;&lt;sacr&eacute;&#32;bleu!&gt;&gt;</p>"
-        expected = u"<p><<sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!>></p>"
+        expected = u"<p>&lt;&lt;sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;</p>"
         self.assertSoupEquals(text, expected)
 
     def test_smart_quotes_converted_on_the_way_in(self):

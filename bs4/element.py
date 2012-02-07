@@ -400,7 +400,7 @@ class NavigableString(unicode, PageElement):
         if substitute_html_entities:
             output = EntitySubstitution.substitute_html(self)
         else:
-            output = self
+            output = EntitySubstitution.substitute_xml(self)
         return self.PREFIX + output + self.SUFFIX
 
 
@@ -668,7 +668,7 @@ class Tag(PageElement):
 
     def __str__(self):
         return self.encode()
-    
+
     if PY3K:
         __str__ = __repr__ = __unicode__
 

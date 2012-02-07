@@ -149,7 +149,7 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
     def test_incomplete_declaration(self):
         # An incomplete declaration is treated as a comment.
         markup = 'a<!b <p>c'
-        self.assertSoupEquals(markup, "a<!--b <p-->c")
+        self.assertSoupEquals(markup, "a<!--b &lt;p-->c")
 
         # Let's spell that out a little more explicitly.
         soup = self.soup(markup)
