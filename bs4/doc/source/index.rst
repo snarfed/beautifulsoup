@@ -1720,7 +1720,7 @@ If you give Beautiful Soup a document that contains HTML entities like
  # u'<html><head></head><body>\u201cHello,\u201d he said.</body></html>'
 
 If you then convert the document to a string, the Unicode characters
-will be encoded as UTF-8. You won't get the HTML entities back:
+will be encoded as UTF-8. You won't get the HTML entities back::
 
  str(soup)
  # '<html><head></head><body>\xe2\x80\x9cHello,\xe2\x80\x9d he said.</body></html>'
@@ -1804,7 +1804,7 @@ implements Beautiful Soup's standard formatters as class methods: the
 use these functions to simulate ``formatter=html`` or
 ``formatter==minimal`` but and then do something in addition.
 
-Here's an example that converts strings to uppercase, ``and`` replaces
+Here's an example that converts strings to uppercase, `and` replaces
 Unicode characters with HTML entities whenever possible::
 
  from bs4.dammit import EntitySubstitution
