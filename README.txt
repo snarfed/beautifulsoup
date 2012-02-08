@@ -51,3 +51,10 @@ If you checked out the source tree, you should see a script in the
 home directory called test-all-versions. This script will run the unit
 tests under Python 2.7, then create a temporary Python 3 conversion of
 the source and run the unit tests again under Python 3.
+
+= Links =
+
+Homepage: http://www.crummy.com/software/BeautifulSoup/bs4/
+Discussion group: http://groups.google.com/group/beautifulsoup/
+Development: https://code.launchpad.net/beautifulsoup/
+Bug tracker: https://bugs.launchpad.net/beautifulsoup/
