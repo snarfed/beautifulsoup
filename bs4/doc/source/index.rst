@@ -1715,15 +1715,15 @@ Output formatters
 If you give Beautiful Soup a document that contains HTML entities like
 "&lquot;", they'll be converted to Unicode characters::
 
- soup = BeautifulSoup("&ldquo;Hello,&rdquo; he said.")
+ soup = BeautifulSoup("&ldquo;Dammit!&rdquo; he said.")
  unicode(soup)
- # u'<html><head></head><body>\u201cHello,\u201d he said.</body></html>'
+ # u'<html><head></head><body>\u201cDammit!\u201d he said.</body></html>'
 
 If you then convert the document to a string, the Unicode characters
 will be encoded as UTF-8. You won't get the HTML entities back::
 
  str(soup)
- # '<html><head></head><body>\xe2\x80\x9cHello,\xe2\x80\x9d he said.</body></html>'
+ # '<html><head></head><body>\xe2\x80\x9cDammit!\xe2\x80\x9d he said.</body></html>'
 
 By default, the only characters that are escaped upon output are bare
 ampersands and angle brackets. These get turned into "&amp;", "&lt;",
@@ -1737,7 +1737,7 @@ invalid HTML or XML::
 You can change this behavior by providing a value for the
 ``formatter`` argument to ``prettify()``, ``encode()``, or
 ``decode()``. Beautiful Soup recognizes four possible values for
-``formatter``
+``formatter``.
 
 The default is ``formatter="minimal"``. Strings will only be processed
 enough to ensure that Beautiful Soup generates valid HTML/XML::
@@ -1753,8 +1753,8 @@ enough to ensure that Beautiful Soup generates valid HTML/XML::
  #  </body>
  # </html>
 
-``formatter="html"`` will convert Unicode characters to HTML entities
-whenever possible::
+If you pass in ``formatter="html"``, Beautiful Soup will convert
+Unicode characters to HTML entities whenever possible::
 
  print(soup.prettify(formatter="html"))
  # <html>
