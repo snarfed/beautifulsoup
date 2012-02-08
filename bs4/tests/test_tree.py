@@ -663,6 +663,15 @@ class TestTreeModification(SoupTest):
         self.assertEqual(new_text.next_sibling, None)
         self.assertEqual(new_text.next_element, soup.c)
 
+    def test_insert_string(self):
+        soup = self.soup("<a></a>")
+        soup.a.insert(0, "bar")
+        soup.a.insert(0, "foo")
+        # The string were added to the tag.
+        self.assertEqual(["foo", "bar"], soup.a.contents)
+        # And they were converted to NavigableStrings.
+        self.assertEqual(soup.a.contents[0].next_element, "bar")
+
     def test_insert_tag(self):
         builder = self.default_builder
         soup = self.soup(
@@ -704,23 +713,22 @@ class TestTreeModification(SoupTest):
 
     def test_insert_before(self):
         soup = self.soup("<a>foo</a><b>bar</b>")
-        soup.new_string("BAZ").insert_before(soup.b)
-        soup.new_string("QUUX").insert_before(soup.a)
+        soup.b.insert_before("BAZ")
+        soup.a.insert_before("QUUX")
         self.assertEqual(
             soup.decode(), self.document_for("QUUX<a>foo</a>BAZ<b>bar</b>"))
 
-        soup.b.insert_before(soup.a)
+        soup.a.insert_before(soup.b)
         self.assertEqual(
             soup.decode(), self.document_for("QUUX<b>bar</b><a>foo</a>BAZ"))
 
-
     def test_insert_after(self):
         soup = self.soup("<a>foo</a><b>bar</b>")
-        soup.new_string("BAZ").insert_after(soup.b)
-        soup.new_string("QUUX").insert_after(soup.a)
+        soup.b.insert_after("BAZ")
+        soup.a.insert_after("QUUX")
         self.assertEqual(
             soup.decode(), self.document_for("<a>foo</a>QUUX<b>bar</b>BAZ"))
-        soup.a.insert_after(soup.b)
+        soup.b.insert_after(soup.a)
         self.assertEqual(
             soup.decode(), self.document_for("QUUX<b>bar</b><a>foo</a>BAZ"))
 
@@ -729,16 +737,16 @@ class TestTreeModification(SoupTest):
         tag = soup.new_tag("a")
         string = soup.new_string("")
         self.assertRaises(ValueError, string.insert_after, tag)
-
         self.assertRaises(ValueError, soup.insert_after, tag)
+        self.assertRaises(ValueError, tag.insert_after, tag)
 
     def test_insert_before_raises_valueerror_if_before_has_no_meaning(self):
         soup = self.soup("")
         tag = soup.new_tag("a")
         string = soup.new_string("")
         self.assertRaises(ValueError, string.insert_before, tag)
-
         self.assertRaises(ValueError, soup.insert_before, tag)
+        self.assertRaises(ValueError, tag.insert_before, tag)
 
     def test_replace_with(self):
         soup = self.soup(

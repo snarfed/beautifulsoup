@@ -156,6 +156,7 @@ Beautiful Soup 4 is published through PyPi, so you can install it with
 and the same package works on Python 2 and Python 3.
 
 :kbd:`$ easy_install beautifulsoup4`
+
 :kbd:`$ pip install beautifulsoup4`
 
 (The ``BeautifulSoup`` package is probably `not` what you want. That's
@@ -180,15 +181,14 @@ Be sure to install a good parser!
 Beautiful Soup uses a plugin system that supports a number of popular
 Python parsers. If no third-party parsers are installed, Beautiful
 Soup uses the HTML parser that comes with Python. In recent releases
-of Python (2.7.2 and 3.2.2), this parser works pretty well at handling
-bad HTML. In older releases, it's not so good.
+of Python (2.7.2 and 3.2.2), this parser is excellent at handling bad
+HTML. Unfortunately, in older releases, it's not very good at all.
 
 Even if you're using a recent release of Python, I recommend you
-install the `lxml parser <http://lxml.de/>`_ if possible. It's much
-faster than Python's built-in parser. It works with both Python 2 and
-Python 3, and it parses HTML and XML very well. Beautiful Soup will
-detect that you have lxml installed, and use it instead of Python's
-built-in parser.
+install the `lxml parser <http://lxml.de/>`_ if you can. Its
+reliability is good on both HTML and XML, and it's much faster than
+Python's built-in parser. Beautiful Soup will detect that you have
+lxml installed, and use it instead of Python's built-in parser.
 
 Depending on your setup, you might install lxml with one of these commands:
 
@@ -1512,7 +1512,7 @@ Only the first argument, the tag name, is required.
 
 ``Tag.insert()`` is just like ``Tag.append()``, except the new element
 doesn't necessarily go at the end of its parent's
-``... contents``. It'll be inserted at whatever numeric position you
+``.contents``. It'll be inserted at whatever numeric position you
 say. It works just like ``.insert()`` on a Python list::
 
   markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
@@ -1528,20 +1528,20 @@ say. It works just like ``.insert()`` on a Python list::
 ``insert_before()`` and ``insert_after()``
 ------------------------------------------
 
-The ``insert_before()`` method moves a tag or string so that it
-immediately precedes something else in the parse tree::
+The ``insert_before()`` method inserts a tag or string immediately
+before something else in the parse tree::
 
    soup = BeautifulSoup("<b>stop</b>")
    tag = soup.new_tag("i")
    tag.string = "Don't"
-   tag.insert_before(soup.b.string)
+   soup.b.string.insert_before(tag)
    soup.b
    # <b><i>Don't</i>stop</b>
 
 The ``insert_after()`` method moves a tag or string so that it
 immediately follows something else in the parse tree::
 
-   soup.new_string(" ever ").insert_after(soup.b.i)
+   soup.b.i.insert_after(soup.new_string(" ever "))
    soup.b
    # <b><i>Don't</i> ever stop</b>
    soup.b.contents
@@ -2246,6 +2246,7 @@ major Linux distributions::
 It's also published through PyPi as `BeautifulSoup`.::
 
 :kbd:`$ easy_install BeautifulSoup`
+
 :kbd:`$ pip install BeautifulSoup`
 
 You can also `download a tarball of Beautiful Soup 3.2.0

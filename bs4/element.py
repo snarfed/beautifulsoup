@@ -190,33 +190,43 @@ class PageElement(object):
         """Appends the given tag to the contents of this tag."""
         self.insert(len(self.contents), tag)
 
-    def insert_before(self, successor):
-        """Makes this element the immediate predecessor of the given element.
+    def insert_before(self, predecessor):
+        """Makes the given element the immediate predecessor of this one.
 
-        The two elements will have the same parent, and this element
-        will be immediately before the given one.
+        The two elements will have the same parent, and the given element
+        will be immediately before this one.
         """
-        parent = successor.parent
+        if self is predecessor:
+            raise ValueError("Can't insert an element before itself.")
+        parent = self.parent
         if parent is None:
             raise ValueError(
-                "Destination has no parent, so 'before' has no meaning.")
-        self.extract()
-        index = parent.index(successor)
-        parent.insert(index, self)
+                "Element has no parent, so 'before' has no meaning.")
+        # Extract first so that the index won't be screwed up if they
+        # are siblings.
+        if isinstance(predecessor, PageElement):
+            predecessor.extract()
+        index = parent.index(self)
+        parent.insert(index, predecessor)
 
-    def insert_after(self, predecessor):
-        """Makes this element the immediate successor of the given element.
+    def insert_after(self, successor):
+        """Makes the given element the immediate successor of this one.
 
-        The two elements will have the same parent, and this element
-        will be immediately after the given one.
+        The two elements will have the same parent, and the given element
+        will be immediately after this one.
         """
-        parent = predecessor.parent
+        if self is successor:
+            raise ValueError("Can't insert an element after itself.")
+        parent = self.parent
         if parent is None:
             raise ValueError(
-                "Destination has no parent, so 'after' has no meaning.")
-        self.extract()
-        index = parent.index(predecessor)
-        parent.insert(index+1, self)
+                "Element has no parent, so 'after' has no meaning.")
+        # Extract first so that the index won't be screwed up if they
+        # are siblings.
+        if isinstance(successor, PageElement):
+            successor.extract()
+        index = parent.index(self)
+        parent.insert(index+1, successor)
 
     def find_next(self, name=None, attrs={}, text=None, **kwargs):
         """Returns the first item that matches the given criteria and
