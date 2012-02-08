@@ -181,7 +181,7 @@ Be sure to install a good parser!
 Beautiful Soup uses a plugin system that supports a number of popular
 Python parsers. If no third-party parsers are installed, Beautiful
 Soup uses the HTML parser that comes with Python. In recent releases
-of Python (2.7.2 and 3.2.2), this parser is excellent at handling bad
+of Python (2.7.3 and 3.2.2), this parser is excellent at handling bad
 HTML. Unfortunately, in older releases, it's not very good at all.
 
 Even if you're using a recent release of Python, I recommend you
