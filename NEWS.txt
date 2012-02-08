@@ -15,14 +15,14 @@
   strict=False disastrous on Python 3.2.2.
 
 * Replaced the "substitute_html_entities" argument with the
-  "formatter" argument.
+  more general "formatter" argument.
 
 * Bare ampersands and angle brackets are always converted to XML
   entities unless the user prevents it.
 
-* Added PageElement.insert_before().
-
-* Added PageElement.insert_after().
+* Added PageElement.insert_before() and PageElement.insert_after(),
+  which let you put an element into the parse tree with respect to
+  some other element.
 
 * Raise an exception when the user tries to do something nonsensical
   like insert a tag into itself.
