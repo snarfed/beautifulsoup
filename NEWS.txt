@@ -1,4 +1,4 @@
-= 4.0.0b4 =
+= 4.0.0b4 (20120208) =
 
 * Added BeautifulSoup.new_string() to go along with BeautifulSoup.new_tag()
 
@@ -28,7 +28,7 @@
   like insert a tag into itself.
 
 
-= 4.0.0b3 =
+= 4.0.0b3 (20120203) =
 
 Beautiful Soup 4 is a nearly-complete rewrite that removes Beautiful
 Soup's custom HTML parser in favor of a system that lets you write a
@@ -217,7 +217,6 @@ longer folded to ASCII spaces. (Robert Leftwich)
 Information inside a TEXTAREA tag is now parsed literally, not as HTML
 tags. TEXTAREA now works exactly the same way as SCRIPT. (Zephyr Fang)
 
-
 = 3.0.4 =
 
 Fixed a bug that crashed Unicode conversion in some cases.
@@ -229,3 +228,389 @@ Fixed some unit test failures when running against Python 2.5.
 
 When considering whether to convert smart quotes, UnicodeDammit now
 looks at the original encoding in a case-insensitive way.
+
+= 3.0.3 (20060606) =
+
+Beautiful Soup is now usable as a way to clean up invalid XML/HTML (be
+sure to pass in an appropriate value for convertEntities, or XML/HTML
+entities might stick around that aren't valid in HTML/XML). The result
+may not validate, but it should be good enough to not choke a
+real-world XML parser. Specifically, the output of a properly
+constructed soup object should always be valid as part of an XML
+document, but parts may be missing if they were missing in the
+original. As always, if the input is valid XML, the output will also
+be valid.
+
+= 3.0.2 (20060602) =
+
+Previously, Beautiful Soup correctly handled attribute values that
+contained embedded quotes (sometimes by escaping), but not other kinds
+of XML character. Now, it correctly handles or escapes all special XML
+characters in attribute values.
+
+I aliased methods to the 2.x names (fetch, find, findText, etc.) for
+backwards compatibility purposes. Those names are deprecated and if I
+ever do a 4.0 I will remove them. I will, I tell you!
+
+Fixed a bug where the findAll method wasn't passing along any keyword
+arguments.
+
+When run from the command line, Beautiful Soup now acts as an HTML
+pretty-printer, not an XML pretty-printer.
+
+= 3.0.1 (20060530) =
+
+Reintroduced the "fetch by CSS class" shortcut. I thought keyword
+arguments would replace it, but they don't. You can't call soup('a',
+class='foo') because class is a Python keyword.
+
+If Beautiful Soup encounters a meta tag that declares the encoding,
+but a SoupStrainer tells it not to parse that tag, Beautiful Soup will
+no longer try to rewrite the meta tag to mention the new
+encoding. Basically, this makes SoupStrainers work in real-world
+applications instead of crashing the parser.
+
+= 3.0.0 "Who would not give all else for two p" (20060528) =
+
+This release is not backward-compatible with previous releases. If
+you've got code written with a previous version of the library, go
+ahead and keep using it, unless one of the features mentioned here
+really makes your life easier. Since the library is self-contained,
+you can include an old copy of the library in your old applications,
+and use the new version for everything else.
+
+The documentation has been rewritten and greatly expanded with many
+more examples.
+
+Beautiful Soup autodetects the encoding of a document (or uses the one
+you specify), and converts it from its native encoding to
+Unicode. Internally, it only deals with Unicode strings. When you
+print out the document, it converts to UTF-8 (or another encoding you
+specify). [Doc reference]
+
+It's now easy to make large-scale changes to the parse tree without
+screwing up the navigation members. The methods are extract,
+replaceWith, and insert. [Doc reference. See also Improving Memory
+Usage with extract]
+
+Passing True in as an attribute value gives you tags that have any
+value for that attribute. You don't have to create a regular
+expression. Passing None for an attribute value gives you tags that
+don't have that attribute at all.
+
+Tag objects now know whether or not they're self-closing. This avoids
+the problem where Beautiful Soup thought that tags like <BR /> were
+self-closing even in XML documents. You can customize the self-closing
+tags for a parser object by passing them in as a list of
+selfClosingTags: you don't have to subclass anymore.
+
+There's a new built-in parser, MinimalSoup, which has most of
+BeautifulSoup's HTML-specific rules, but no tag nesting rules. [Doc
+reference]
+
+You can use a SoupStrainer to tell Beautiful Soup to parse only part
+of a document. This saves time and memory, often making Beautiful Soup
+about as fast as a custom-built SGMLParser subclass. [Doc reference,
+SoupStrainer reference]
+
+You can (usually) use keyword arguments instead of passing a
+dictionary of attributes to a search method. That is, you can replace
+soup(args={"id" : "5"}) with soup(id="5"). You can still use args if
+(for instance) you need to find an attribute whose name clashes with
+the name of an argument to findAll. [Doc reference: **kwargs attrs]
+
+The method names have changed to the better method names used in
+Rubyful Soup. Instead of find methods and fetch methods, there are
+only find methods. Instead of a scheme where you can't remember which
+method finds one element and which one finds them all, we have find
+and findAll. In general, if the method name mentions All or a plural
+noun (eg. findNextSiblings), then it finds many elements
+method. Otherwise, it only finds one element. [Doc reference]
+
+Some of the argument names have been renamed for clarity. For instance
+avoidParserProblems is now parserMassage.
+
+Beautiful Soup no longer implements a feed method. You need to pass a
+string or a filehandle into the soup constructor, not with feed after
+the soup has been created. There is still a feed method, but it's the
+feed method implemented by SGMLParser and calling it will bypass
+Beautiful Soup and cause problems.
+
+The NavigableText class has been renamed to NavigableString. There is
+no NavigableUnicodeString anymore, because every string inside a
+Beautiful Soup parse tree is a Unicode string.
+
+findText and fetchText are gone. Just pass a text argument into find
+or findAll.
+
+Null was more trouble than it was worth, so I got rid of it. Anything
+that used to return Null now returns None.
+
+Special XML constructs like comments and CDATA now have their own
+NavigableString subclasses, instead of being treated as oddly-formed
+data. If you parse a document that contains CDATA and write it back
+out, the CDATA will still be there.
+
+When you're parsing a document, you can get Beautiful Soup to convert
+XML or HTML entities into the corresponding Unicode characters. [Doc
+reference]
+
+= 2.1.1 (20050918) =
+
+Fixed a serious performance bug in BeautifulStoneSoup which was
+causing parsing to be incredibly slow.
+
+Corrected several entities that were previously being incorrectly
+translated from Microsoft smart-quote-like characters.
+
+Fixed a bug that was breaking text fetch.
+
+Fixed a bug that crashed the parser when text chunks that look like
+HTML tag names showed up within a SCRIPT tag.
+
+THEAD, TBODY, and TFOOT tags are now nestable within TABLE
+tags. Nested tables should parse more sensibly now.
+
+BASE is now considered a self-closing tag.
+
+= 2.1.0 "Game, or any other dish?" (20050504) =
+
+Added a wide variety of new search methods which, given a starting
+point inside the tree, follow a particular navigation member (like
+nextSibling) over and over again, looking for Tag and NavigableText
+objects that match certain criteria. The new methods are findNext,
+fetchNext, findPrevious, fetchPrevious, findNextSibling,
+fetchNextSiblings, findPreviousSibling, fetchPreviousSiblings,
+findParent, and fetchParents. All of these use the same basic code
+used by first and fetch, so you can pass your weird ways of matching
+things into these methods.
+
+The fetch method and its derivatives now accept a limit argument.
+
+You can now pass keyword arguments when calling a Tag object as though
+it were a method.
+
+Fixed a bug that caused all hand-created tags to share a single set of
+attributes.
+
+= 2.0.3 (20050501) =
+
+Fixed Python 2.2 support for iterators.
+
+Fixed a bug that gave the wrong representation to tags within quote
+tags like <script>.
+
+Took some code from Mark Pilgrim that treats CDATA declarations as
+data instead of ignoring them.
+
+Beautiful Soup's setup.py will now do an install even if the unit
+tests fail. It won't build a source distribution if the unit tests
+fail, so I can't release a new version unless they pass.
+
+= 2.0.2 (20050416) =
+
+Added the unit tests in a separate module, and packaged it with
+distutils.
+
+Fixed a bug that sometimes caused renderContents() to return a Unicode
+string even if there was no Unicode in the original string.
+
+Added the done() method, which closes all of the parser's open
+tags. It gets called automatically when you pass in some text to the
+constructor of a parser class; otherwise you must call it yourself.
+
+Reinstated some backwards compatibility with 1.x versions: referencing
+the string member of a NavigableText object returns the NavigableText
+object instead of throwing an error.
+
+= 2.0.1 (20050412) =
+
+Fixed a bug that caused bad results when you tried to reference a tag
+name shorter than 3 characters as a member of a Tag, eg. tag.table.td.
+
+Made sure all Tags have the 'hidden' attribute so that an attempt to
+access tag.hidden doesn't spawn an attempt to find a tag named
+'hidden'.
+
+Fixed a bug in the comparison operator.
+
+= 2.0.0 "Who cares for fish?" (20050410)
+
+Beautiful Soup version 1 was very useful but also pretty stupid. I
+originally wrote it without noticing any of the problems inherent in
+trying to build a parse tree out of ambiguous HTML tags. This version
+solves all of those problems to my satisfaction. It also adds many new
+clever things to make up for the removal of the stupid things.
+
+== Parsing ==
+
+The parser logic has been greatly improved, and the BeautifulSoup
+class should much more reliably yield a parse tree that looks like
+what the page author intended. For a particular class of odd edge
+cases that now causes problems, there is a new class,
+ICantBelieveItsBeautifulSoup.
+
+By default, Beautiful Soup now performs some cleanup operations on
+text before parsing it. This is to avoid common problems with bad
+definitions and self-closing tags that crash SGMLParser. You can
+provide your own set of cleanup operations, or turn it off
+altogether. The cleanup operations include fixing self-closing tags
+that don't close, and replacing Microsoft smart quotes and similar
+characters with their HTML entity equivalents.
+
+You can now get a pretty-print version of parsed HTML to get a visual
+picture of how Beautiful Soup parses it, with the Tag.prettify()
+method.
+
+== Strings and Unicode ==
+
+There are separate NavigableText subclasses for ASCII and Unicode
+strings. These classes directly subclass the corresponding base data
+types. This means you can treat NavigableText objects as strings
+instead of having to call methods on them to get the strings.
+
+str() on a Tag always returns a string, and unicode() always returns
+Unicode. Previously it was inconsistent.
+
+== Tree traversal ==
+
+In a first() or fetch() call, the tag name or the desired value of an
+attribute can now be any of the following:
+
+ * A string (matches that specific tag or that specific attribute value)
+ * A list of strings (matches any tag or attribute value in the list)
+ * A compiled regular expression object (matches any tag or attribute
+   value that matches the regular expression)
+ * A callable object that takes the Tag object or attribute value as a
+   string. It returns None/false/empty string if the given string
+   doesn't match, and any other value if it does.
+
+This is much easier to use than SQL-style wildcards (see, regular
+expressions are good for something). Because of this, I took out
+SQL-style wildcards. I'll put them back if someone complains, but
+their removal simplifies the code a lot.
+
+You can use fetch() and first() to search for text in the parse tree,
+not just tags. There are new alias methods fetchText() and firstText()
+designed for this purpose. As with searching for tags, you can pass in
+a string, a regular expression object, or a method to match your text.
+
+If you pass in something besides a map to the attrs argument of
+fetch() or first(), Beautiful Soup will assume you want to match that
+thing against the "class" attribute. When you're scraping
+well-structured HTML, this makes your code a lot cleaner.
+
+1.x and 2.x both let you call a Tag object as a shorthand for
+fetch(). For instance, foo("bar") is a shorthand for
+foo.fetch("bar"). In 2.x, you can also access a specially-named member
+of a Tag object as a shorthand for first(). For instance, foo.barTag
+is a shorthand for foo.first("bar"). By chaining these shortcuts you
+traverse a tree in very little code: for header in
+soup.bodyTag.pTag.tableTag('th'):
+
+If an element relationship (like parent or next) doesn't apply to a
+tag, it'll now show up Null instead of None. first() will also return
+Null if you ask it for a nonexistent tag. Null is an object that's
+just like None, except you can do whatever you want to it and it'll
+give you Null instead of throwing an error.
+
+This lets you do tree traversals like soup.htmlTag.headTag.titleTag
+without having to worry if the intermediate stages are actually
+there. Previously, if there was no 'head' tag in the document, headTag
+in that instance would have been None, and accessing its 'titleTag'
+member would have thrown an AttributeError. Now, you can get what you
+want when it exists, and get Null when it doesn't, without having to
+do a lot of conditionals checking to see if every stage is None.
+
+There are two new relations between page elements: previousSibling and
+nextSibling. They reference the previous and next element at the same
+level of the parse tree. For instance, if you have HTML like this:
+
+  <p><ul><li>Foo<br /><li>Bar</ul>
+
+The first 'li' tag has a previousSibling of Null and its nextSibling
+is the second 'li' tag. The second 'li' tag has a nextSibling of Null
+and its previousSibling is the first 'li' tag. The previousSibling of
+the 'ul' tag is the first 'p' tag. The nextSibling of 'Foo' is the
+'br' tag.
+
+I took out the ability to use fetch() to find tags that have a
+specific list of contents. See, I can't even explain it well. It was
+really difficult to use, I never used it, and I don't think anyone
+else ever used it. To the extent anyone did, they can probably use
+fetchText() instead. If it turns out someone needs it I'll think of
+another solution.
+
+== Tree manipulation ==
+
+You can add new attributes to a tag, and delete attributes from a
+tag. In 1.x you could only change a tag's existing attributes.
+
+== Porting Considerations ==
+
+There are three changes in 2.0 that break old code:
+
+In the post-1.2 release you could pass in a function into fetch(). The
+function took a string, the tag name. In 2.0, the function takes the
+actual Tag object.
+
+It's no longer to pass in SQL-style wildcards to fetch(). Use a
+regular expression instead.
+
+The different parsing algorithm means the parse tree may not be shaped
+like you expect. This will only actually affect you if your code uses
+one of the affected parts. I haven't run into this problem yet while
+porting my code.
+
+= Between 1.2 and 2.0 =
+
+This is the release to get if you want Python 1.5 compatibility.
+
+The desired value of an attribute can now be any of the following:
+
+ * A string
+ * A string with SQL-style wildcards
+ * A compiled RE object
+ * A callable that returns None/false/empty string if the given value
+   doesn't match, and any other value otherwise.
+
+This is much easier to use than SQL-style wildcards (see, regular
+expressions are good for something). Because of this, I no longer
+recommend you use SQL-style wildcards. They may go away in a future
+release to clean up the code.
+
+Made Beautiful Soup handle processing instructions as text instead of
+ignoring them.
+
+Applied patch from Richie Hindle (richie at entrian dot com) that
+makes tag.string a shorthand for tag.contents[0].string when the tag
+has only one string-owning child.
+
+Added still more nestable tags. The nestable tags thing won't work in
+a lot of cases and needs to be rethought.
+
+Fixed an edge case where searching for "%foo" would match any string
+shorter than "foo".
+
+= 1.2 "Who for such dainties would not stoop?" (20040708) =
+
+Applied patch from Ben Last (ben at benlast dot com) that made
+Tag.renderContents() correctly handle Unicode.
+
+Made BeautifulStoneSoup even dumber by making it not implicitly close
+a tag when another tag of the same type is encountered; only when an
+actual closing tag is encountered. This change courtesy of Fuzzy (mike
+at pcblokes dot com). BeautifulSoup still works as before.
+
+= 1.1 "Swimming in a hot tureen" =
+
+Added more 'nestable' tags. Changed popping semantics so that when a
+nestable tag is encountered, tags are popped up to the previously
+encountered nestable tag (of whatever kind). I will revert this if
+enough people complain, but it should make more people's lives easier
+than harder. This enhancement was suggested by Anthony Baxter (anthony
+at interlink dot com dot au).
+
+= 1.0 "So rich and green" (20040420) =
+
+Initial release.
