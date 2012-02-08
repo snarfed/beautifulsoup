@@ -190,7 +190,7 @@ class PageElement(object):
         """Appends the given tag to the contents of this tag."""
         self.insert(len(self.contents), tag)
 
-    def move_before(self, successor):
+    def insert_before(self, successor):
         """Makes this element the immediate predecessor of the given element.
 
         The two elements will have the same parent, and this element
@@ -204,7 +204,7 @@ class PageElement(object):
         index = parent.index(successor)
         parent.insert(index, self)
 
-    def move_after(self, predecessor):
+    def insert_after(self, predecessor):
         """Makes this element the immediate successor of the given element.
 
         The two elements will have the same parent, and this element

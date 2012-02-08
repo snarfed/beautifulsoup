@@ -702,43 +702,43 @@ class TestTreeModification(SoupTest):
         soup.br.insert(1, "Contents")
         self.assertEqual(str(soup.br), "<br>Contents</br>")
 
-    def test_move_before(self):
+    def test_insert_before(self):
         soup = self.soup("<a>foo</a><b>bar</b>")
-        soup.new_string("BAZ").move_before(soup.b)
-        soup.new_string("QUUX").move_before(soup.a)
+        soup.new_string("BAZ").insert_before(soup.b)
+        soup.new_string("QUUX").insert_before(soup.a)
         self.assertEqual(
             soup.decode(), self.document_for("QUUX<a>foo</a>BAZ<b>bar</b>"))
 
-        soup.b.move_before(soup.a)
+        soup.b.insert_before(soup.a)
         self.assertEqual(
             soup.decode(), self.document_for("QUUX<b>bar</b><a>foo</a>BAZ"))
 
 
-    def test_move_after(self):
+    def test_insert_after(self):
         soup = self.soup("<a>foo</a><b>bar</b>")
-        soup.new_string("BAZ").move_after(soup.b)
-        soup.new_string("QUUX").move_after(soup.a)
+        soup.new_string("BAZ").insert_after(soup.b)
+        soup.new_string("QUUX").insert_after(soup.a)
         self.assertEqual(
             soup.decode(), self.document_for("<a>foo</a>QUUX<b>bar</b>BAZ"))
-        soup.a.move_after(soup.b)
+        soup.a.insert_after(soup.b)
         self.assertEqual(
             soup.decode(), self.document_for("QUUX<b>bar</b><a>foo</a>BAZ"))
 
-    def test_move_after_raises_valueerror_if_after_has_no_meaning(self):
+    def test_insert_after_raises_valueerror_if_after_has_no_meaning(self):
         soup = self.soup("")
         tag = soup.new_tag("a")
         string = soup.new_string("")
-        self.assertRaises(ValueError, string.move_after, tag)
+        self.assertRaises(ValueError, string.insert_after, tag)
 
-        self.assertRaises(ValueError, soup.move_after, tag)
+        self.assertRaises(ValueError, soup.insert_after, tag)
 
-    def test_move_before_raises_valueerror_if_before_has_no_meaning(self):
+    def test_insert_before_raises_valueerror_if_before_has_no_meaning(self):
         soup = self.soup("")
         tag = soup.new_tag("a")
         string = soup.new_string("")
-        self.assertRaises(ValueError, string.move_before, tag)
+        self.assertRaises(ValueError, string.insert_before, tag)
 
-        self.assertRaises(ValueError, soup.move_before, tag)
+        self.assertRaises(ValueError, soup.insert_before, tag)
 
     def test_replace_with(self):
         soup = self.soup(

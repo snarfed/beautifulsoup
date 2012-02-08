@@ -1525,23 +1525,23 @@ say. It works just like ``.insert()`` on a Python list::
   tag.contents
   # [u'I linked to ', u'but did not endorse', <i>example.com</i>]
 
-``move_before()`` and ``move_after()``
+``insert_before()`` and ``insert_after()``
 ------------------------------------------
 
-The ``move_before()`` method moves a tag or string so that it
+The ``insert_before()`` method moves a tag or string so that it
 immediately precedes something else in the parse tree::
 
    soup = BeautifulSoup("<b>stop</b>")
    tag = soup.new_tag("i")
    tag.string = "Don't"
-   tag.move_before(soup.b.string)
+   tag.insert_before(soup.b.string)
    soup.b
    # <b><i>Don't</i>stop</b>
 
-The ``move_after()`` method moves a tag or string so that it
+The ``insert_after()`` method moves a tag or string so that it
 immediately follows something else in the parse tree::
 
-   soup.new_string(" ever ").move_after(soup.b.i)
+   soup.new_string(" ever ").insert_after(soup.b.i)
    soup.b
    # <b><i>Don't</i> ever stop</b>
    soup.b.contents
