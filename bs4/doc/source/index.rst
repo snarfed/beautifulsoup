@@ -1474,7 +1474,7 @@ like calling ``.append()`` on a Python list::
    # [u'Foo', u'Bar']
 
 ``BeautifulSoup.new_string()`` and ``.new_tag()``
-------------------------------------------------
+-------------------------------------------------
 
 If you need to add a string to a document, no problem--you can pass a
 Python string in to ``append()``, or you can call the factory method
