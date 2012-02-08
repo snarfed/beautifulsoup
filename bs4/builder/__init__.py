@@ -82,6 +82,11 @@ class TreeBuilder(object):
     empty_element_tags = None # A tag will be considered an empty-element
                               # tag when and only when it has no contents.
 
+    # A value for these attributes is a space- or comma-separated list
+    # of CDATA, rather than a single CDATA.
+    cdata_list_attributes = None
+
+
     def __init__(self):
         self.soup = None
 
@@ -188,6 +193,16 @@ class HTMLTreeBuilder(TreeBuilder):
     preserve_whitespace_tags = set(['pre', 'textarea'])
     empty_element_tags = set(['br' , 'hr', 'input', 'img', 'meta',
                               'spacer', 'link', 'frame', 'base'])
+
+    # The HTML standard defines these attributes as containing a
+    # space-separated list of values, not a single value. That is,
+    # class="foo bar" means that the 'class' attribute has two values,
+    # 'foo' and 'bar', not the single value 'foo bar'.  When we
+    # encounter one of these attributes, we will parse its value into
+    # a list of values if possible. Upon output, the list will be
+    # converted back into a string.
+    cdata_list_attributes = set(
+        ['class', 'rel', 'rev', 'archive', 'accept-charset', 'headers'])
 
     # Used by set_up_substitutions to detect the charset in a META tag
     CHARSET_RE = re.compile("((^|;)\s*charset=)([^;]*)", re.M)

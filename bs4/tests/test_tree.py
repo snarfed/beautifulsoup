@@ -188,6 +188,38 @@ class TestFindAllByAttribute(TreeTest):
         self.assertSelects(tree.find_all('c', '3'), ['Class 3 and 4.'])
         self.assertSelects(tree.find_all('c', '4'), ['Class 3 and 4.'])
 
+    def test_find_by_class_when_multiple_classes_present(self):
+        tree = self.soup("<gar class='foo bar'>Found it</gar>")
+
+        attrs = { 'class' : re.compile("o") }
+        f = tree.find_all("gar", attrs=attrs)
+        self.assertSelects(f, ["Found it"])
+
+        f = tree.find_all("gar", re.compile("a"))
+        self.assertSelects(f, ["Found it"])
+
+        # Since the class is not the string "foo bar", but the two
+        # strings "foo" and "bar", this will not find anything.
+        attrs = { 'class' : re.compile("o b") }
+        f = tree.find_all("gar", attrs=attrs)
+        self.assertSelects(f, [])
+
+    def test_find_all_with_non_dictionary_for_attrs_finds_by_class(self):
+        soup = self.soup("<a class='bar'>Found it</a>")
+
+        self.assertSelects(soup.find_all("a", re.compile("ba")), ["Found it"])
+
+        def big_attribute_value(value):
+            return len(value) > 3
+
+        self.assertSelects(soup.find_all("a", big_attribute_value), [])
+
+        def small_attribute_value(value):
+            return len(value) <= 3
+
+        self.assertSelects(
+            soup.find_all("a", small_attribute_value), ["Found it"])
+
     def test_find_all_by_attribute_soupstrainer(self):
         tree = self.soup("""
                          <a id="first">Match.</a>
@@ -956,6 +988,29 @@ class TestElementObjects(SoupTest):
         self.assertEqual(soup.a.get_text(","), "a,r, , t ")
         self.assertEqual(soup.a.get_text(",", strip=True), "a,r,t")
 
+class TestCDAtaListAttributes(SoupTest):
+
+    """Testing cdata-list attributes like 'class'.
+    """
+    def test_single_value_stays_string(self):
+        soup = self.soup("<a class='foo'>")
+        self.assertEqual("foo",soup.a['class'])
+
+    def test_multiple_values_becomes_list(self):
+        soup = self.soup("<a class='foo bar'>")
+        self.assertEqual(["foo", "bar"], soup.a['class'])
+
+    def test_multiple_values_separated_by_weird_whitespace(self):
+        soup = self.soup("<a class='foo\tbar\nbaz'>")
+        self.assertEqual(["foo", "bar", "baz"],soup.a['class'])
+
+    def test_attributes_joined_into_string_on_output(self):
+        soup = self.soup("<a class='foo\tbar'>")
+        self.assertEqual(b'<a class="foo bar"></a>', soup.a.encode())
+
+    def test_accept_charset(self):
+        soup = self.soup('<form accept-charset="ISO-8859-1 UTF-8">')
+        self.assertEqual(['ISO-8859-1', 'UTF-8'], soup.form['accept-charset'])
 
 class TestPersistence(SoupTest):
     "Testing features like pickle and deepcopy."

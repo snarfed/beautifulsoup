@@ -1,3 +1,19 @@
+= 4.0.0b5 =
+
+* Rationalized Beautiful Soup's treatment of CSS class. A tag
+  belonging to multiple CSS classes is treated as having a list of
+  values for the 'class' attribute. Searching for a CSS class will
+  match *any* of the CSS classes.
+
+  This actually affects all attributes that the HTML standard defines
+  as taking multiple values (class, rel, rev, archive, accept-charset,
+  and headers), but 'class' is by far the most common.
+
+* If you pass anything other than a dictionary as the second argument
+  to one of the find* methods, it'll assume you want to use that
+  object to search against a tag's CSS classes. Previously this only
+  worked if you passed in a string.
+
 = 4.0.0b4 (20120208) =
 
 * Added BeautifulSoup.new_string() to go along with BeautifulSoup.new_tag()

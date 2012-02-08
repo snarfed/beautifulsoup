@@ -298,6 +298,39 @@ done by treating the tag as a dictionary::
  tag
  # <blockquote>Extremely bold</blockquote>
 
+.. _multivalue:
+
+Multi-valued attributes
+&&&&&&&&&&&&&&&&&&&&&&&
+
+HTML defines a few attributes that can have multiple values. The most
+common is ``class`` (a tag can have more than one CSS class), but
+there are a few others: ``rel``, ``rev``, ``archive``,
+``accept-charset``, and ``headers``. If one of these attributes has
+more than one value, Beautiful Soup will turn its values into a list::
+
+ css_soup = BeautifulSoup('<p class="body strikeout"></p>')
+ css_soup.p['class']
+ # ["body", "strikeout"]
+
+If an attribute `looks` like it has more than one value, but it's not
+one of the special attributes listed above, Beautiful Soup will leave
+the attribute alone::
+
+ id_soup = BeautifulSoup('<p id="my id"></p>')
+ id_soup.p['id']
+ # 'my id'
+
+When you turn a tag back into a string, multiple attribute values are
+consolidated::
+
+ rel_soup = BeautifulSoup('<p>Back to the <a rel="index">homepage</a></p>')
+ rel_soup.a['rel']
+ # 'index'
+ rel_soup.a['rel'] = ['index', 'contents']
+ print(rel_soup.p)
+ # <p>Back to the <a rel="index contents">homepage</a></p>
+
 ``NavigableString``
 -------------------
 
@@ -1084,11 +1117,11 @@ keyword argument::
 
 .. _attrs:
 
-``attrs`` and searching by CSS class
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Searching by CSS class
+^^^^^^^^^^^^^^^^^^^^^^
 
 Instead of using keyword arguments, you can filter tags based on their
-attributes passing a dictionary in for ``attrs``. These two lines of
+attributes by passing a dictionary in for ``attrs``. These two lines of
 code are equivalent::
 
  soup.find_all(href=re.compile("elsie"), id='link1')
@@ -1107,13 +1140,45 @@ You can use ``attrs`` to search by CSS class::
  #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
 
 But that's a lot of code for such a common operation. Instead, you can
-pass a string for `attrs` instead of a dictionary. The string will be
-used to restrict the CSS class::
+pass a string `attrs` instead of a dictionary. The string will be used
+to restrict the CSS class::
 
  soup.find_all("a", "sister")
  # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
  #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
  #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+You can also pass in a regular expression, a function or
+True. Anything you pass in for ``attrs`` that's not a dictionary will
+be used to search against the CSS class::
+
+ soup.find_all(attrs=re.compile("itl"))
+ # [<p class="title"><b>The Dormouse's story</b></p>]
+
+ def has_six_characters(css_class):
+     return css_class is not None and len(css_class) == 6
+
+ soup.find_all(attrs=has_six_characters)
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+:ref:`Remember <multivalue>` that a single tag can have multiple
+values for its "class" attribute. When you search for a tag that
+matches a certain CSS class, you're matching against `any` of its CSS
+classes::
+
+ css_soup = BeautifulSoup('<p class="body strikeout"></p>')
+ css_soup.find_all("p", "strikeout")
+ # [<p class="body strikeout"></p>]
+
+ css_soup.find_all("p", "body")
+ # [<p class="body strikeout"></p>]
+
+Searching for the string value of the ``class`` attribute won't work::
+
+ css_soup.find_all("p", "body strikeout")
+ # []
 
 .. _text:
 
@@ -2417,6 +2482,10 @@ Miscellaneous
 :ref:`Tag.string <.string>` now operates recursively. If tag A
 contains a single tag B and nothing else, then A.string is the same as
 B.string. (Previously, it was None.)
+
+`Multi-valued attributes`_ like ``class`` are parsed into lists if
+they have more than one value. This may affect the way you search by
+CSS class.
 
 The ``BeautifulSoup`` constructor no longer recognizes the
 `markupMassage` argument. It's now the parser's responsibility to

@@ -7,11 +7,7 @@ from bs4.dammit import EntitySubstitution
 DEFAULT_OUTPUT_ENCODING = "utf-8"
 PY3K = (sys.version_info[0] > 2)
 
-
-def _match_css_class(str):
-    """Build a RE to match the given CSS class."""
-    return re.compile(r"(^|.*\s)%s($|\s)" % str)
-
+whitespace_re = re.compile("\s+")
 
 def _alias(attr):
     """Alias one attribute name to another for backward compatibility"""
@@ -524,6 +520,16 @@ class Tag(PageElement):
             attrs = {}
         else:
             attrs = dict(attrs)
+            if builder.cdata_list_attributes:
+                for cdata_list_attr in builder.cdata_list_attributes:
+                    if cdata_list_attr in attrs:
+                        # Basically, we have a "class" attribute whose
+                        # value is a whitespace-separated list of CSS
+                        # classes. Split it into a list.
+                        value = attrs[cdata_list_attr]
+                        values = whitespace_re.split(value)
+                        if len(values) > 1:
+                            attrs[cdata_list_attr] = values
         self.attrs = attrs
         self.contents = []
         self.setup(parent, previous)
@@ -755,7 +761,9 @@ class Tag(PageElement):
                 if val is None:
                     decoded = key
                 else:
-                    if not isinstance(val, basestring):
+                    if isinstance(val, list) or isinstance(val, tuple):
+                        val = ' '.join(val)
+                    elif not isinstance(val, basestring):
                         val = str(val)
                     if (self.contains_substitutions
                         and eventual_encoding is not None
@@ -907,8 +915,10 @@ class SoupStrainer(object):
 
     def __init__(self, name=None, attrs={}, text=None, **kwargs):
         self.name = name
-        if isinstance(attrs, basestring):
-            kwargs['class'] = _match_css_class(attrs)
+        if not isinstance(attrs, dict):
+            # Treat a non-dict value for attrs as a search for the 'class'
+            # attribute.
+            kwargs['class'] = attrs
             attrs = None
         if kwargs:
             if attrs:
@@ -993,7 +1003,14 @@ class SoupStrainer(object):
     def _matches(self, markup, match_against):
         #print "Matching %s against %s" % (markup, match_against)
         result = False
-        if match_against is True:
+
+        if isinstance(markup, list) or isinstance(markup, tuple):
+            # This should only happen when searching the 'class'
+            # attribute of a tag with multiple CSS classes.
+            for item in markup:
+                if self._matches(item, match_against):
+                    result = True
+        elif match_against is True:
             result = markup is not None
         elif isinstance(match_against, collections.Callable):
             result = match_against(markup)
