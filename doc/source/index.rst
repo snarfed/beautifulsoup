@@ -1464,13 +1464,25 @@ like calling ``.append()`` on a Python list::
    soup.a.contents
    # [u'Foo', u'Bar']
 
-``BeautifulSoup.new_tag()``
----------------------------
+``BeautifulSoup.new_tag()`` and ``new_string()``
+------------------------------------------------
 
-If you need to add a string to a document, no problem--you can just
-pass a Python string in to ``append()``. But what if you need to
-create a whole new tag?  The best solution is to call the factory
-method ``BeautifulSoup.new_tag()``::
+If you need to add a string to a document, no problem--you can pass a
+Python string in to ``append()``, or you can call the factory method
+``BeautifulSoup.new_string()``::
+
+   soup = BeautifulSoup("<b></b>")
+   tag = soup.b
+   tag.append("Hello")
+   new_string = soup.new_string(" there")
+   tag.append(new_string)
+   tag
+   # <b>Hello there.</b>
+   tag.contents
+   # [u'Hello', u' there']
+
+What if you need to create a whole new tag?  The best solution is to
+call the factory method ``BeautifulSoup.new_tag()``::
 
    soup = BeautifulSoup("<b></b>")
    original_tag = soup.b
@@ -1503,6 +1515,28 @@ say. It works just like ``.insert()`` on a Python list::
   # <a href="http://example.com/">I linked to but did not endorse <i>example.com</i></a>
   tag.contents
   # [u'I linked to ', u'but did not endorse', <i>example.com</i>]
+
+``insert_before()`` and ``insert_after()``
+------------------------------------------
+
+The ``insert_before()`` method adds a tag or string to the parse tree
+immediately before something else::
+
+   soup = BeautifulSoup("<b>stop</b>")
+   tag = soup.new_tag("i")
+   tag.string = "Don't"
+   tag.insert_before(soup.b.string)
+   soup.b
+   # <b><i>Don't</i>stop</b>
+
+The ``insert_after()`` method adds a tag or string to the parse tree
+immediately `after` something else::
+
+   soup.new_string(" ever ").insert_after(soup.b.i)
+   soup.b
+   # <b><i>Don't</i> ever stop</b>
+   soup.b.contents
+   # [<i>Don't</i>, u' ever ', u'stop']
 
 ``clear()``
 -----------
@@ -1663,29 +1697,119 @@ within it::
 The ``str()`` function returns a string encoded in UTF-8. See
 `Encodings`_ for other options.
 
-Substituting HTML entities
---------------------------
+You can also call ``encode()`` to get a bytestring, and ``decode()``
+to get Unicode.
 
-If you give Beautiful Soup a document that contains HTML or XML
-entities such as "&lquot;" they'll be converted to Unicode
-characters::
+Output formatters
+-----------------
+
+If you give Beautiful Soup a document that contains HTML entities like
+"&lquot;", they'll be converted to Unicode characters::
 
  soup = BeautifulSoup("&ldquo;Hello,&rdquo; he said.")
  unicode(soup)
  # u'<html><head></head><body>\u201cHello,\u201d he said.</body></html>'
 
 If you then convert the document to a string, the Unicode characters
-will be encoded as UTF-8::
+will be encoded as UTF-8. You won't get the HTML entities back:
 
  str(soup)
  # '<html><head></head><body>\xe2\x80\x9cHello,\xe2\x80\x9d he said.</body></html>'
 
-You can get the HTML entities back (or create them where they didn't
-exist) by calling ``.encode()`` and passing in
-``substitute_html_entities=True``::
+By default, the only characters that are escaped upon output are bare
+ampersands and angle brackets. These get turned into "&amp;", "&lt;",
+and "&gt;", so that Beautiful Soup doesn't inadvertently generate
+invalid HTML or XML::
 
- soup.encode(substitute_html_entities=True)
- # '<html><head></head><body>&ldquo;Hello,&rdquo; he said.</body></html>'
+ soup = BeautifulSoup("<p>The law firm of Dewey, Cheatem, & Howe</p>")
+ soup.p
+ # <p>The law firm of Dewey, Cheatem, &amp; Howe</p>
+
+You can change this behavior by providing a value for the
+``formatter`` argument to ``prettify()``, ``encode()``, or
+``decode()``. Beautiful Soup recognizes four possible values for
+``formatter``
+
+The default is ``formatter="minimal"``. Strings will only be processed
+enough to ensure that Beautiful Soup generates valid HTML/XML::
+
+ french = "<p>Il a dit &lt;&lt;Sacr&eacute; bleu!&gt;&gt;</p>"
+ soup = BeautifulSoup(french)
+ print(soup.prettify(formatter="minimal"))
+ # <html>
+ #  <body>
+ #   <p>
+ #    Il a dit &lt;&lt;Sacré bleu!&gt;&gt;
+ #   </p>
+ #  </body>
+ # </html>
+
+``formatter="html"`` will convert Unicode characters to HTML entities
+whenever possible::
+
+ print(soup.prettify(formatter="html"))
+ # <html>
+ #  <body>
+ #   <p>
+ #    Il a dit &lt;&lt;Sacr&eacute; bleu!&gt;&gt;
+ #   </p>
+ #  </body>
+ # </html>
+
+If you pass in ``formatter=None``, Beautiful Soup will not modify
+strings at all on output. This is the fastest option, but it may lead
+to Beautiful Soup generating invalid HTML/XML, as in this example::
+
+ print(soup.prettify(formatter=None))
+ # <html>
+ #  <body>
+ #   <p>
+ #    Il a dit <<Sacré bleu!>>
+ #   </p>
+ #  </body>
+ # </html>
+
+
+Finally, if you pass in a function for ``formatter``, Beautiful Soup
+will call that function once for every string in the document. You can
+do whatever you want in this function. Here's a formatter that
+converts strings to uppercase and does absolutely nothing else::
+
+ def uppercase(str):
+     return str.upper()
+
+ print(soup.prettify(formatter=uppercase))
+ # <html>
+ #  <body>
+ #   <p>
+ #    IL A DIT <<SACRÉ BLEU!>>
+ #   </p>
+ #  </body>
+ # </html>
+
+If you're writing your own function, you should know about the
+``EntitySubstitution`` class in the ``bs4.dammit`` module. This class
+implements Beautiful Soup's standard formatters as class methods: the
+"html" formatter is ``EntitySubstitution.substitute_html``, and the
+"minimal" formatter is ``EntitySubstitution.substitute_xml``. You can
+use these functions to simulate ``formatter=html`` or
+``formatter==minimal`` but and then do something in addition.
+
+Here's an example that converts strings to uppercase, ``and`` replaces
+Unicode characters with HTML entities whenever possible::
+
+ from bs4.dammit import EntitySubstitution
+ def uppercase_and_substitute_html_entities(str):
+     return EntitySubstitution.substitute_html(str.upper())
+
+ print(soup.prettify(formatter=uppercase_and_substitute_html_entities))
+ # <html>
+ #  <body>
+ #   <p>
+ #    IL A DIT &lt;&lt;SACR&Eacute; BLEU!&gt;&gt;
+ #   </p>
+ #  </body>
+ # </html>
 
 ``get_text()``
 --------------
