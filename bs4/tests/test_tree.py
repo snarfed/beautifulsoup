@@ -682,11 +682,11 @@ class TestTreeModification(SoupTest):
         soup = self.soup("<a>foo</a><b>bar</b>")
         soup.new_string("BAZ").move_before(soup.b)
         soup.new_string("QUUX").move_before(soup.a)
-        self.assertEquals(
+        self.assertEqual(
             soup.decode(), self.document_for("QUUX<a>foo</a>BAZ<b>bar</b>"))
 
         soup.b.move_before(soup.a)
-        self.assertEquals(
+        self.assertEqual(
             soup.decode(), self.document_for("QUUX<b>bar</b><a>foo</a>BAZ"))
 
 
@@ -694,10 +694,10 @@ class TestTreeModification(SoupTest):
         soup = self.soup("<a>foo</a><b>bar</b>")
         soup.new_string("BAZ").move_after(soup.b)
         soup.new_string("QUUX").move_after(soup.a)
-        self.assertEquals(
+        self.assertEqual(
             soup.decode(), self.document_for("<a>foo</a>QUUX<b>bar</b>BAZ"))
         soup.a.move_after(soup.b)
-        self.assertEquals(
+        self.assertEqual(
             soup.decode(), self.document_for("QUUX<b>bar</b><a>foo</a>BAZ"))
 
     def test_move_after_raises_valueerror_if_after_has_no_meaning(self):
@@ -706,11 +706,15 @@ class TestTreeModification(SoupTest):
         string = soup.new_string("")
         self.assertRaises(ValueError, string.move_after, tag)
 
+        self.assertRaises(ValueError, soup.move_after, tag)
+
     def test_move_before_raises_valueerror_if_before_has_no_meaning(self):
         soup = self.soup("")
         tag = soup.new_tag("a")
         string = soup.new_string("")
         self.assertRaises(ValueError, string.move_before, tag)
+
+        self.assertRaises(ValueError, soup.move_before, tag)
 
     def test_replace_with(self):
         soup = self.soup(

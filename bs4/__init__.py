@@ -203,6 +203,12 @@ class BeautifulSoup(Tag):
         navigable.setup()
         return navigable
 
+    def move_before(self, successor):
+        raise ValueError("BeautifulSoup objects don't support move_before().")
+
+    def move_after(self, successor):
+        raise ValueError("BeautifulSoup objects don't support move_after().")
+
     def popTag(self):
         tag = self.tagStack.pop()
         #print "Pop", tag.name
