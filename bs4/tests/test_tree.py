@@ -15,7 +15,7 @@ import re
 import warnings
 from bs4 import BeautifulSoup
 from bs4.builder import builder_registry
-from bs4.element import CData, SoupStrainer, Tag
+from bs4.element import CData, NavigableString, SoupStrainer, Tag
 from bs4.testing import SoupTest
 
 class TreeTest(SoupTest):
@@ -535,6 +535,30 @@ class TestTagCreation(SoupTest):
         self.assertEqual(dict(bar="baz"), new_tag.attrs)
         self.assertEqual(None, new_tag.parent)
 
+    def test_tag_inherits_self_closing_rules_from_builder(self):
+        xml_soup = BeautifulSoup("", "xml")
+        xml_br = xml_soup.new_tag("br")
+        xml_p = xml_soup.new_tag("p")
+
+        # Both the <br> and <p> tag are empty-element, just because
+        # they have no contents.
+        self.assertEqual(b"<br />", xml_br.encode())
+        self.assertEqual(b"<p />", xml_p.encode())
+
+        html_soup = BeautifulSoup("", "html")
+        html_br = html_soup.new_tag("br")
+        html_p = html_soup.new_tag("p")
+
+        # The HTML builder users HTML's rules about which tags are
+        # empty-element tags, and the new tags reflect these rules.
+        self.assertEqual(b"<br />", html_br.encode())
+        self.assertEqual(b"<p></p>", html_p.encode())
+
+    def test_new_string_creates_navigablestring(self):
+        soup = self.soup("")
+        s = soup.new_string("foo")
+        self.assertEqual("foo", s)
+        self.assertTrue(isinstance(s, NavigableString))
 
 class TestTreeModification(SoupTest):
 

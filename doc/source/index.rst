@@ -152,10 +152,11 @@ Installing Beautiful Soup
 =========================
 
 Beautiful Soup 4 is published through PyPi, so you can install it with
-``easy_install``. The package name is ``beautifulsoup4``, and the same
-package works on Python 2 and Python 3.
+``easy_install`` or ``pip``. The package name is ``beautifulsoup4``,
+and the same package works on Python 2 and Python 3.
 
 :kbd:`$ easy_install beautifulsoup4`
+:kbd:`$ pip install beautifulsoup4`
 
 (The ``BeautifulSoup`` package is probably `not` what you want. That's
 the previous major release, `Beautiful Soup 3`_. Lots of software uses
@@ -163,11 +164,10 @@ BS3, so it's still available, but if you're writing new code you
 should install ``beautifulsoup4``.)
 
 You can also `download the Beautiful Soup 4 source tarball
-<http://www.crummy.com/software/BeautifulSoup/download/4.x/beautifulsoup4-4.0.0b3.tar.gz>`_
-and install it with ``setup.py``. The license for Beautiful Soup
-allows you to package the entire library with your application, so you
-can also download the tarball and insert the ``bs4`` directory into
-your application's codebase.
+<http://www.crummy.com/software/BeautifulSoup/download/4.x/>`_ and
+install it with ``setup.py``. The license for Beautiful Soup allows
+you to package the entire library with your application, allowing you
+to copy the ``bs4`` directory into your application's codebase.
 
 I use Python 2.7 and Python 3.2 to develop Beautiful Soup, but it
 should work with other recent versions.
@@ -177,10 +177,15 @@ should work with other recent versions.
 Be sure to install a good parser!
 ---------------------------------
 
-By default, Beautiful Soup uses the HTML parser that comes with
-Python. Unfortunately, that parser is not very good at handling bad
-HTML. I recommend you install the `lxml parser
-<http://lxml.de/>`_. It's very fast, it works with both Python 2 and
+Beautiful Soup uses a plugin system that supports a number of popular
+Python parsers. If no third-party parsers are installed, Beautiful
+Soup uses the HTML parser that comes with Python. In recent releases
+of Python (2.7.2 and 3.2.2), this parser works pretty well at handling
+bad HTML. In older releases, it's not so good.
+
+Even if you're using a recent release of Python, I recommend you
+install the `lxml parser <http://lxml.de/>`_ if possible. It's much
+faster than Python's built-in parser. It works with both Python 2 and
 Python 3, and it parses HTML and XML very well. Beautiful Soup will
 detect that you have lxml installed, and use it instead of Python's
 built-in parser.
@@ -191,6 +196,8 @@ Depending on your setup, you might install lxml with one of these commands:
 
 :kbd:`$ easy_install lxml`
 
+:kbd:`$ pip install lxml`
+
 If you're using Python 2, another alternative is the pure-Python
 `html5lib parser <http://code.google.com/p/html5lib/>`_, which parses
 HTML the way a web browser does. Depending on your setup, you might
@@ -199,6 +206,8 @@ install html5lib with one of these commands:
 :kbd:`$ apt-get install python-html5lib`
 
 :kbd:`$ easy_install html5lib`
+
+:kbd:`$ pip install html5lib`
 
 Making the soup
 ===============
@@ -1464,7 +1473,7 @@ like calling ``.append()`` on a Python list::
    soup.a.contents
    # [u'Foo', u'Bar']
 
-``BeautifulSoup.new_tag()`` and ``new_string()``
+``BeautifulSoup.new_string()`` and ``.new_tag()``
 ------------------------------------------------
 
 If you need to add a string to a document, no problem--you can pass a
@@ -1487,7 +1496,7 @@ call the factory method ``BeautifulSoup.new_tag()``::
    soup = BeautifulSoup("<b></b>")
    original_tag = soup.b
 
-   new_tag = soup.new_tag("a", dict(href="http://www.example.com"))
+   new_tag = soup.new_tag("a", href="http://www.example.com")
    original_tag.append(new_tag)
    original_tag
    # <b><a href="http://www.example.com"></a></b>
@@ -1519,8 +1528,8 @@ say. It works just like ``.insert()`` on a Python list::
 ``move_before()`` and ``move_after()``
 ------------------------------------------
 
-The ``move_before()`` method adds a tag or string to the parse tree
-immediately before something else::
+The ``move_before()`` method moves a tag or string so that it
+immediately precedes something else in the parse tree::
 
    soup = BeautifulSoup("<b>stop</b>")
    tag = soup.new_tag("i")
@@ -1529,8 +1538,8 @@ immediately before something else::
    soup.b
    # <b><i>Don't</i>stop</b>
 
-The ``move_after()`` method adds a tag or string to the parse tree
-immediately `after` something else::
+The ``move_after()`` method moves a tag or string so that it
+immediately follows something else in the parse tree::
 
    soup.new_string(" ever ").move_after(soup.b.i)
    soup.b
@@ -2232,11 +2241,12 @@ Beautiful Soup 3.2.0 is the old version, the last release of the
 Beautiful Soup 3 series. It's currently the version packaged with all
 major Linux distributions::
 
- $ apt-get install python-beautifulsoup
+:kbd:`$ apt-get install python-beautifulsoup`
 
 It's also published through PyPi as `BeautifulSoup`.::
 
- $ easy_install BeautifulSoup
+:kbd:`$ easy_install BeautifulSoup`
+:kbd:`$ pip install BeautifulSoup`
 
 You can also `download a tarball of Beautiful Soup 3.2.0
 <http://www.crummy.com/software/BeautifulSoup/bs3/download/3.x/BeautifulSoup-3.2.0.tar.gz>`_.

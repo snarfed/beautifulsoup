@@ -17,6 +17,12 @@ try:
 except ImportError:
     HTML5LIB_PRESENT = False
 
+try:
+    from bs4.builder import LXMLTreeBuilder
+    LXML_PRESENT = True
+except ImportError:
+    LXML_PRESENT = False
+
 
 class BuiltInRegistryTest(unittest.TestCase):
     """Test the built-in registry with the default builders registered."""
@@ -29,14 +35,14 @@ class BuiltInRegistryTest(unittest.TestCase):
         self.assertEqual(registry.lookup('strict', 'html'),
                           HTMLParserTreeBuilder)
         if HTML5LIB_PRESENT:
-            self.assertEqual(registry.lookup('permissive', 'html'),
+            self.assertEqual(registry.lookup('html5lib', 'html'),
                               HTML5TreeBuilder)
 
     def test_lookup_by_markup_type(self):
-        if HTML5LIB_PRESENT:
-            self.assertEqual(registry.lookup('html'), HTML5TreeBuilder)
-        else:
+        if LXML_PRESENT:
             self.assertEqual(registry.lookup('html'), LXMLTreeBuilder)
+        else:
+            self.assertEqual(registry.lookup('html'), HTML5TreeBuilder)
         self.assertEqual(registry.lookup('xml'), LXMLTreeBuilderForXML)
 
     def test_named_library(self):

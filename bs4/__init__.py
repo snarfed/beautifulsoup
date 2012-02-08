@@ -169,10 +169,10 @@ class BeautifulSoup(Tag):
         except StopParsing:
             pass
 
-        # Clear out the markup and the builder so they can be CGed.
+        # Clear out the markup and remove the builder's circular
+        # reference to this object.
         self.markup = None
         self.builder.soup = None
-        self.builder = None
 
     def _feed(self):
         # Convert the document to Unicode.
@@ -195,7 +195,7 @@ class BeautifulSoup(Tag):
 
     def new_tag(self, name, **attrs):
         """Create a new tag associated with this soup."""
-        return Tag(None, None, name, attrs)
+        return Tag(None, self.builder, name, attrs)
 
     def new_string(self, s):
         """Create a new NavigableString associated with this soup."""

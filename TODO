@@ -11,10 +11,6 @@ Big features
 
 * Add namespace support.
 
-* soup.new_tag("<br>") should create an empty-element tag if the soup
-was created with an HTML-aware builder, but not otherwise. This
-requires keeping around information about the builder.
-
 Optimizations
 -------------
 
