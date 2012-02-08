@@ -34,21 +34,20 @@
    </tag3>
   </tag1>
 
-The bs4/doc directory contains full documentation in Sphinx
-format. Run "make html" to create HTML documentation.
+= Full documentation =
+
+The bs4/doc/ directory contains full documentation in Sphinx
+format. Run "make html" in that directory to create HTML
+documentation.
 
 = Running the unit tests =
 
-Here's how to run the tests on Python 2.7:
+Beautiful Soup supports unit test discovery. You can run the tests
+from the project root directory with this command:
 
- $ cd bs4
- $ python2.7 -m unittest discover -s bs4
+ $ python -m unittest discover -s bs4
 
-Here's how to do it with Python 3.2:
-
- $ ./convert-py3k
- $ cd py3k/bs4
- $ python3 -m unittest discover -s bs4
-
-The script test-all-versions will run the tests twice, once on Python
-2.7 and once on Python 3.
+If you checked out the source tree, you should see a script in the
+home directory called test-all-versions. This script will run the unit
+tests under Python 2.7, then create a temporary Python 3 conversion of
+the source and run the unit tests again under Python 3.

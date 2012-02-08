@@ -1,30 +1,32 @@
-= 4.0 beta 4 =
+= 4.0.0b4 =
 
-Added BeautifulSoup.new_string() to go along with BeautifulSoup.new_tag()
+* Added BeautifulSoup.new_string() to go along with BeautifulSoup.new_tag()
 
-BeautifulSoup.new_tag() will follow the rules of whatever tree-builder
-was used to create the original BeautifulSoup object. A new <p> tag
-will look like "<p />" if the soup object was created to parse XML,
-but it will look like "<p></p>" if the soup object was created to
-parse HTML.
+* BeautifulSoup.new_tag() will follow the rules of whatever
+  tree-builder was used to create the original BeautifulSoup object. A
+  new <p> tag will look like "<p />" if the soup object was created to
+  parse XML, but it will look like "<p></p>" if the soup object was
+  created to parse HTML.
 
-We pass in strict=False to html.parser on Python 3, greatly improving
-html.parser's ability to handle bad HTML.
+* We pass in strict=False to html.parser on Python 3, greatly
+  improving html.parser's ability to handle bad HTML.
 
-Monkeypatch a serious bug in html.parser that made strict=False
-disastrous on Python 3.2.2.
+* We also monkeypatch a serious bug in html.parser that made
+  strict=False disastrous on Python 3.2.2.
 
-Replaced the "substitute_html_entities" argument with the "formatter" argument.
+* Replaced the "substitute_html_entities" argument with the
+  "formatter" argument.
 
-Bare ampersands and angle brackets are always converted to XML
-entities unless the user prevents it.
+* Bare ampersands and angle brackets are always converted to XML
+  entities unless the user prevents it.
 
-Added PageElement.insert_before().
+* Added PageElement.insert_before().
 
-Added PageElement.insert_after().
+* Added PageElement.insert_after().
 
-Raise an exception when the user tries to do something nonsensical
-like insert a tag into itself.
+* Raise an exception when the user tries to do something nonsensical
+  like insert a tag into itself.
+
 
 = 4.0.0b3 =
 
