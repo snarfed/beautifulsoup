@@ -53,7 +53,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
             return markup, None, None
 
         try_encodings = [user_specified_encoding, document_declared_encoding]
-        dammit = UnicodeDammit(markup, try_encodings, isHTML=True)
+        dammit = UnicodeDammit(markup, try_encodings, is_html=True)
         return (dammit.markup, dammit.original_encoding,
                 dammit.declared_html_encoding)
 

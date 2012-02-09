@@ -27,6 +27,8 @@ try:
 except ImportError:
     pass
 
+xml_encoding_re = re.compile('^<\?.*encoding=[\'"](.*?)[\'"].*\?>'.encode(), re.I)
+html_meta_re = re.compile('<\s*meta[^>]+charset=([^>]*?)[;\'">]'.encode(), re.I)
 
 class EntitySubstitution(object):
 
@@ -165,18 +167,19 @@ class UnicodeDammit:
         ]
 
     def __init__(self, markup, override_encodings=[],
-                 smart_quotes_to=None, isHTML=False):
+                 smart_quotes_to=None, is_html=False):
         self.declared_html_encoding = None
         self.smart_quotes_to = smart_quotes_to
         self.tried_encodings = []
 
         if markup == '' or isinstance(markup, unicode):
-            self.original_encoding = None
+            self.markup = markup
             self.unicode_markup = unicode(markup)
+            self.original_encoding = None
             return
 
         self.markup, document_encoding, sniffed_encoding = \
-                     self._detectEncoding(markup, isHTML)
+                     self._detectEncoding(markup, is_html)
 
         u = None
         for proposed_encoding in (
@@ -267,7 +270,7 @@ class UnicodeDammit:
         newdata = unicode(data, encoding)
         return newdata
 
-    def _detectEncoding(self, xml_data, isHTML=False):
+    def _detectEncoding(self, xml_data, is_html=False):
         """Given a document, tries to detect its XML encoding."""
         xml_encoding = sniffed_xml_encoding = None
         try:
@@ -317,16 +320,13 @@ class UnicodeDammit:
                 pass
         except:
             xml_encoding_match = None
-        xml_encoding_re = '^<\?.*encoding=[\'"](.*?)[\'"].*\?>'.encode()
-        xml_encoding_match = re.compile(xml_encoding_re).match(xml_data)
-        if not xml_encoding_match and isHTML:
-            meta_re = '<\s*meta[^>]+charset=([^>]*?)[;\'">]'.encode()
-            regexp = re.compile(meta_re, re.I)
-            xml_encoding_match = regexp.search(xml_data)
+        xml_encoding_match = xml_encoding_re.match(xml_data)
+        if not xml_encoding_match and is_html:
+            xml_encoding_match = html_meta_re.search(xml_data)
         if xml_encoding_match is not None:
             xml_encoding = xml_encoding_match.groups()[0].decode(
                 'ascii').lower()
-            if isHTML:
+            if is_html:
                 self.declared_html_encoding = xml_encoding
             if sniffed_xml_encoding and \
                (xml_encoding in ('iso-10646-ucs-2', 'ucs-2', 'csunicode',
