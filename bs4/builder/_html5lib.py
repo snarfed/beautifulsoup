@@ -9,7 +9,10 @@ from bs4.builder import (
     HTMLTreeBuilder,
     )
 import html5lib
-from html5lib.constants import DataLossWarning
+from html5lib.constants import (
+    DataLossWarning,
+    namespaces,
+    )
 import warnings
 from bs4.element import (
     Comment,
