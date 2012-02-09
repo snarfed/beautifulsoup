@@ -167,14 +167,16 @@ class UnicodeDammit:
     def __init__(self, markup, override_encodings=[],
                  smart_quotes_to=None, isHTML=False):
         self.declared_html_encoding = None
-        self.markup, document_encoding, sniffed_encoding = \
-                     self._detectEncoding(markup, isHTML)
         self.smart_quotes_to = smart_quotes_to
         self.tried_encodings = []
+
         if markup == '' or isinstance(markup, unicode):
             self.original_encoding = None
             self.unicode_markup = unicode(markup)
             return
+
+        self.markup, document_encoding, sniffed_encoding = \
+                     self._detectEncoding(markup, isHTML)
 
         u = None
         for proposed_encoding in (

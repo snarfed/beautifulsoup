@@ -20,6 +20,9 @@
 * Fixed a bug that wrecked the tree if you replaced an element with an
   empty string. [bug=728697]
 
+* Improved Unicode, Dammit's behavior when you give it Unicode to
+  begin with.
+
 = 4.0.0b4 (20120208) =
 
 * Added BeautifulSoup.new_string() to go along with BeautifulSoup.new_tag()
