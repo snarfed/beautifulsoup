@@ -14,6 +14,9 @@
   object to search against a tag's CSS classes. Previously this only
   worked if you passed in a string.
 
+* Fixed a bug that caused a crash when you passed a dictionary as an
+  attribute value (possibly because you mistyped "attrs"). [bug=842419]
+
 = 4.0.0b4 (20120208) =
 
 * Added BeautifulSoup.new_string() to go along with BeautifulSoup.new_tag()

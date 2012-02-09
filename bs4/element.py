@@ -1030,7 +1030,10 @@ class SoupStrainer(object):
                     and not isinstance(match_against, basestring)):
                 result = markup in match_against
             elif hasattr(match_against, 'items'):
-                result = match_against in markup
+                if markup is None:
+                    result = len(match_against.items()) == 0
+                else:
+                    result = match_against in markup
             elif match_against and isinstance(markup, basestring):
                 match_against = markup.__class__(match_against)
 
