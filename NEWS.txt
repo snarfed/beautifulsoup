@@ -17,6 +17,9 @@
 * Fixed a bug that caused a crash when you passed a dictionary as an
   attribute value (possibly because you mistyped "attrs"). [bug=842419]
 
+* Fixed a bug that wrecked the tree if you replaced an element with an
+  empty string. [bug=728697]
+
 = 4.0.0b4 (20120208) =
 
 * Added BeautifulSoup.new_string() to go along with BeautifulSoup.new_tag()

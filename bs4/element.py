@@ -51,7 +51,7 @@ class PageElement(object):
         self.next_element = None
         self.previous_sibling = None
         self.next_sibling = None
-        if self.parent and self.parent.contents:
+        if self.parent is not None and self.parent.contents:
             self.previous_sibling = self.parent.contents[-1]
             self.previous_sibling.next_sibling = self
 
@@ -89,7 +89,7 @@ class PageElement(object):
 
     def extract(self):
         """Destructively rips this element out of the tree."""
-        if self.parent:
+        if self.parent is not None:
             del self.parent.contents[self.parent.index(self)]
 
         #Find the two elements that would be next to each other if
@@ -98,17 +98,17 @@ class PageElement(object):
         last_child = self._last_descendant()
         next_element = last_child.next_element
 
-        if self.previous_element:
+        if self.previous_element is not None:
             self.previous_element.next_element = next_element
-        if next_element:
+        if next_element is not None:
             next_element.previous_element = self.previous_element
         self.previous_element = None
         last_child.next_element = None
 
         self.parent = None
-        if self.previous_sibling:
+        if self.previous_sibling is not None:
             self.previous_sibling.next_sibling = self.next_sibling
-        if self.next_sibling:
+        if self.next_sibling is not None:
             self.next_sibling.previous_sibling = self.previous_sibling
         self.previous_sibling = self.next_sibling = None
         return self
@@ -152,7 +152,7 @@ class PageElement(object):
             new_child.previous_sibling = previous_child
             new_child.previous_sibling.next_sibling = new_child
             new_child.previous_element = previous_child._last_descendant()
-        if new_child.previous:
+        if new_child.previous_element is not None:
             new_child.previous_element.next_element = new_child
 
         new_childs_last_element = new_child._last_descendant()
@@ -162,23 +162,26 @@ class PageElement(object):
 
             parent = self
             parents_next_sibling = None
-            while not parents_next_sibling:
+            while parents_next_sibling is None and parent is not None:
                 parents_next_sibling = parent.next_sibling
                 parent = parent.parent
-                if not parent:  # This is the last element in the document.
+                if parents_next_sibling is not None:
+                    # We found the element that comes next in the document.
                     break
-            if parents_next_sibling:
+            if parents_next_sibling is not None:
                 new_childs_last_element.next_element = parents_next_sibling
             else:
+                # The last element of this tag is the last element in
+                # the document.
                 new_childs_last_element.next_element = None
         else:
             next_child = self.contents[position]
             new_child.next_sibling = next_child
-            if new_child.next_sibling:
+            if new_child.next_sibling is not None:
                 new_child.next_sibling.previous_sibling = new_child
             new_childs_last_element.next_element = next_child
 
-        if new_childs_last_element.next_element:
+        if new_childs_last_element.next_element is not None:
             new_childs_last_element.next_element.previous_element = new_childs_last_element
         self.contents.insert(position, new_child)
 

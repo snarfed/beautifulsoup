@@ -664,6 +664,21 @@ class TestTreeModification(SoupTest):
         soup = self.soup(text)
         self.assertRaises(ValueError, soup.a.insert, 0, soup.a)
 
+    def test_replace_with_maintains_next_element_throughout(self):
+        soup = self.soup('<p><a>one</a><b>three</b></p>')
+        a = soup.a
+        b = a.contents[0]
+        # Make it so the <a> tag has two text children.
+        a.insert(1, "two")
+
+        # Now replace each one with the empty string.
+        left, right = a.contents
+        left.replaceWith('')
+        right.replaceWith('')
+
+        # The <b> tag is still connected to the tree.
+        self.assertEqual("three", soup.b.string)
+
     def test_replace_final_node(self):
         soup = self.soup("<b>Argh!</b>")
         soup.find(text="Argh!").replace_with("Hooray!")
