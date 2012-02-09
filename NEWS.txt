@@ -7,7 +7,7 @@
 
   This actually affects all attributes that the HTML standard defines
   as taking multiple values (class, rel, rev, archive, accept-charset,
-  and headers), but 'class' is by far the most common.
+  and headers), but 'class' is by far the most common. [bug=41034]
 
 * If you pass anything other than a dictionary as the second argument
   to one of the find* methods, it'll assume you want to use that
