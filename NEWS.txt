@@ -20,6 +20,9 @@
 * Unicode, Dammit now detects the encoding in HTML 5-style <meta> tags
   like <meta charset="utf-8" />. [bug=837268]
 
+* Patched over a bug in html5lib (?) that was crashing Beautiful Soup
+  on certain kinds of markup. [bug=838800]
+
 * Fixed a bug that wrecked the tree if you replaced an element with an
   empty string. [bug=728697]
 

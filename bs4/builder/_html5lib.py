@@ -195,7 +195,10 @@ class Element(html5lib.treebuilders._base.Node):
 
     def removeChild(self, node):
         index = self._nodeIndex(node.parent, node)
-        del node.parent.element.contents[index]
+        # XXX This if statement is problematic:
+        # https://bugs.launchpad.net/beautifulsoup/+bug/838800
+        if index is not None:
+            del node.parent.element.contents[index]
         node.element.parent = None
         node.element.extract()
         node.parent = None
