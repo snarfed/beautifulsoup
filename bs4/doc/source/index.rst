@@ -2080,10 +2080,13 @@ In rare cases (usually when a UTF-8 document contains text written in
 a completely different encoding), the only way to get Unicode may be
 to replace some characters with the special Unicode character
 "REPLACEMENT CHARACTER" (U+FFFD, �). If Unicode, Dammit needs to do
-this, it will set the ``.characters_were_replaced`` attribute to
-``True`` on the ``UnicodeDammit`` or ``BeautifulSoup`` object. This
+this, it will set the ``.contains_replacement_characters`` attribute
+to ``True`` on the ``UnicodeDammit`` or ``BeautifulSoup`` object. This
 lets you know that the Unicode representation is not an exact
-representation of the original--some data was lost.
+representation of the original--some data was lost. If a document
+contains �, but ``.contains_replacement_characters`` if ``False``,
+you'll know that the � was there originally (as it is in this
+paragrpah) and doesn't stand in for missing data.
 
 Output encoding
 ---------------
