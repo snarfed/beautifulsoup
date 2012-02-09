@@ -1,4 +1,4 @@
-= 4.0.0b5 =
+= 4.0.0b5 (20120209) =
 
 * Rationalized Beautiful Soup's treatment of CSS class. A tag
   belonging to multiple CSS classes is treated as having a list of
