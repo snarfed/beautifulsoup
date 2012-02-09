@@ -27,8 +27,10 @@ try:
 except ImportError:
     pass
 
-xml_encoding_re = re.compile('^<\?.*encoding=[\'"](.*?)[\'"].*\?>'.encode(), re.I)
-html_meta_re = re.compile('<\s*meta[^>]+charset=([^>]*?)[;\'">]'.encode(), re.I)
+xml_encoding_re = re.compile(
+    '^<\?.*encoding=[\'"](.*?)[\'"].*\?>'.encode(), re.I)
+html_meta_re = re.compile(
+    '<\s*meta[^>]+charset\s*=\s*["\']?([^>]*?)[ /;\'">]'.encode(), re.I)
 
 class EntitySubstitution(object):
 

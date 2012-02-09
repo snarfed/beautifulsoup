@@ -151,3 +151,14 @@ class TestUnicodeDammit(unittest.TestCase):
         for bad_encoding in ['.utf8', '...', 'utF---16.!']:
             dammit = UnicodeDammit(utf8_data, [bad_encoding])
             self.assertEqual(dammit.original_encoding, 'utf-8')
+
+    def test_detect_html5_style_meta_tag(self):
+
+        for data in (
+            b'<html><meta charset="euc-jp" /></html>',
+            b"<html><meta charset='euc-jp' /></html>",
+            b"<html><meta charset=euc-jp /></html>",
+            b"<html><meta charset=euc-jp/></html>"):
+            dammit = UnicodeDammit(data, is_html=True)
+            self.assertEquals(
+                "euc-jp", dammit.original_encoding)

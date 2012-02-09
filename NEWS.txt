@@ -17,6 +17,9 @@
 * Fixed a bug that caused a crash when you passed a dictionary as an
   attribute value (possibly because you mistyped "attrs"). [bug=842419]
 
+* Unicode, Dammit now detects the encoding in HTML 5-style <meta> tags
+  like <meta charset="utf-8" />. [bug=837268]
+
 * Fixed a bug that wrecked the tree if you replaced an element with an
   empty string. [bug=728697]
 
