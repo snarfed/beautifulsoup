@@ -161,7 +161,8 @@ class BeautifulSoup(Tag):
 
         if hasattr(markup, 'read'):        # It's a file-type object.
             markup = markup.read()
-        self.markup, self.original_encoding, self.declared_html_encoding = (
+        (self.markup, self.original_encoding, self.declared_html_encoding,
+         self.contains_replacement_characters) = (
             self.builder.prepare_markup(markup, from_encoding))
 
         try:

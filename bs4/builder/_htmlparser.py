@@ -51,16 +51,18 @@ class HTMLParserTreeBuilder(HTMLParser, HTMLTreeBuilder):
     def prepare_markup(self, markup, user_specified_encoding=None,
                        document_declared_encoding=None):
         """
-        :return: A 3-tuple (markup, original encoding, encoding
-        declared within markup).
+        :return: A 4-tuple (markup, original encoding, encoding
+        declared within markup, whether any characters had to be
+        replaced with REPLACEMENT CHARACTER).
         """
         if isinstance(markup, unicode):
-            return markup, None, None
+            return markup, None, None, False
 
         try_encodings = [user_specified_encoding, document_declared_encoding]
         dammit = UnicodeDammit(markup, try_encodings, is_html=True)
         return (dammit.markup, dammit.original_encoding,
-                dammit.declared_html_encoding)
+                dammit.declared_html_encoding,
+                dammit.contains_replacement_characters)
 
     def feed(self, markup):
         super(HTMLParserTreeBuilder, self).feed(markup)

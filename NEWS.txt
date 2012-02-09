@@ -20,6 +20,12 @@
 * Unicode, Dammit now detects the encoding in HTML 5-style <meta> tags
   like <meta charset="utf-8" />. [bug=837268]
 
+* If Unicode, Dammit can't figure out a consistent encoding for a
+  page, it will try each of its guesses again, with errors="replace"
+  instead of errors="strict". This may mean that some data gets
+  replaced with REPLACEMENT CHARACTER, but at least most of it will
+  get turned into Unicode. [bug=754903]
+
 * Patched over a bug in html5lib (?) that was crashing Beautiful Soup
   on certain kinds of markup. [bug=838800]
 

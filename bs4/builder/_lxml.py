@@ -50,12 +50,13 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         declared within markup).
         """
         if isinstance(markup, unicode):
-            return markup, None, None
+            return markup, None, None, False
 
         try_encodings = [user_specified_encoding, document_declared_encoding]
         dammit = UnicodeDammit(markup, try_encodings, is_html=True)
         return (dammit.markup, dammit.original_encoding,
-                dammit.declared_html_encoding)
+                dammit.declared_html_encoding,
+                dammit.contains_replacement_characters)
 
     def feed(self, markup):
         self.parser.feed(markup)

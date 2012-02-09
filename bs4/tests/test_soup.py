@@ -2,6 +2,7 @@
 """Tests of Beautiful Soup as a whole."""
 
 import unittest
+from bs4 import BeautifulSoup
 from bs4.element import SoupStrainer
 from bs4.dammit import EntitySubstitution, UnicodeDammit
 from bs4.testing import SoupTest
@@ -162,3 +163,23 @@ class TestUnicodeDammit(unittest.TestCase):
             dammit = UnicodeDammit(data, is_html=True)
             self.assertEquals(
                 "euc-jp", dammit.original_encoding)
+
+    def test_last_ditch_entity_replacement(self):
+        # This is a UTF-8 document that contains bytestrings
+        # completely incompatible with UTF-8 (encoded with some other
+        # encoding).
+        #
+        # Since there is no consistent encoding for the document,
+        # Unicode, Dammit will eventually encode the document as UTF-8
+        # and encode the incompatible characters as REPLACEMENT
+        # CHARACTER.
+
+        doc = b"""\357\273\277<?xml version="1.0" encoding="UTF-8"?>
+<html><b>\330\250\330\252\330\261</b>
+<i>\310\322\321\220\312\321\355\344</i></html>"""
+        dammit = UnicodeDammit(doc)
+        self.assertEqual(True, dammit.contains_replacement_characters)
+        self.assertTrue(u"\ufffd" in dammit.unicode_markup)
+
+        soup = BeautifulSoup(doc)
+        self.assertTrue(soup.contains_replacement_characters)

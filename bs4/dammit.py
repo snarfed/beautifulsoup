@@ -173,6 +173,7 @@ class UnicodeDammit:
         self.declared_html_encoding = None
         self.smart_quotes_to = smart_quotes_to
         self.tried_encodings = []
+        self.contains_replacement_characters = False
 
         if markup == '' or isinstance(markup, unicode):
             self.markup = markup
@@ -202,6 +203,20 @@ class UnicodeDammit:
                 if u:
                     break
 
+        # As an absolute last resort, try the encodings again with
+        # character replacement.
+        if not u:
+            for proposed_encoding in (
+                override_encodings + [
+                    document_encoding, sniffed_encoding, "utf-8", "windows-1252"]):
+                if proposed_encoding != "ascii":
+                    u = self._convert_from(proposed_encoding, "replace")
+                if u is not None:
+                    self.contains_replacement_characters = True
+                    break
+
+        # We could at this point force it to ASCII, but that would
+        # destroy so much data that I think giving up is better
         self.unicode_markup = u
         if not u:
             self.original_encoding = None
@@ -220,11 +235,11 @@ class UnicodeDammit:
             sub = sub.encode()
         return sub
 
-    def _convert_from(self, proposed):
+    def _convert_from(self, proposed, errors="strict"):
         proposed = self.find_codec(proposed)
-        if not proposed or proposed in self.tried_encodings:
+        if not proposed or (proposed, errors) in self.tried_encodings:
             return None
-        self.tried_encodings.append(proposed)
+        self.tried_encodings.append((proposed, errors))
         markup = self.markup
 
         # Convert smart quotes to HTML if coming from an encoding
@@ -236,18 +251,19 @@ class UnicodeDammit:
             markup = smart_quotes_compiled.sub(self._sub_ms_char, markup)
 
         try:
-            # print "Trying to convert document to %s" % proposed
-            u = self._to_unicode(markup, proposed)
+            #print "Trying to convert document to %s (errors=%s)" % (
+            #    proposed, errors)
+            u = self._to_unicode(markup, proposed, errors)
             self.markup = u
             self.original_encoding = proposed
         except Exception as e:
-            # print "That didn't work!"
-            # print e
+            #print "That didn't work!"
+            #print e
             return None
         #print "Correct encoding: %s" % proposed
         return self.markup
 
-    def _to_unicode(self, data, encoding):
+    def _to_unicode(self, data, encoding, errors="strict"):
         '''Given a string and its encoding, decodes the string into Unicode.
         %encoding is a string recognized by encodings.aliases'''
 
@@ -269,7 +285,7 @@ class UnicodeDammit:
         elif data[:4] == '\xff\xfe\x00\x00':
             encoding = 'utf-32le'
             data = data[4:]
-        newdata = unicode(data, encoding)
+        newdata = unicode(data, encoding, errors)
         return newdata
 
     def _detectEncoding(self, xml_data, is_html=False):

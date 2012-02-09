@@ -2076,6 +2076,15 @@ We can fix this by passing in the correct ``from_encoding``::
  soup.original_encoding
  'iso8859-8'
 
+In rare cases (usually when a UTF-8 document contains text written in
+a completely different encoding), the only way to get Unicode may be
+to replace some characters with the special Unicode character
+"REPLACEMENT CHARACTER" (U+FFFD, �). If Unicode, Dammit needs to do
+this, it will set the ``.characters_were_replaced`` attribute to
+``True`` on the ``UnicodeDammit`` or ``BeautifulSoup`` object. This
+lets you know that the Unicode representation is not an exact
+representation of the original--some data was lost.
+
 Output encoding
 ---------------
 
