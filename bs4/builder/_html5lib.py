@@ -78,7 +78,8 @@ class TreeBuilderForHtml5lib(html5lib.treebuilders._base.TreeBuilder):
     def elementClass(self, name, namespace):
         if namespace is not None:
             warnings.warn("BeautifulSoup cannot represent elements in any namespace", DataLossWarning)
-        return Element(Tag(self.soup, self.soup.builder, name), self.soup, namespace)
+        tag = self.soup.new_tag(name)
+        return Element(tag, self.soup, namespace)
 
     def commentClass(self, data):
         return TextNode(Comment(data), self.soup)
@@ -89,10 +90,8 @@ class TreeBuilderForHtml5lib(html5lib.treebuilders._base.TreeBuilder):
         return Element(self.soup, self.soup, None)
 
     def appendChild(self, node):
-        self.soup.insert(len(self.soup.contents), node.element)
-
-    def testSerializer(self, element):
-        return testSerializer(element)
+        # XXX This code is not covered by the BS4 tests.
+        self.soup.append(node.element)
 
     def getDocument(self):
         return self.soup
@@ -192,9 +191,11 @@ class Element(html5lib.treebuilders._base.Node):
             child = self.element.contents[0]
             child.extract()
             if isinstance(child, Tag):
-                newParent.appendChild(Element(child, self.soup, namespaces["html"]))
+                newParent.appendChild(
+                    Element(child, self.soup, namespaces["html"]))
             else:
-                newParent.appendChild(TextNode(child, self.soup))
+                newParent.appendChild(
+                    TextNode(child, self.soup))
 
     def cloneNode(self):
         tag = self.soup.new_tag(self.element.name)
