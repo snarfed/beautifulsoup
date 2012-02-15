@@ -128,8 +128,8 @@ class Element(html5lib.treebuilders._base.Node):
 
     def _nodeIndex(self, node, refNode):
         # Finds a node by identity rather than equality
-        for index in range(len(self.element.contents)):
-            if id(self.element.contents[index]) == id(refNode.element):
+        for index, element in enumerate(self.element.contents):
+            if id(element) == id(refNode.element):
                 return index
         return None
 
@@ -138,14 +138,11 @@ class Element(html5lib.treebuilders._base.Node):
             and self.element.contents[-1].__class__ == NavigableString):
             # Concatenate new text onto old text node
             # (TODO: This has O(n^2) performance, for input like "a</a>a</a>a</a>...")
-            newStr = NavigableString(self.element.contents[-1]+node.element)
+            newStr = self.soup.new_string(
+                self.element.contents[-1]+node.element)
 
             # Remove the old text node
-            # (Can't simply use .extract() by itself, because it fails if
-            # an equal text node exists within the parent node)
             oldElement = self.element.contents[-1]
-            del self.element.contents[-1]
-            oldElement.parent = None
             oldElement.extract()
 
             self.element.insert(len(self.element.contents), newStr)
@@ -171,7 +168,7 @@ class Element(html5lib.treebuilders._base.Node):
     attributes = property(getAttributes, setAttributes)
 
     def insertText(self, data, insertBefore=None):
-        text = TextNode(NavigableString(data), self.soup)
+        text = TextNode(self.soup.new_string(data), self.soup)
         if insertBefore:
             self.insertBefore(text, insertBefore)
         else:
@@ -184,8 +181,6 @@ class Element(html5lib.treebuilders._base.Node):
             # (See comments in appendChild)
             newStr = NavigableString(self.element.contents[index-1]+node.element)
             oldNode = self.element.contents[index-1]
-            del self.element.contents[index-1]
-            oldNode.parent = None
             oldNode.extract()
 
             self.element.insert(index-1, newStr)
@@ -194,14 +189,7 @@ class Element(html5lib.treebuilders._base.Node):
             node.parent = self
 
     def removeChild(self, node):
-        index = self._nodeIndex(node.parent, node)
-        # XXX This if statement is problematic:
-        # https://bugs.launchpad.net/beautifulsoup/+bug/838800
-        if index is not None:
-            del node.parent.element.contents[index]
-        node.element.parent = None
         node.element.extract()
-        node.parent = None
 
     def reparentChildren(self, newParent):
         while self.element.contents:
@@ -213,7 +201,8 @@ class Element(html5lib.treebuilders._base.Node):
                 newParent.appendChild(TextNode(child, self.soup))
 
     def cloneNode(self):
-        node = Element(Tag(self.soup, self.soup.builder, self.element.name), self.soup, self.namespace)
+        tag = self.soup.new_tag(self.element.name)
+        node = Element(tag, self.soup, self.namespace)
         for key,value in self.attributes:
             node.attributes[key] = value
         return node
