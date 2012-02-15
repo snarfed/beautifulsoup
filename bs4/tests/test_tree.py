@@ -1065,6 +1065,15 @@ class TestCDAtaListAttributes(SoupTest):
         soup = self.soup('<form accept-charset="ISO-8859-1 UTF-8">')
         self.assertEqual(['ISO-8859-1', 'UTF-8'], soup.form['accept-charset'])
 
+    def test_cdata_attribute_applying_only_to_one_tag(self):
+        data = '<a accept-charset="ISO-8859-1 UTF-8"></a>'
+        soup = self.soup(data)
+        # We saw in another test that accept-charset is a cdata-list
+        # attribute for the <form> tag. But it's not a cdata-list
+        # attribute for any other tag.
+        self.assertEquals('ISO-8859-1 UTF-8', soup.a['accept-charset'])
+
+
 class TestPersistence(SoupTest):
     "Testing features like pickle and deepcopy."
 

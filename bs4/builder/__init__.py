@@ -82,9 +82,9 @@ class TreeBuilder(object):
     empty_element_tags = None # A tag will be considered an empty-element
                               # tag when and only when it has no contents.
 
-    # A value for these attributes is a space- or comma-separated list
-    # of CDATA, rather than a single CDATA.
-    cdata_list_attributes = None
+    # A value for these tag/attribute combinations is a space- or
+    # comma-separated list of CDATA, rather than a single CDATA.
+    cdata_list_attributes = {}
 
 
     def __init__(self):
@@ -201,8 +201,22 @@ class HTMLTreeBuilder(TreeBuilder):
     # encounter one of these attributes, we will parse its value into
     # a list of values if possible. Upon output, the list will be
     # converted back into a string.
-    cdata_list_attributes = set(
-        ['class', 'rel', 'rev', 'archive', 'accept-charset', 'headers'])
+    cdata_list_attributes = {
+        "*" : ['class', 'accesskey', 'dropzone'],
+        "a" : ['rel', 'rev'],
+        "link" :  ['rel', 'rev'],
+        "td" : ["headers"],
+        "th" : ["headers"],
+        "td" : ["headers"],
+        "form" : ["accept-charset"],
+        "object" : ["archive"],
+
+        # These are HTML5 specific, as are *.accesskey and *.dropzone above.
+        "area" : ["rel"],
+        "icon" : ["sizes"],
+        "iframe" : ["sandbox"],
+        "output" : ["for"],
+        }
 
     # Used by set_up_substitutions to detect the charset in a META tag
     CHARSET_RE = re.compile("((^|;)\s*charset=)([^;]*)", re.M)

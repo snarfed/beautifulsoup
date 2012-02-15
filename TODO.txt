@@ -6,10 +6,6 @@ Bugs
 * html5lib doesn't support SoupStrainers, which is OK, but there
   should be a warning about it.
 
-* HTML5 defines more multivalue attributes: iframe.sandbox,
-  output.for, icon.sizes, *.accesskey, *.dropzone, td.headers,
-  th.headers, a.rel, area.rel, link.rel, *.class, form.accept-charset
-
 Big features
 ------------
 

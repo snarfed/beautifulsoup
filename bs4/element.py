@@ -1,4 +1,5 @@
 import collections
+import itertools
 import re
 import sys
 import warnings
@@ -524,7 +525,10 @@ class Tag(PageElement):
         else:
             attrs = dict(attrs)
             if builder.cdata_list_attributes:
-                for cdata_list_attr in builder.cdata_list_attributes:
+                universal = builder.cdata_list_attributes.get('*', [])
+                tag_specific = builder.cdata_list_attributes.get(
+                    self.name.lower(), [])
+                for cdata_list_attr in itertools.chain(universal, tag_specific):
                     if cdata_list_attr in attrs:
                         # Basically, we have a "class" attribute whose
                         # value is a whitespace-separated list of CSS
