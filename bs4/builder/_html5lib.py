@@ -137,14 +137,11 @@ class Element(html5lib.treebuilders._base.Node):
         if (node.element.__class__ == NavigableString and self.element.contents
             and self.element.contents[-1].__class__ == NavigableString):
             # Concatenate new text onto old text node
-            # (TODO: This has O(n^2) performance, for input like "a</a>a</a>a</a>...")
-            newStr = self.soup.new_string(
-                self.element.contents[-1]+node.element)
-
-            # Remove the old text node
-            oldElement = self.element.contents[-1]
-            oldElement.extract()
-            self.element.append(newStr)
+            # XXX This has O(n^2) performance, for input like
+            # "a</a>a</a>a</a>..."
+            old_element = self.element.contents[-1]
+            new_element = self.soup.new_string(old_element + node.element)
+            old_element.replace_with(new_element)
         else:
             self.element.append(node.element)
             node.parent = self
@@ -158,9 +155,11 @@ class Element(html5lib.treebuilders._base.Node):
                 self.element[name] =  value
             # The attributes may contain variables that need substitution.
             # Call set_up_substitutions manually.
+            #
             # The Tag constructor calls this method automatically,
             # but html5lib creates a Tag object before setting up
-            # the attributes.
+            # its attributes, so Tags are initially created with no
+            # attributes.
             self.element.contains_substitutions = (
                 self.soup.builder.set_up_substitutions(
                     self.element))
@@ -178,11 +177,9 @@ class Element(html5lib.treebuilders._base.Node):
         if (node.element.__class__ == NavigableString and self.element.contents
             and self.element.contents[index-1].__class__ == NavigableString):
             # (See comments in appendChild)
-            newStr = NavigableString(self.element.contents[index-1]+node.element)
-            oldNode = self.element.contents[index-1]
-            oldNode.extract()
-
-            self.element.insert(index-1, newStr)
+            old_node = self.element.contents[index-1]
+            new_str = self.soup.new_string(old_node + node.element)
+            old_node.replace_with(new_str)
         else:
             self.element.insert(index, node.element)
             node.parent = self

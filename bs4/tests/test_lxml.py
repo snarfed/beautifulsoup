@@ -381,6 +381,9 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
             '<table><tr><table><tr id="nested">',
             '<table><tr><table><tr id="nested"></tr></table></tr></table>')
 
+    def test_floating_text_in_table(self):
+        self.assertSoupEquals("<table><td></td>foo<td>bar</td></table>")
+
     def test_paragraphs_containing_block_display_elements(self):
         markup = self.soup("<p>this is the definition:"
                            "<dl><dt>first case</dt>")

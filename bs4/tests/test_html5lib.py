@@ -131,6 +131,11 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
             ('<table><tbody><tr></tr></tbody></table>'
              '<table><tbody><tr id="nested"></tr></tbody></table>'))
 
+    def test_floating_text_in_table(self):
+        self.assertSoupEquals(
+            "<table><td></td>foo<td>bar</td></table>",
+            "foo<table><tbody><tr><td></td><td>bar</td></tr></tbody></table>")
+
     def test_empty_element_tag_with_contents(self):
         self.assertSoupEquals("<br>foo</br>", "<br />foo<br />")
 
