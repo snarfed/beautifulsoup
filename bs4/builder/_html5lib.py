@@ -125,13 +125,6 @@ class Element(html5lib.treebuilders._base.Node):
         self.soup = soup
         self.namespace = namespace
 
-    def _nodeIndex(self, node, refNode):
-        # Finds a node by identity rather than equality
-        for index, element in enumerate(self.element.contents):
-            if id(element) == id(refNode.element):
-                return index
-        return None
-
     def appendChild(self, node):
         if (node.element.__class__ == NavigableString and self.element.contents
             and self.element.contents[-1].__class__ == NavigableString):
@@ -172,7 +165,7 @@ class Element(html5lib.treebuilders._base.Node):
             self.appendChild(text)
 
     def insertBefore(self, node, refNode):
-        index = self._nodeIndex(node, refNode)
+        index = self.element.index(refNode.element)
         if (node.element.__class__ == NavigableString and self.element.contents
             and self.element.contents[index-1].__class__ == NavigableString):
             # (See comments in appendChild)
