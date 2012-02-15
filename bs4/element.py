@@ -535,8 +535,7 @@ class Tag(PageElement):
                         # classes. Split it into a list.
                         value = attrs[cdata_list_attr]
                         values = whitespace_re.split(value)
-                        if len(values) > 1:
-                            attrs[cdata_list_attr] = values
+                        attrs[cdata_list_attr] = values
         self.attrs = attrs
         self.contents = []
         self.setup(parent, previous)

@@ -1,5 +1,8 @@
 = 4.0.0b6 () =
 
+* The value of multi-valued attributes like "class" are always turned
+  into a list, even if there's only one value.
+
 * Passing text along with tag-specific arguments to a find* method:
 
    find("a", text="Click here")

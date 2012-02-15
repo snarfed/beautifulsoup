@@ -1045,9 +1045,9 @@ class TestCDAtaListAttributes(SoupTest):
 
     """Testing cdata-list attributes like 'class'.
     """
-    def test_single_value_stays_string(self):
+    def test_single_value_becomes_list(self):
         soup = self.soup("<a class='foo'>")
-        self.assertEqual("foo",soup.a['class'])
+        self.assertEqual(["foo"],soup.a['class'])
 
     def test_multiple_values_becomes_list(self):
         soup = self.soup("<a class='foo bar'>")
