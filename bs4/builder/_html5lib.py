@@ -148,10 +148,8 @@ class Element(html5lib.treebuilders._base.Node):
             # The attributes may contain variables that need substitution.
             # Call set_up_substitutions manually.
             #
-            # The Tag constructor calls this method automatically,
-            # but html5lib creates a Tag object before setting up
-            # its attributes, so Tags are initially created with no
-            # attributes.
+            # The Tag constructor called this method when the Tag was created,
+            # but we just set/changed the attributes, so call it again.
             self.element.contains_substitutions = (
                 self.soup.builder.set_up_substitutions(
                     self.element))
