@@ -1,5 +1,13 @@
 = 4.0.0b6 () =
 
+* Passing text along with tag-specific arguments to a find* method:
+
+   find("a", text="Click here")
+
+  will find tags that contain the given text as their
+  .string. Previously, the tag-specific arguments were ignored and
+  only strings were searched.
+
 * Fixed a bug that caused the html5lib tree builder to build a
   partially disconnected tree. Generally cleaned up the html5lib tree
   builder.

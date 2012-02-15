@@ -974,6 +974,8 @@ class SoupStrainer(object):
                     found = markup
                 else:
                     found = markup_name
+        if found and self.text and self.text != found.string:
+            found = None
         return found
     searchTag = search_tag
 
@@ -991,12 +993,12 @@ class SoupStrainer(object):
         # If it's a Tag, make sure its name or attributes match.
         # Don't bother with Tags if we're searching for text.
         elif isinstance(markup, Tag):
-            if not self.text:
+            if not self.text or self.name or self.attrs:
                 found = self.search_tag(markup)
         # If it's text, make sure the text matches.
         elif isinstance(markup, NavigableString) or \
                  isinstance(markup, basestring):
-            if self._matches(markup, self.text):
+            if not self.name and not self.attrs and self._matches(markup, self.text):
                 found = markup
         else:
             raise Exception(

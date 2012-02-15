@@ -277,6 +277,27 @@ class TestFindAllByAttribute(TreeTest):
         self.assertSelects(tree.find_all(id=re.compile("^a+$")),
                            ["One a.", "Two as."])
 
+    def test_find_by_name_and_containing_string(self):
+        soup = self.soup("<b>foo</b><b>bar</b><a>foo</a>")
+        a = soup.a
+
+        self.assertEqual([a], soup.find_all("a", text="foo"))
+        self.assertEqual([], soup.find_all("a", text="bar"))
+        self.assertEqual([], soup.find_all("a", text="bar"))
+
+    def test_find_by_name_and_containing_string_when_string_is_buried(self):
+        soup = self.soup("<a>foo</a><a><b><c>foo</c></b></a>")
+        self.assertEqual(soup.find_all("a"), soup.find_all("a", text="foo"))
+
+    def test_find_by_attribute_and_containing_string(self):
+        soup = self.soup('<b id="1">foo</b><a id="2">foo</a>')
+        a = soup.a
+
+        self.assertEqual([a], soup.find_all(id=2, text="foo"))
+        self.assertEqual([], soup.find_all(id=1, text="bar"))
+
+
+
 
 class TestIndex(TreeTest):
     """Test Tag.index"""

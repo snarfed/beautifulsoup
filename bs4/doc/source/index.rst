@@ -1206,6 +1206,14 @@ Here are some examples::
  soup.find_all(text=is_the_only_string_within_a_tag)
  # [u"The Dormouse's story", u"The Dormouse's story", u'Elsie', u'Lacie', u'Tillie', u'...']
 
+Although ``text`` is for finding strings, you can combine it with
+arguments for finding tags, Beautiful Soup will find all tags whose
+``.string`` matches your value for ``text``. This code finds the <a>
+tags whose ``.string`` is "Elsie"::
+
+ soup.find_all("a", "Elsie")
+ # [<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>]
+
 .. _limit:
 
 The ``limit`` argument
@@ -2495,9 +2503,16 @@ Miscellaneous
 contains a single tag B and nothing else, then A.string is the same as
 B.string. (Previously, it was None.)
 
-`Multi-valued attributes`_ like ``class`` are parsed into lists if
-they have more than one value. This may affect the way you search by
-CSS class.
+`Multi-valued attributes`_ like ``class`` are presented as lists. This
+may affect the way you search by CSS class.
+
+If you pass one of the ``find*`` methods both :ref:`text <text>` `and`
+a tag-specific argument like :ref:`name <name>`, Beautiful Soup will
+search for tags that match your tag-specific criteria and whose
+:ref:`Tag.string <.string>` matches your value for :ref:`text
+<text>`. It will `not` find the strings themselves. Previously,
+Beautiful Soup ignored the tag-specific arguments and looked for
+strings.
 
 The ``BeautifulSoup`` constructor no longer recognizes the
 `markupMassage` argument. It's now the parser's responsibility to
