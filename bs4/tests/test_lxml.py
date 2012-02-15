@@ -332,6 +332,32 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
                       '<tr><td>foo</td></tr>'
                       '</table></td>')
 
+
+    def test_unclosed_a_tag(self):
+        # <a> tags really ought to be closed at some point.
+        #
+        # We have all the <div> tags because HTML5 says to duplicate
+        # the <a> tag rather than closing it, and that's what html5lib
+        # does.
+        markup = """<div id="1">
+ <a href="foo">
+</div>
+<div id="2">
+ <div id="3">
+   <a href="bar"></a>
+  </div>
+</div>"""
+
+        expect = """<div id="1">
+<a href="foo">
+</a></div>
+<div id="2">
+<div id="3">
+<a href="bar"></a>
+</div>
+</div>"""
+        self.assertSoupEquals(markup, expect)
+
     def test_unclosed_block_level_elements(self):
         # Unclosed block-level elements should be closed.
         self.assertSoupEquals(
