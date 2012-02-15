@@ -879,6 +879,23 @@ class TestTreeModification(SoupTest):
         self.assertEqual(content_2.previous_element, content_1)
         self.assertEqual(content_2.previous_sibling, content_1)
 
+    def test_extract_distinguishes_between_identical_strings(self):
+        soup = self.soup("<a>foo</a><b>bar</b>")
+        foo_1 = soup.a.string
+        bar_1 = soup.b.string
+        foo_2 = soup.new_string("foo")
+        bar_2 = soup.new_string("bar")
+        soup.a.append(foo_2)
+        soup.b.append(bar_2)
+
+        # Now there are two identical strings in the <a> tag, and two
+        # in the <b> tag. Let's remove the first "foo" and the second
+        # "bar".
+        foo_1.extract()
+        bar_2.extract()
+        self.assertEqual(foo_2, soup.a.string)
+        self.assertEqual(bar_2, soup.b.string)
+
     def test_clear(self):
         """Tag.clear()"""
         soup = self.soup("<p><a>String <em>Italicized</em></a> and another</p>")
