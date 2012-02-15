@@ -104,11 +104,37 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
         self.assertSoupEquals("<table><div>Foo</div></table>",
                               "<div>Foo</div><table></table>")
 
+    def test_unclosed_a_tag(self):
+        # n.b. the whitespace is important here.
+        markup = """<div id="1">
+ <a href="foo">
+</div>
+<div id="2">
+ <div id="3">
+   <a href="bar"></a>
+  </div>
+</div>"""
+
+        expect = """<div id="1">
+ <a href="foo">
+</a></div><a href="foo">
+</a><div id="2"><a href="foo">
+ </a><div id="3"><a href="foo">
+   </a><a href="bar"></a>
+  </div>
+</div>"""
+        self.assertSoupEquals(markup, expect)
+
     def test_incorrectly_nested_tables(self):
         self.assertSoupEquals(
             '<table><tr><table><tr id="nested">',
             ('<table><tbody><tr></tr></tbody></table>'
              '<table><tbody><tr id="nested"></tr></tbody></table>'))
+
+    def test_floating_text_in_table(self):
+        self.assertSoupEquals(
+            "<table><td></td>foo<td>bar</td></table>",
+            "foo<table><tbody><tr><td></td><td>bar</td></tr></tbody></table>")
 
     def test_empty_element_tag_with_contents(self):
         self.assertSoupEquals("<br>foo</br>", "<br />foo<br />")

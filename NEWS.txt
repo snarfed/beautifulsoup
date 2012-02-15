@@ -1,3 +1,9 @@
+= 4.0.0b6 () =
+
+* Fixed a bug that caused the html5lib tree builder to build a
+  partially disconnected tree. Generally cleaned up the html5lib tree
+  builder.
+
 = 4.0.0b5 (20120209) =
 
 * Rationalized Beautiful Soup's treatment of CSS class. A tag
