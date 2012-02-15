@@ -144,10 +144,9 @@ class Element(html5lib.treebuilders._base.Node):
             # Remove the old text node
             oldElement = self.element.contents[-1]
             oldElement.extract()
-
-            self.element.insert(len(self.element.contents), newStr)
+            self.element.append(newStr)
         else:
-            self.element.insert(len(self.element.contents), node.element)
+            self.element.append(node.element)
             node.parent = self
 
     def getAttributes(self):
