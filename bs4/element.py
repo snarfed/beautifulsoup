@@ -782,7 +782,7 @@ class Tag(PageElement):
         close = ''
         closeTag = ''
         if self.is_empty_element:
-            close = ' /'
+            close = '/'
         else:
             closeTag = '</%s>' % self.name
 
@@ -1013,11 +1013,22 @@ class SoupStrainer(object):
         result = False
 
         if isinstance(markup, list) or isinstance(markup, tuple):
-            # This should only happen when searching the 'class'
-            # attribute of a tag with multiple CSS classes.
-            for item in markup:
-                if self._matches(item, match_against):
-                    result = True
+            # This should only happen when searching, e.g. the 'class'
+            # attribute.
+            if (isinstance(match_against, basestring)
+                and ' ' in match_against):
+                # A bit of a special case. If they try to match "foo
+                # bar" on a multivalue attribute's value, only accept
+                # the literal value "foo bar"
+                #
+                # XXX This is going to be pretty slow because we keep
+                # splitting match_against. But it shouldn't come up
+                # too often.
+                result = (whitespace_re.split(match_against) == markup)
+            else:
+                for item in markup:
+                    if self._matches(item, match_against):
+                        result = True
         elif match_against is True:
             result = markup is not None
         elif isinstance(match_against, collections.Callable):

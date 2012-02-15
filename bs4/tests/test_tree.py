@@ -220,6 +220,17 @@ class TestFindAllByAttribute(TreeTest):
         self.assertSelects(
             soup.find_all("a", small_attribute_value), ["Found it"])
 
+    def test_find_all_with_string_for_attrs_finds_multiple_classes(self):
+        soup = self.soup('<a class="foo bar"></a><a class="foo"></a>')
+        a, a2 = soup.find_all("a")
+        self.assertEqual([a, a2], soup.find_all("a", "foo"))
+        self.assertEqual([a], soup.find_all("a", "bar"))
+
+        # If you specify the attribute as a string that contains a
+        # space, only that specific value will be found.
+        self.assertEqual([a], soup.find_all("a", "foo bar"))
+        self.assertEqual([], soup.find_all("a", "bar foo"))
+
     def test_find_all_by_attribute_soupstrainer(self):
         tree = self.soup("""
                          <a id="first">Match.</a>
@@ -595,8 +606,8 @@ class TestTagCreation(SoupTest):
 
         # Both the <br> and <p> tag are empty-element, just because
         # they have no contents.
-        self.assertEqual(b"<br />", xml_br.encode())
-        self.assertEqual(b"<p />", xml_p.encode())
+        self.assertEqual(b"<br/>", xml_br.encode())
+        self.assertEqual(b"<p/>", xml_p.encode())
 
         html_soup = BeautifulSoup("", "html")
         html_br = html_soup.new_tag("br")
@@ -604,7 +615,7 @@ class TestTagCreation(SoupTest):
 
         # The HTML builder users HTML's rules about which tags are
         # empty-element tags, and the new tags reflect these rules.
-        self.assertEqual(b"<br />", html_br.encode())
+        self.assertEqual(b"<br/>", html_br.encode())
         self.assertEqual(b"<p></p>", html_p.encode())
 
     def test_new_string_creates_navigablestring(self):
@@ -775,7 +786,7 @@ class TestTreeModification(SoupTest):
         # markup like this to come through. But in general, we don't
         # know what the parser would or wouldn't have allowed, so
         # I'm letting this succeed for now.
-        soup = self.soup("<br />")
+        soup = self.soup("<br/>")
         soup.br.insert(1, "Contents")
         self.assertEqual(str(soup.br), "<br>Contents</br>")
 
@@ -1071,7 +1082,7 @@ class TestCDAtaListAttributes(SoupTest):
         # We saw in another test that accept-charset is a cdata-list
         # attribute for the <form> tag. But it's not a cdata-list
         # attribute for any other tag.
-        self.assertEquals('ISO-8859-1 UTF-8', soup.a['accept-charset'])
+        self.assertEqual('ISO-8859-1 UTF-8', soup.a['accept-charset'])
 
 
 class TestPersistence(SoupTest):
@@ -1183,7 +1194,7 @@ class TestSubstitutions(SoupTest):
         # Here's the <meta> tag saying that a document is
         # encoded in Shift-JIS.
         meta_tag = ('<meta content="text/html; charset=x-sjis" '
-                    'http-equiv="Content-type" />')
+                    'http-equiv="Content-type"/>')
         soup = self.soup(meta_tag)
 
         # Parse the document, and the charset is replaced with a
@@ -1207,7 +1218,7 @@ class TestSubstitutions(SoupTest):
 
     def test_encoding_substitution_doesnt_happen_if_tag_is_strained(self):
         markup = ('<head><meta content="text/html; charset=x-sjis" '
-                    'http-equiv="Content-type" /></head><pre>foo</pre>')
+                    'http-equiv="Content-type"/></head><pre>foo</pre>')
 
         # Beautiful Soup used to try to rewrite the meta tag even if the
         # meta tag got filtered out by the strainer. This test makes

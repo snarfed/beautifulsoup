@@ -3,6 +3,11 @@
 * The value of multi-valued attributes like "class" are always turned
   into a list, even if there's only one value.
 
+* Stopped generating a space before the slash that closes an
+  empty-element tag. This may come back if I add a special XHTML mode
+  (http://www.w3.org/TR/xhtml1/#C_2), but right now it's pretty
+  useless.
+
 * Passing text along with tag-specific arguments to a find* method:
 
    find("a", text="Click here")
@@ -14,6 +19,10 @@
 * Fixed a bug that caused the html5lib tree builder to build a
   partially disconnected tree. Generally cleaned up the html5lib tree
   builder.
+
+* If you restrict a multi-valued attribute like "class" to a string
+  that contains spaces, Beautiful Soup will only consider it a match
+  if the values correspond to that specific string.
 
 = 4.0.0b5 (20120209) =
 

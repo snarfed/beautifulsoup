@@ -38,10 +38,10 @@ class TestLXMLBuilder(SoupTest):
     def test_empty_element(self):
         # HTML's empty-element tags are recognized as such.
         self.assertSoupEquals(
-            "<p>A <meta> tag</p>", "<p>A <meta /> tag</p>")
+            "<p>A <meta> tag</p>", "<p>A <meta/> tag</p>")
 
         self.assertSoupEquals(
-            "<p>Foo<br/>bar</p>", "<p>Foo<br />bar</p>")
+            "<p>Foo<br/>bar</p>", "<p>Foo<br/>bar</p>")
 
     def test_empty_tag_thats_not_an_empty_element_tag(self):
         # A tag that is empty but not an HTML empty-element tag
@@ -218,7 +218,7 @@ class TestLXMLBuilder(SoupTest):
         # easy-to-understand document.
 
         # Here it is in Unicode. Note that it claims to be in ISO-Latin-1.
-        unicode_html = u'<html><head><meta content="text/html; charset=ISO-Latin-1" http-equiv="Content-type" /></head><body><p>Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!</p></body></html>'
+        unicode_html = u'<html><head><meta content="text/html; charset=ISO-Latin-1" http-equiv="Content-type"/></head><body><p>Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!</p></body></html>'
 
         # That's because we're going to encode it into ISO-Latin-1, and use
         # that to test.
@@ -263,12 +263,12 @@ class TestLXMLBuilder(SoupTest):
         # Here's the <meta> tag saying that a document is
         # encoded in Shift-JIS.
         meta_tag = ('<meta content="text/html; charset=x-sjis" '
-                    'http-equiv="Content-type" />')
+                    'http-equiv="Content-type"/>')
 
         # Here's a document incorporating that meta tag.
         shift_jis_html = (
             '<html><head>\n%s\n'
-            '<meta http-equiv="Content-language" content="ja" />'
+            '<meta http-equiv="Content-language" content="ja"/>'
             '</head><body>Shift-JIS markup goes here.') % meta_tag
         soup = self.soup(shift_jis_html)
 
@@ -293,17 +293,17 @@ class TestLXMLBuilder(SoupTest):
         """A <br> tag is designated as an empty-element tag."""
         soup = self.soup("<br></br>")
         self.assertTrue(soup.br.is_empty_element)
-        self.assertEqual(str(soup.br), "<br />")
+        self.assertEqual(str(soup.br), "<br/>")
 
     def test_p_tag_is_not_empty_element(self):
         """A <p> tag is not designated as an empty-element tag."""
-        soup = self.soup("<p />")
+        soup = self.soup("<p/>")
         self.assertFalse(soup.p.is_empty_element)
         self.assertEqual(str(soup.p), "<p></p>")
 
     def test_soupstrainer(self):
         strainer = SoupStrainer("b")
-        soup = self.soup("A <b>bold</b> <meta /> <i>statement</i>",
+        soup = self.soup("A <b>bold</b> <meta/> <i>statement</i>",
                          parse_only=strainer)
         self.assertEqual(soup.decode(), "<b>bold</b>")
 
@@ -370,7 +370,7 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
         # the 'close' tag is ignored.
         self.assertSoupEquals(
             "<item><link>http://foo.com/</link></item>",
-            "<item><link />http://foo.com/</item>")
+            "<item><link/>http://foo.com/</item>")
 
     def test_boolean_attribute_with_no_value_gets_empty_value(self):
         soup = self.soup("<table><td nowrap>foo</td></table>")
@@ -391,7 +391,7 @@ class TestLXMLBuilderInvalidMarkup(SoupTest):
         self.assertEqual(markup.p.contents, ["this is the definition:"])
 
     def test_empty_element_tag_with_contents(self):
-        self.assertSoupEquals("<br>foo</br>", "<br />foo")
+        self.assertSoupEquals("<br>foo</br>", "<br/>foo")
 
     def test_doctype_in_body(self):
         markup = "<p>one<!DOCTYPE foobar>two</p>"
@@ -556,8 +556,8 @@ class TestLXMLXMLBuilder(SoupTest):
         # Mixed-case tags are *not* folded to lowercase, but the
         # end tag is always the same case as the start tag.
         self.assertSoupEquals(
-            "<a><B><Cd><EFG /></CD></b></A>",
-            "<a><B><Cd><EFG /></Cd></B></a>")
+            "<a><B><Cd><EFG/></CD></b></A>",
+            "<a><B><Cd><EFG/></Cd></B></a>")
 
 
     def test_cdata_becomes_text(self):
@@ -572,10 +572,10 @@ class TestLXMLXMLBuilder(SoupTest):
 
 
     def test_can_handle_invalid_xml(self):
-        self.assertSoupEquals("<a><b>", "<a><b /></a>")
+        self.assertSoupEquals("<a><b>", "<a><b/></a>")
 
     def test_empty_element_tag(self):
-        soup = self.soup("<p><iamselfclosing /></p>")
+        soup = self.soup("<p><iamselfclosing/></p>")
         self.assertTrue(soup.iamselfclosing.is_empty_element)
 
     def test_self_empty_tag_treated_as_empty_element(self):
@@ -587,7 +587,7 @@ class TestLXMLXMLBuilder(SoupTest):
         self.assertFalse(soup.ihavecontents.is_empty_element)
 
     def test_empty_tag_that_stops_being_empty_gets_a_closing_tag(self):
-        soup = self.soup("<bar />")
+        soup = self.soup("<bar/>")
         self.assertTrue(soup.bar.is_empty_element)
         soup.bar.insert(1, "Contents")
         self.assertFalse(soup.bar.is_empty_element)
@@ -597,12 +597,12 @@ class TestLXMLXMLBuilder(SoupTest):
         builder = LXMLTreeBuilderForXML(empty_element_tags=['bar'])
         soup = BeautifulSoup(builder=builder, markup="<bar></bar>")
         self.assertTrue(soup.bar.is_empty_element)
-        self.assertEqual(str(soup), self.document_for("<bar />"))
+        self.assertEqual(str(soup), self.document_for("<bar/>"))
 
     def test_empty_tag_not_in_empty_element_tag_list_has_closing_tag(self):
         builder = LXMLTreeBuilderForXML(empty_element_tags=['bar'])
 
-        soup = BeautifulSoup(builder=builder, markup="<foo />")
+        soup = BeautifulSoup(builder=builder, markup="<foo/>")
         self.assertFalse(soup.foo.is_empty_element)
         self.assertEqual(str(soup), self.document_for("<foo></foo>"))
 

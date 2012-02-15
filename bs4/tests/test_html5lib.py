@@ -137,7 +137,7 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
             "foo<table><tbody><tr><td></td><td>bar</td></tr></tbody></table>")
 
     def test_empty_element_tag_with_contents(self):
-        self.assertSoupEquals("<br>foo</br>", "<br />foo<br />")
+        self.assertSoupEquals("<br>foo</br>", "<br/>foo<br/>")
 
     def test_doctype_in_body(self):
         markup = "<p>one<!DOCTYPE foobar>two</p>"

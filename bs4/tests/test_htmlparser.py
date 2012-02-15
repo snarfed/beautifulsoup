@@ -42,7 +42,7 @@ class TestHTMLParserTreeBuilder(TestLXMLBuilder):
             "<p>A <meta> tag</p>", "<p>A <meta> tag</meta></p>")
 
         self.assertSoupEquals(
-            "<p>Foo<br/>bar</p>", "<p>Foo<br />bar</p>")
+            "<p>Foo<br/>bar</p>", "<p>Foo<br/>bar</p>")
 
     def test_hex_entities_in_text(self):
         # XXX This tests a workaround for a bug in HTMLParser.
