@@ -1,5 +1,9 @@
 = 4.0.0b7 () =
 
+* Upon decoding to string, any characters that can't be represented in
+  your chosen encoding will be converted into numeric XML entity
+  references.
+
 * Issue a warning if characters were replaced with REPLACEMENT
   CHARACTER during Unicode conversion.
 

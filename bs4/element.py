@@ -745,9 +745,12 @@ class Tag(PageElement):
         __str__ = __repr__ = __unicode__
 
     def encode(self, encoding=DEFAULT_OUTPUT_ENCODING,
-               indent_level=None, formatter="minimal"):
-        return self.decode(indent_level, encoding,
-                           formatter).encode(encoding)
+               indent_level=None, formatter="minimal",
+               errors="xmlcharrefreplace"):
+        # Turn the data structure into Unicode, then encode the
+        # Unicode.
+        u = self.decode(indent_level, encoding, formatter)
+        return u.encode(encoding, errors=errors)
 
     def decode(self, indent_level=None,
                eventual_encoding=DEFAULT_OUTPUT_ENCODING,

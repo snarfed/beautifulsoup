@@ -1242,6 +1242,16 @@ class TestEncoding(SoupTest):
         self.assertEqual(
             soup.b.encode("utf-8"), html.encode("utf-8"))
 
+    def test_encoding_substitutes_unrecognized_characters_by_default(self):
+        html = u"<b>\N{SNOWMAN}</b>"
+        soup = self.soup(html)
+        self.assertEqual(soup.b.encode("ascii"), b"<b>&#9731;</b>")
+
+    def test_encoding_can_be_made_strict(self):
+        html = u"<b>\N{SNOWMAN}</b>"
+        soup = self.soup(html)
+        self.assertRaises(
+            UnicodeEncodeError, soup.encode, "ascii", errors="strict")
 
 class TestNavigableStringSubclasses(SoupTest):
 

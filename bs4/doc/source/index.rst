@@ -2160,6 +2160,27 @@ element in the soup, just as if it were a Python string::
  soup.p.encode("utf-8")
  # '<p>Sacr\xc3\xa9 bleu!</p>'
 
+Any characters that can't be represented in your chosen encoding will
+be converted into numeric XML entity references. For instance, here's
+a document that includes the Unicode character SNOWMAN::
+
+ markup = u"<b>\N{SNOWMAN}</b>"
+ snowman_soup = BeautifulSoup(markup)
+ tag = snowman_soup.b
+
+The SNOWMAN character can be part of a UTF-8 document (it looks like
+☃), but there's no representation for that character in ISO-Latin-1 or
+ASCII, so it's converted into "&#9731" for those encodings::
+
+ print(tag.encode("utf-8"))
+ # <b>☃</b>
+
+ print tag.encode("latin-1")
+ # <b>&#9731;</b>
+
+ print tag.encode("ascii")
+ # <b>&#9731;</b>
+
 Unicode, Dammit
 ---------------
 
