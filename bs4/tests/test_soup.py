@@ -177,9 +177,14 @@ class TestUnicodeDammit(unittest.TestCase):
         doc = b"""\357\273\277<?xml version="1.0" encoding="UTF-8"?>
 <html><b>\330\250\330\252\330\261</b>
 <i>\310\322\321\220\312\321\355\344</i></html>"""
-        dammit = UnicodeDammit(doc)
-        self.assertEqual(True, dammit.contains_replacement_characters)
-        self.assertTrue(u"\ufffd" in dammit.unicode_markup)
+        with warnings.catch_warnings(record=True) as w:
+            dammit = UnicodeDammit(doc)
+            self.assertEqual(True, dammit.contains_replacement_characters)
+            self.assertTrue(u"\ufffd" in dammit.unicode_markup)
 
-        soup = BeautifulSoup(doc)
-        self.assertTrue(soup.contains_replacement_characters)
+            soup = BeautifulSoup(doc)
+            self.assertTrue(soup.contains_replacement_characters)
+
+            msg = w[0].message
+            self.assertTrue(isinstance(msg, UnicodeWarning))
+            self.assertTrue("Some characters could not be decoded" in str(msg))

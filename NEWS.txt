@@ -1,7 +1,14 @@
+= 4.0.0b7 () =
+
+* Issue a warning if characters were replaced with REPLACEMENT
+  CHARACTER during Unicode conversion.
+
 = 4.0.0b6 (20110216) =
 
-* The value of multi-valued attributes like "class" are always turned
-  into a list, even if there's only one value.
+* Multi-valued attributes like "class" always have a list of values,
+  even if there's only one value in the list.
+
+* Added a number of multi-valued attributes defined in HTML5.
 
 * Stopped generating a space before the slash that closes an
   empty-element tag. This may come back if I add a special XHTML mode

@@ -303,19 +303,24 @@ done by treating the tag as a dictionary::
 Multi-valued attributes
 &&&&&&&&&&&&&&&&&&&&&&&
 
-HTML defines a few attributes that can have multiple values. The most
-common is ``class`` (a tag can have more than one CSS class), but
-there are a few others: ``rel``, ``rev``, ``archive``,
-``accept-charset``, and ``headers``. If one of these attributes has
-more than one value, Beautiful Soup will turn its values into a list::
+HTML 4 defines a few attributes that can have multiple values. HTML 5
+removes a couple of them, but defines a few more. The most common
+multi-valued attribute is ``class`` (that is, a tag can have more than
+one CSS class). Others include ``rel``, ``rev``, ``accept-charset``,
+``headers``, and ``accesskey``. Beautiful Soup presents the value(s)
+of a multi-valued attribute as a list::
 
  css_soup = BeautifulSoup('<p class="body strikeout"></p>')
  css_soup.p['class']
  # ["body", "strikeout"]
 
+ css_soup = BeautifulSoup('<p class="body"></p>')
+ css_soup.p['class']
+ # ["body"]
+
 If an attribute `looks` like it has more than one value, but it's not
-one of the special attributes listed above, Beautiful Soup will leave
-the attribute alone::
+a multi-valued attribute as defined by any version of the HTML
+standard, Beautiful Soup will leave the attribute alone::
 
  id_soup = BeautifulSoup('<p id="my id"></p>')
  id_soup.p['id']
@@ -326,10 +331,18 @@ consolidated::
 
  rel_soup = BeautifulSoup('<p>Back to the <a rel="index">homepage</a></p>')
  rel_soup.a['rel']
- # 'index'
+ # ['index']
  rel_soup.a['rel'] = ['index', 'contents']
  print(rel_soup.p)
  # <p>Back to the <a rel="index contents">homepage</a></p>
+
+If you parse a document as XML, there are no multi-valued attributes::
+
+ xml_soup = BeautifulSoup('<p class="body strikeout"></p>', 'xml')
+ xml_soup.p['class']
+ # u'body strikeout'
+
+
 
 ``NavigableString``
 -------------------
