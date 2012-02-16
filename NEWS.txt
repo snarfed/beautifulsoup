@@ -1,4 +1,4 @@
-= 4.0.0b6 () =
+= 4.0.0b6 (20110216) =
 
 * The value of multi-valued attributes like "class" are always turned
   into a list, even if there's only one value.

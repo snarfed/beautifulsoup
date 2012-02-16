@@ -1,6 +1,8 @@
 Bugs
 ----
 
+* Issue a DataLossWarning if Unicode, Dammit replaces characters.
+
 * I think whitespace may not be processed correctly.
 
 * html5lib doesn't support SoupStrainers, which is OK, but there
