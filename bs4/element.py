@@ -22,6 +22,20 @@ def _alias(attr):
     return alias
 
 
+class NamespacedAttribute(object):
+
+    def __init__(self, namespace_abbreviation, name, namespace):
+        self.namespace_abbreviation = namespace_abbreviation
+        self.name = name
+        self.namespace = namespace
+
+    def __str__(self):
+        name = self.name
+        if self.namespace_abbreviation:
+            name = self.namespace_abbreviation + ":" + name
+        return name
+
+
 class PageElement(object):
     """Contains the navigational information for some part of the page
     (either a tag or a piece of text)"""
@@ -507,8 +521,8 @@ class Tag(PageElement):
 
     """Represents a found HTML tag with its attributes and contents."""
 
-    def __init__(self, parser=None, builder=None, name=None, attrs=None,
-                 parent=None, previous=None):
+    def __init__(self, parser=None, builder=None, name=None, namespace=None,
+                 attrs=None, parent=None, previous=None):
         "Basic constructor."
 
         if parser is None:
@@ -520,6 +534,7 @@ class Tag(PageElement):
         if name is None:
             raise ValueError("No value provided for new tag's name.")
         self.name = name
+        self.namespace = namespace
         if attrs is None:
             attrs = {}
         else:
@@ -779,7 +794,7 @@ class Tag(PageElement):
                         and '%SOUP-ENCODING%' in val):
                         val = self.substitute_encoding(val, eventual_encoding)
 
-                    decoded = (key + '='
+                    decoded = (str(key) + '='
                                + EntitySubstitution.substitute_xml(val, True))
                 attrs.append(decoded)
         close = ''

@@ -8,6 +8,7 @@ from bs4.builder import (
     HTML_5,
     HTMLTreeBuilder,
     )
+from bs4.element import NamespacedAttribute
 import html5lib
 from html5lib.constants import (
     DataLossWarning,
@@ -58,9 +59,6 @@ class TreeBuilderForHtml5lib(html5lib.treebuilders._base.TreeBuilder):
 
     def __init__(self, soup, namespaceHTMLElements):
         self.soup = soup
-        if namespaceHTMLElements:
-            warnings.warn("namespaceHTMLElements not supported yet",
-                          DataLossWarning)
         super(TreeBuilderForHtml5lib, self).__init__(namespaceHTMLElements)
 
     def documentClass(self):
@@ -76,9 +74,7 @@ class TreeBuilderForHtml5lib(html5lib.treebuilders._base.TreeBuilder):
         self.soup.object_was_parsed(doctype)
 
     def elementClass(self, name, namespace):
-        if namespace is not None:
-            warnings.warn("BeautifulSoup cannot represent elements in any namespace", DataLossWarning)
-        tag = self.soup.new_tag(name)
+        tag = self.soup.new_tag(name, namespace)
         return Element(tag, self.soup, namespace)
 
     def commentClass(self, data):
@@ -144,6 +140,8 @@ class Element(html5lib.treebuilders._base.Node):
     def setAttributes(self, attributes):
         if attributes is not None and attributes != {}:
             for name, value in list(attributes.items()):
+                if isinstance(name, tuple):
+                    name = NamespacedAttribute(*name)
                 self.element[name] =  value
             # The attributes may contain variables that need substitution.
             # Call set_up_substitutions manually.
@@ -189,7 +187,7 @@ class Element(html5lib.treebuilders._base.Node):
                     TextNode(child, self.soup))
 
     def cloneNode(self):
-        tag = self.soup.new_tag(self.element.name)
+        tag = self.soup.new_tag(self.element.name, self.namespace)
         node = Element(tag, self.soup, self.namespace)
         for key,value in self.attributes:
             node.attributes[key] = value
