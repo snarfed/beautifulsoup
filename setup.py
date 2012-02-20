@@ -15,12 +15,6 @@ setup(name="beautifulsoup4",
       long_description="""Beautiful Soup sits atop an HTML or XML parser, providing Pythonic idioms for iterating, searching, and modifying the parse tree.""",
       license="MIT",
       packages=['bs4', 'bs4.builder', 'bs4.tests'],
-#      package_data={
-#        "bs4": ["doc/source/*.jpg", "doc/source/*.rst",
-#                "doc/source/*.py", "doc/Makefile"]
-#        },
-#      data_files=[
-#        ('', ['COPYING.txt', 'NEWS.txt', 'AUTHORS.txt', 'README.txt'])],
       cmdclass = {'build_py':build_py},
       classifiers=["Development Status :: 4 - Beta",
                    "Intended Audience :: Developers",
