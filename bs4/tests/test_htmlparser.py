@@ -1,3 +1,4 @@
+import copy
 from HTMLParser import HTMLParseError
 from bs4.element import Comment, Doctype, SoupStrainer
 from bs4.builder import HTMLParserTreeBuilder
@@ -338,6 +339,11 @@ class TestHTMLParserTreeBuilder(SoupTest):
                          parse_only=strainer)
         self.assertEqual(soup.decode(), "<b>bold</b>")
 
+    def test_deepcopy(self):
+        # Make sure you can copy the builder. This is important because
+        # the builder is part of a BeautifulSoup object, and we want to be
+        # able to copy that.
+        copy.deepcopy(self.default_builder)
 
 class TestHTMLParserTreeBuilderInvalidMarkup(SoupTest):
     """Tests of invalid markup for the default tree builder.

@@ -9,6 +9,11 @@
 
 * Restored compatibility with Python 2.6.
 
+* The install process no longer installs docs or auxillary text files.
+
+* It's now possible to deepcopy a BeautifulSoup object created with
+  Python's built-in HTML parser.
+
 = 4.0.0b6 (20110216) =
 
 * Multi-valued attributes like "class" always have a list of values,

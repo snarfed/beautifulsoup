@@ -1122,8 +1122,6 @@ class TestPersistence(SoupTest):
         self.assertEqual(loaded.__class__, BeautifulSoup)
         self.assertEqual(loaded.decode(), self.tree.decode())
 
-    @skipIf(not LXML_PRESENT,
-            "Skipping deepcopy test to work around htmlparser bug.")
     def test_deepcopy_identity(self):
         # Making a deepcopy of a tree yields an identical tree.
         copied = copy.deepcopy(self.tree)
