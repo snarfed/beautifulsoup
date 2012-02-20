@@ -14,7 +14,10 @@ import pickle
 import re
 import warnings
 from bs4 import BeautifulSoup
-from bs4.builder import builder_registry
+from bs4.builder import (
+    builder_registry,
+    HTMLParserTreeBuilder,
+)
 from bs4.element import CData, NavigableString, SoupStrainer, Tag
 from bs4.testing import (
     SoupTest,
@@ -22,7 +25,7 @@ from bs4.testing import (
 )
 
 XML_BUILDER_PRESENT = (builder_registry.lookup("xml") is not None)
-
+LXML_PRESENT = (builder_registry.lookup("lxml") is not None)
 
 class TreeTest(SoupTest):
 
@@ -1119,6 +1122,8 @@ class TestPersistence(SoupTest):
         self.assertEqual(loaded.__class__, BeautifulSoup)
         self.assertEqual(loaded.decode(), self.tree.decode())
 
+    @skipIf(not LXML_PRESENT,
+            "Skipping deepcopy test to work around htmlparser bug.")
     def test_deepcopy_identity(self):
         # Making a deepcopy of a tree yields an identical tree.
         copied = copy.deepcopy(self.tree)

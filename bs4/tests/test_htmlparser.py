@@ -454,16 +454,7 @@ class TestHTMLParserTreeBuilderInvalidMarkup(SoupTest):
     def test_attribute_value_never_got_closed(self):
         markup = '<a href="http://foo.com/</a> and blah and blah'
         soup = self.soup(markup)
-        self.assertEqual(soup.encode(), "")
-
-    def test_attribute_value_was_closed_by_subsequent_tag(self):
-        markup = """<a href="foo</a>, </a><a href="bar">baz</a>"""
-        soup = self.soup(markup)
-        self.assertEqual(soup.encode(), "")
-
-    def test_unquoted_attribute_value(self):
-        self.assertRaises(
-            HTMLParseError, self.soup, '<a style={height:21px;}></a>')
+        self.assertEqual(soup.encode(), b"")
 
     def test_attribute_value_with_embedded_brackets(self):
         soup = self.soup('<a b="<a>">')
