@@ -4,18 +4,14 @@ try:
 except ImportError, e:
     HTML5LIB_PRESENT = False
 from bs4.element import Comment, SoupStrainer
-from test_lxml import (
-    TestLXMLBuilder,
-    TestLXMLBuilderInvalidMarkup,
-    TestLXMLBuilderEncodingConversion,
-    )
+import test_htmlparser
 import unittest
 from bs4.testing import skipIf
 
 @skipIf(
     not HTML5LIB_PRESENT,
     "html5lib seems not to be present, not testing its tree builder.")
-class TestHTML5Builder(TestLXMLBuilder):
+class TestHTML5Builder(test_htmlparser.TestHTMLParserTreeBuilder):
     """See `BuilderSmokeTest`."""
 
     @property
@@ -35,7 +31,7 @@ class TestHTML5Builder(TestLXMLBuilder):
         # A bare string is turned into some kind of HTML document or
         # fragment recognizable as the original string.
         #
-        # In this case, lxml puts a <p> tag around the bare string.
+        # In this case, html5lib puts a <p> tag around the bare string.
         self.assertSoupEquals(
             "A bare string", "A bare string")
 
@@ -82,10 +78,35 @@ class TestHTML5Builder(TestLXMLBuilder):
         # get a CData object.
         self.assertSoupEquals(markup, "<svg><!--[CDATA[foobar]]--></svg>")
 
+    def test_entities_in_attribute_values_converted_during_parsing(self):
+
+        # The numeric entity is recognized even without the closing
+        # semicolon.
+        text = '<x t="pi&#241ata">'
+        expected = u"pi\N{LATIN SMALL LETTER N WITH TILDE}ata"
+        soup = self.soup(text)
+        self.assertEqual(soup.x['t'], expected)
+
+    def test_naked_ampersands(self):
+        # Ampersands are not treated as entities, unlike in html.parser.
+        text = "<p>AT&T</p>"
+        soup = self.soup(text)
+        self.assertEqual(soup.p.string, "AT&T")
+
+    def test_namespaced_system_doctype(self):
+        # Test a namespaced doctype with a system id.
+        self._test_doctype('xsl:stylesheet SYSTEM "htmlent.dtd"')
+
+    def test_namespaced_public_doctype(self):
+        # Test a namespaced doctype with a public id.
+        self._test_doctype('xsl:stylesheet PUBLIC "htmlent.dtd"')
+
+
 @skipIf(
     not HTML5LIB_PRESENT,
     "html5lib seems not to be present, not testing it on invalid markup.")
-class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
+class TestHTML5BuilderInvalidMarkup(
+    test_htmlparser.TestHTMLParserTreeBuilderInvalidMarkup):
     """See `BuilderInvalidMarkupSmokeTest`."""
 
     @property
@@ -99,6 +120,29 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
         self.assertSoupEquals(
             '<blockquote><p><b>Foo</blockquote><p>Bar',
             '<blockquote><p><b>Foo</b></p></blockquote><p><b>Bar</b></p>')
+
+    def test_attribute_value_never_got_closed(self):
+        markup = '<a href="http://foo.com/</a> and blah and blah'
+        soup = self.soup(markup)
+        self.assertEqual(
+            soup.a['href'], "http://foo.com/</a> and blah and blah")
+
+    def test_attribute_value_was_closed_by_subsequent_tag(self):
+        markup = """<a href="foo</a>, </a><a href="bar">baz</a>"""
+        soup = self.soup(markup)
+        # The string between the first and second quotes was interpreted
+        # as the value of the 'href' attribute.
+        self.assertEqual(soup.a['href'], 'foo</a>, </a><a href=')
+
+        #The string after the second quote (bar"), was treated as an
+        #empty attribute called bar.
+        self.assertEqual(soup.a['bar'], '')
+        self.assertEqual(soup.a.string, "baz")
+
+    def test_document_starts_with_bogus_declaration(self):
+        soup = self.soup('<! Foo ><p>a</p>')
+        # The declaration is ignored altogether.
+        self.assertEqual(soup.encode(), b"<html><body><p>a</p></body></html>")
 
     def test_table_containing_bare_markup(self):
         # Markup should be in table cells, not directly in the table.
@@ -246,11 +290,55 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
         soup = self.soup("<p>&#x1000000000000;</p>")
         self.assertEqual(soup.p.string, u"\N{REPLACEMENT CHARACTER}")
 
+    def test_incomplete_declaration(self):
+        self.assertSoupEquals('a<!b <p>c', 'a<!--b &lt;p-->c')
+
+    def test_nonsensical_declaration(self):
+        soup = self.soup('<! Foo = -8><p>a</p>')
+        self.assertEquals(
+            soup.decode(),
+            "<!-- Foo = -8--><html><head></head><body><p>a</p></body></html>")
+
+    def test_unquoted_attribute_value(self):
+        soup = self.soup('<a style={height:21px;}></a>')
+        self.assertEqual(soup.a['style'], '{height:21px;}')
+
+    def test_boolean_attribute_with_no_value(self):
+        soup = self.soup("<table><td nowrap>foo</td></table>")
+        self.assertEqual(soup.table.td['nowrap'], '')
+
+    def test_cdata_where_it_doesnt_belong(self):
+        #CDATA sections are ignored.
+        markup = "<div><![CDATA[foo]]>"
+        self.assertSoupEquals(markup, "<div><!--[CDATA[foo]]--></div>")
+
+    def test_empty_element_tag_with_contents(self):
+        self.assertSoupEquals("<br>foo</br>", "<br/>foo<br/>")
+
+    def test_fake_self_closing_tag(self):
+        # If a self-closing tag presents as a normal tag, the 'open'
+        # tag is treated as an instance of the self-closing tag and
+        # the 'close' tag is ignored.
+        self.assertSoupEquals(
+            "<item><link>http://foo.com/</link></item>",
+            "<item><link/>http://foo.com/</item>")
+
+    def test_paragraphs_containing_block_display_elements(self):
+        markup = self.soup("<p>this is the definition:"
+                           "<dl><dt>first case</dt>")
+        # The <p> tag is closed before the <dl> tag begins.
+        self.assertEqual(markup.p.contents, ["this is the definition:"])
+
+    def test_multiple_values_for_the_same_attribute(self):
+        markup = '<b b="20" a="1" b="10" a="2" a="3" a="4"></b>'
+        self.assertSoupEquals(markup, '<b a="1" b="20"></b>')
+
 
 @skipIf(
     not HTML5LIB_PRESENT,
-    "html5lib seems not to be present, not testing encoding conversion.")
-class TestHTML5LibEncodingConversion(TestLXMLBuilderEncodingConversion):
+    "html5lib seems not to be present, not testing it on encoding conversion.")
+class TestHTML5LibEncodingConversion(
+    test_htmlparser.TestHTMLParserTreeBuilderEncodingConversion):
     @property
     def default_builder(self):
         return HTML5TreeBuilder()

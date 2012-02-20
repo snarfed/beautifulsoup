@@ -80,9 +80,15 @@ class HTMLParserTreeBuilder(HTMLParser, HTMLTreeBuilder):
         # XXX workaround for a bug in HTMLParser. Remove this once
         # it's fixed.
         if name.startswith('x'):
-            data = unichr(int(name.lstrip('x'), 16))
+            real_name = int(name.lstrip('x'), 16)
         else:
-            data = unichr(int(name))
+            real_name = int(name)
+
+        try:
+            data = unichr(real_name)
+        except (ValueError, OverflowError), e:
+            data = u"\N{REPLACEMENT CHARACTER}"
+
         self.handle_data(data)
 
     def handle_entityref(self, name):

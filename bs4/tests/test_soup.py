@@ -182,7 +182,7 @@ class TestUnicodeDammit(unittest.TestCase):
             self.assertEqual(True, dammit.contains_replacement_characters)
             self.assertTrue(u"\ufffd" in dammit.unicode_markup)
 
-            soup = BeautifulSoup(doc)
+            soup = BeautifulSoup(doc, "html.parser")
             self.assertTrue(soup.contains_replacement_characters)
 
             msg = w[0].message
