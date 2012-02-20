@@ -47,8 +47,11 @@ class BuiltInRegistryTest(unittest.TestCase):
             self.assertEqual(registry.lookup('html'), LXMLTreeBuilder)
             self.assertEqual(registry.lookup('xml'), LXMLTreeBuilderForXML)
         else:
-            self.assertEqual(registry.lookup('html'), HTML5TreeBuilder)
             self.assertEqual(registry.lookup('xml'), None)
+            if HTML5LIB_PRESENT:
+                self.assertEqual(registry.lookup('html'), HTML5TreeBuilder)
+            else:
+                self.assertEqual(registry.lookup('html'), HTMLParserTreeBuilder)
 
     def test_named_library(self):
         if LXML_PRESENT:

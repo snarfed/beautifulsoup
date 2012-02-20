@@ -1,9 +1,8 @@
 Bugs
 ----
 
-* Issue a DataLossWarning if Unicode, Dammit replaces characters.
-
-* I think whitespace may not be processed correctly.
+* You can't deepcopy a tree if it was created with the html.parser
+  tree builder.
 
 * html5lib doesn't support SoupStrainers, which is OK, but there
   should be a warning about it.
