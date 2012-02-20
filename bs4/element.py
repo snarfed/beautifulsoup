@@ -750,7 +750,7 @@ class Tag(PageElement):
         # Turn the data structure into Unicode, then encode the
         # Unicode.
         u = self.decode(indent_level, encoding, formatter)
-        return u.encode(encoding, errors=errors)
+        return u.encode(encoding, errors)
 
     def decode(self, indent_level=None,
                eventual_encoding=DEFAULT_OUTPUT_ENCODING,

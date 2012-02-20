@@ -7,6 +7,8 @@
 * Issue a warning if characters were replaced with REPLACEMENT
   CHARACTER during Unicode conversion.
 
+* Restored compatibility with Python 2.6.
+
 = 4.0.0b6 (20110216) =
 
 * Multi-valued attributes like "class" always have a list of values,

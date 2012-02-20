@@ -10,8 +10,9 @@ from test_lxml import (
     TestLXMLBuilderEncodingConversion,
     )
 import unittest
+from bs4.testing import skipIf
 
-@unittest.skipIf(
+@skipIf(
     not HTML5LIB_PRESENT,
     "html5lib seems not to be present, not testing its tree builder.")
 class TestHTML5Builder(TestLXMLBuilder):
@@ -81,7 +82,7 @@ class TestHTML5Builder(TestLXMLBuilder):
         # get a CData object.
         self.assertSoupEquals(markup, "<svg><!--[CDATA[foobar]]--></svg>")
 
-@unittest.skipIf(
+@skipIf(
     not HTML5LIB_PRESENT,
     "html5lib seems not to be present, not testing it on invalid markup.")
 class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
@@ -246,7 +247,7 @@ class TestHTML5BuilderInvalidMarkup(TestLXMLBuilderInvalidMarkup):
         self.assertEqual(soup.p.string, u"\N{REPLACEMENT CHARACTER}")
 
 
-@unittest.skipIf(
+@skipIf(
     not HTML5LIB_PRESENT,
     "html5lib seems not to be present, not testing encoding conversion.")
 class TestHTML5LibEncodingConversion(TestLXMLBuilderEncodingConversion):
