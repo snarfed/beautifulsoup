@@ -1,5 +1,6 @@
 """Helper classes for tests."""
 
+import functools
 import unittest
 from unittest import TestCase
 from bs4 import BeautifulSoup
@@ -37,33 +38,14 @@ class SoupTest(unittest.TestCase):
 
         self.assertEqual(obj.decode(), self.document_for(compare_parsed_to))
 
-# Code copied from Python 2.7 standard library, unittest.py, for use
-# in Python 2.6.
-
-def _id(obj):
-    return obj
-
-
-def skip(reason):
-    """
-    Unconditionally skip a test.
-    """
-    def decorator(test_item):
-        if not (isinstance(test_item, type) and issubclass(test_item, TestCase)):
-            @functools.wraps(test_item)
-            def skip_wrapper(*args, **kwargs):
-                raise SkipTest(reason)
-            test_item = skip_wrapper
-
-        test_item.__unittest_skip__ = True
-        test_item.__unittest_skip_why__ = reason
-        return test_item
-    return decorator
-
 def skipIf(condition, reason):
-    """
-    Skip a test if the condition is true.
-    """
-    if condition:
-        return skip(reason)
-    return _id
+   def nothing(test, *args, **kwargs):
+       return None
+
+   def decorator(test_item):
+       if condition:
+           return nothing
+       else:
+           return test_item
+
+   return decorator
