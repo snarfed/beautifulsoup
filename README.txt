@@ -42,10 +42,11 @@ documentation.
 
 = Running the unit tests =
 
-Beautiful Soup supports unit test discovery. You can run the tests
-from the project root directory with this command:
+Beautiful Soup supports unit test discovery from the project root directory:
 
- $ python -m unittest discover -s bs4
+ $ nosetests
+
+ $ python -m unittest discover -s bs4 # Python 2.7 and up
 
 If you checked out the source tree, you should see a script in the
 home directory called test-all-versions. This script will run the unit
