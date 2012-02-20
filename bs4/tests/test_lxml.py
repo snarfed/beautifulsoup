@@ -30,6 +30,10 @@ class TestLXMLTreeBuilder(test_htmlparser.TestHTMLParserTreeBuilder):
     trees that make most of these tests pass.
     """
 
+    @property
+    def default_builder(self):
+        return LXMLTreeBuilder()
+
     def test_bare_string(self):
         # A bare string is turned into some kind of HTML document or
         # fragment recognizable as the original string.
@@ -94,12 +98,45 @@ class TestLXMLTreeBuilder(test_htmlparser.TestHTMLParserTreeBuilder):
         # Test a namespaced doctype with a public id.
         self._test_doctype('xsl:stylesheet PUBLIC "htmlent.dtd"')
 
+    def test_entities_in_attribute_values_converted_during_parsing(self):
+
+        # The numeric entity isn't recognized without the closing
+        # semicolon.
+        text = '<x t="pi&#241ata">'
+        expected = u"pi\N{LATIN SMALL LETTER N WITH TILDE}ata"
+        soup = self.soup(text)
+        self.assertEqual(soup.x['t'], expected)
+
+        text = '<x t="pi&#241;ata">'
+        expected = u"pi\N{LATIN SMALL LETTER N WITH TILDE}ata"
+        soup = self.soup(text)
+        self.assertEqual(soup.x['t'], u"pi\xf1ata")
+
+        text = '<x t="pi&#xf1;ata">'
+        soup = self.soup(text)
+        self.assertEqual(soup.x['t'], expected)
+
+        text = '<x t="sacr&eacute; bleu">'
+        soup = self.soup(text)
+        self.assertEqual(
+            soup.x['t'],
+            u"sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu")
+
+        # This can cause valid HTML to become invalid.
+        valid_url = '<a href="http://example.org?a=1&amp;b=2;3">foo</a>'
+        soup = self.soup(valid_url)
+        self.assertEqual(soup.a['href'], "http://example.org?a=1&b=2;3")
+
 
 @skipIf(
     not LXML_PRESENT,
     "lxml seems not to be present, not testing it on invalid markup.")
 class TestLXMLTreeBuilderInvalidMarkup(
     test_htmlparser.TestHTMLParserTreeBuilderInvalidMarkup):
+
+    @property
+    def default_builder(self):
+        return LXMLTreeBuilder()
 
     def test_attribute_value_never_got_closed(self):
         markup = '<a href="http://foo.com/</a> and blah and blah'
@@ -143,7 +180,7 @@ class TestLXMLTreeBuilderInvalidMarkup(
              '<p>foo</p>'),
             '<p>foo</p>')
 
-    def test_boolean_attribute_with_no_value_gets_empty_value(self):
+    def test_boolean_attribute_with_no_value(self):
         soup = self.soup("<table><td nowrap>foo</td></table>")
         self.assertEqual(soup.table.td['nowrap'], '')
 
@@ -153,7 +190,7 @@ class TestLXMLTreeBuilderInvalidMarkup(
         self.assertSoupEquals(markup, "<div></div>")
 
     def test_empty_element_tag_with_contents(self):
-        self.assertSoupEquals("<br>foo</br>", "<br/>foo</br>")
+        self.assertSoupEquals("<br>foo</br>", "<br/>foo")
 
     def test_nonexistent_entity(self):
         soup = self.soup("<p>foo&#bar;baz</p>")
@@ -189,11 +226,24 @@ class TestLXMLTreeBuilderInvalidMarkup(
         markup = '<b b="20" a="1" b="10" a="2" a="3" a="4"></b>'
         self.assertSoupEquals(markup, '<b a="1" b="20"></b>')
 
+    def test_entity_out_of_range(self):
+        # An entity that's out of range will be ignored.
+        soup = self.soup("<p>&#10000000000000;</p>")
+        self.assertEqual(0, len(soup.p.contents))
+
+        soup = self.soup("<p>&#x1000000000000;</p>")
+        self.assertEqual(0, len(soup.p.contents))
+
+        soup = self.soup("<p>&#1000000000;</p>")
+        self.assertEqual(0, len(soup.p.contents))
+
 
 @skipIf(
     not LXML_PRESENT,
     "lxml seems not to be present, not testing it on encoding conversion.")
 class TestLXMLParserTreeBuilderEncodingConversion(
     test_htmlparser.TestHTMLParserTreeBuilderEncodingConversion):
-    # Re-run the lxml tests for HTMLParser
-    pass
+
+    @property
+    def default_builder(self):
+        return LXMLTreeBuilder()

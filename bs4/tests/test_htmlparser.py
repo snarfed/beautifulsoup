@@ -40,7 +40,7 @@ class TestHTMLParserTreeBuilder(SoupTest):
 
     def test_hex_entities_in_text(self):
         # XXX This tests a workaround for a bug in HTMLParser.
-        self.assertSoupEquals("&#xf1;", u"\xf1")
+        self.assertSoupEquals("<p>&#xf1;</p>", u"<p>\xf1</p>")
 
     def test_entities_in_attribute_values_converted_during_parsing(self):
 
