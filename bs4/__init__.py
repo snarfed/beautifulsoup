@@ -193,9 +193,9 @@ class BeautifulSoup(Tag):
         self.tagStack = []
         self.pushTag(self)
 
-    def new_tag(self, name, namespace=None, **attrs):
+    def new_tag(self, name, namespace=None, nsprefix=None, **attrs):
         """Create a new tag associated with this soup."""
-        return Tag(None, self.builder, name, namespace, attrs)
+        return Tag(None, self.builder, name, namespace, nsprefix, attrs)
 
     def new_string(self, s):
         """Create a new NavigableString associated with this soup."""
@@ -272,7 +272,7 @@ class BeautifulSoup(Tag):
             mostRecentTag = self.popTag()
         return mostRecentTag
 
-    def handle_starttag(self, name, namespace, attrs):
+    def handle_starttag(self, name, namespace, nsprefix, attrs):
         """Push a start tag on to the stack.
 
         If this method returns None, the tag was rejected by the
@@ -289,8 +289,8 @@ class BeautifulSoup(Tag):
                  or not self.parse_only.search_tag(name, attrs))):
             return None
 
-        tag = Tag(self, self.builder, name, namespace, attrs, self.currentTag,
-                  self.previous_element)
+        tag = Tag(self, self.builder, name, namespace, nsprefix, attrs,
+                  self.currentTag, self.previous_element)
         if tag is None:
             return tag
         if self.previous_element:

@@ -522,7 +522,7 @@ class Tag(PageElement):
     """Represents a found HTML tag with its attributes and contents."""
 
     def __init__(self, parser=None, builder=None, name=None, namespace=None,
-                 attrs=None, parent=None, previous=None):
+                 nsprefix=None, attrs=None, parent=None, previous=None):
         "Basic constructor."
 
         if parser is None:
@@ -535,6 +535,7 @@ class Tag(PageElement):
             raise ValueError("No value provided for new tag's name.")
         self.name = name
         self.namespace = namespace
+        self.nsprefix = nsprefix
         if attrs is None:
             attrs = {}
         else:

@@ -67,7 +67,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
 
     def start(self, name, attrs):
         # XXX namespace
-        self.soup.handle_starttag(name, None, attrs)
+        self.soup.handle_starttag(name, None, None, attrs)
 
     def end(self, name):
         self.soup.endData()
