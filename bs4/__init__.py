@@ -281,7 +281,7 @@ class BeautifulSoup(Tag):
         don't call handle_endtag.
         """
 
-        #print "Start tag %s: %s" % (name, attrs)
+        # print "Start tag %s: %s" % (name, attrs)
         self.endData()
 
         if (self.parse_only and len(self.tagStack) <= 1

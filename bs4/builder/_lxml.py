@@ -42,6 +42,15 @@ class LXMLTreeBuilderForXML(TreeBuilder):
             parser = parser(target=self, strip_cdata=False)
         self.parser = parser
         self.soup = None
+        self.nsmaps = []
+
+    def _getNsTag(self, tag):
+        # Split the namespace URL out of a fully-qualified lxml tag
+        # name. Copied from lxml's src/lxml/sax.py.
+        if tag[0] == '{':
+            return tuple(tag[1:].split('}', 1))
+        else:
+            return (None, tag)
 
     def prepare_markup(self, markup, user_specified_encoding=None,
                        document_declared_encoding=None):
@@ -63,16 +72,31 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         self.parser.close()
 
     def close(self):
-        pass
+        self.namespaces.clear()
 
-    def start(self, name, attrs):
-        # XXX namespace
-        self.soup.handle_starttag(name, None, None, attrs)
+    def start(self, name, attrs, nsmap={}):
+        nsprefix = None
+        # Invert each namespace map as it comes in.
+        if len(nsmap) == 0:
+            self.nsmaps.append(None)
+        else:
+            inverted_nsmap = dict((value, key) for key, value in nsmap.items())
+            self.nsmaps.append(inverted_nsmap)
+        if "{" in name:
+            import pdb; pdb.set_trace()
+        namespace, name = self._getNsTag(name)
+        if namespace is not None:
+            for inverted_nsmap in reversed(self.nsmaps):
+                if inverted_nsmap is not None and namespace in inverted_nsmap:
+                    nsprefix = inverted_nsmap[namespace]
+                    break
+        self.soup.handle_starttag(name, namespace, nsprefix, attrs)
 
     def end(self, name):
         self.soup.endData()
         completed_tag = self.soup.tagStack[-1]
         self.soup.handle_endtag(name)
+        self.nsmaps.pop()
 
     def pi(self, target, data):
         pass

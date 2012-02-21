@@ -805,6 +805,10 @@ class Tag(PageElement):
         else:
             closeTag = '</%s>' % self.name
 
+        prefix = ''
+        if self.nsprefix:
+            prefix = self.nsprefix + ":"
+
         pretty_print = (indent_level is not None)
         if pretty_print:
             space = (' ' * (indent_level - 1))
@@ -825,7 +829,8 @@ class Tag(PageElement):
                 attribute_string = ' ' + ' '.join(attrs)
             if pretty_print:
                 s.append(space)
-            s.append('<%s%s%s>' % (self.name, attribute_string, close))
+            s.append('<%s%s%s%s>' % (
+                    prefix, self.name, attribute_string, close))
             if pretty_print:
                 s.append("\n")
             s.append(contents)
