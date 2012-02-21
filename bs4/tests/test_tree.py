@@ -14,9 +14,18 @@ import pickle
 import re
 import warnings
 from bs4 import BeautifulSoup
-from bs4.builder import builder_registry
+from bs4.builder import (
+    builder_registry,
+    HTMLParserTreeBuilder,
+)
 from bs4.element import CData, NavigableString, SoupStrainer, Tag
-from bs4.testing import SoupTest
+from bs4.testing import (
+    SoupTest,
+    skipIf,
+)
+
+XML_BUILDER_PRESENT = (builder_registry.lookup("xml") is not None)
+LXML_PRESENT = (builder_registry.lookup("lxml") is not None)
 
 class TreeTest(SoupTest):
 
@@ -600,14 +609,15 @@ class TestTagCreation(SoupTest):
         self.assertEqual(None, new_tag.parent)
 
     def test_tag_inherits_self_closing_rules_from_builder(self):
-        xml_soup = BeautifulSoup("", "xml")
-        xml_br = xml_soup.new_tag("br")
-        xml_p = xml_soup.new_tag("p")
+        if XML_BUILDER_PRESENT:
+            xml_soup = BeautifulSoup("", "xml")
+            xml_br = xml_soup.new_tag("br")
+            xml_p = xml_soup.new_tag("p")
 
-        # Both the <br> and <p> tag are empty-element, just because
-        # they have no contents.
-        self.assertEqual(b"<br/>", xml_br.encode())
-        self.assertEqual(b"<p/>", xml_p.encode())
+            # Both the <br> and <p> tag are empty-element, just because
+            # they have no contents.
+            self.assertEqual(b"<br/>", xml_br.encode())
+            self.assertEqual(b"<p/>", xml_p.encode())
 
         html_soup = BeautifulSoup("", "html")
         html_br = html_soup.new_tag("br")
@@ -999,10 +1009,6 @@ class TestElementObjects(SoupTest):
     def test_attributes_come_out_in_alphabetical_order(self):
         markup = '<b a="1" z="5" m="3" f="2" y="4"></b>'
         self.assertSoupEquals(markup, '<b a="1" f="2" m="3" y="4" z="5"></b>')
-
-    def test_multiple_values_for_the_same_attribute_are_collapsed(self):
-        markup = '<b b="20" a="1" b="10" a="2" a="3" a="4"></b>'
-        self.assertSoupEquals(markup, '<b a="1" b="20"></b>')
 
     def test_string(self):
         # A tag that contains only a text node makes that node

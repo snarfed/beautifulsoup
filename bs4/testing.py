@@ -1,16 +1,22 @@
 """Helper classes for tests."""
 
+import functools
 import unittest
+from unittest import TestCase
 from bs4 import BeautifulSoup
 from bs4.element import Comment, SoupStrainer
-from bs4.builder import LXMLTreeBuilder
-
+try:
+    from bs4.builder import LXMLTreeBuilder
+    default_builder = LXMLTreeBuilder
+except ImportError, e:
+    from bs4.builder import HTMLParserTreeBuilder
+    default_builder = HTMLParserTreeBuilder
 
 class SoupTest(unittest.TestCase):
 
     @property
     def default_builder(self):
-        return LXMLTreeBuilder()
+        return default_builder()
 
     def soup(self, markup, **kwargs):
         """Build a Beautiful Soup object from markup."""
@@ -31,3 +37,15 @@ class SoupTest(unittest.TestCase):
             compare_parsed_to = to_parse
 
         self.assertEqual(obj.decode(), self.document_for(compare_parsed_to))
+
+def skipIf(condition, reason):
+   def nothing(test, *args, **kwargs):
+       return None
+
+   def decorator(test_item):
+       if condition:
+           return nothing
+       else:
+           return test_item
+
+   return decorator
