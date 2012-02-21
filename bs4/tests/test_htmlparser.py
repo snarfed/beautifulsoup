@@ -128,8 +128,6 @@ class TestHTMLParserTreeBuilder(SoupTest):
         # parse tree and that the rest of the document parsed.
         self.assertEqual(soup.p.contents[0], 'foo')
 
-# -------------------------
-
     def test_mixed_case_tags(self):
         # Mixed-case tags are folded to lowercase.
         self.assertSoupEquals(
@@ -167,15 +165,6 @@ class TestHTMLParserTreeBuilder(SoupTest):
         blockquote = soup.blockquote
         self.assertEqual(blockquote.p.b.string, 'Foo')
         self.assertEqual(blockquote.b.string, 'Foo')
-
-    # This is a <table> tag containing another <table> tag in one of its
-    # cells.
-    TABLE_MARKUP_1 = ('<table id="1">'
-                     '<tr>'
-                     "<td>Here's another table:"
-                     '<table id="2">'
-                     '<tr><td>foo</td></tr>'
-                     '</table></td>')
 
     def test_correctly_nested_tables(self):
         markup = ('<table id="1">'
