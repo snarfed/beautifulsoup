@@ -227,10 +227,9 @@ class HTMLTreeBuilderSmokeTest(object):
 
     def test_entities_converted_on_the_way_out(self):
         text = "<p>&lt;&lt;sacr&eacute;&#32;bleu!&gt;&gt;</p>"
-        expected = u"&lt;&lt;sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;".encode("utf-8")
+        expected = u"<p>&lt;&lt;sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!&gt;&gt;</p>".encode("utf-8")
         soup = self.soup(text)
-        str = soup.p.string
-        self.assertEqual(str.encode("utf-8"), expected)
+        self.assertEqual(soup.p.encode("utf-8"), expected)
 
     def test_real_iso_latin_document(self):
         # Smoke test of interrelated functionality, using an
