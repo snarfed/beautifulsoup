@@ -78,8 +78,9 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         nsprefix = None
         # Invert each namespace map as it comes in.
         if len(nsmap) == 0 and self.nsmaps != None:
-            # There are namespaces in play, so we need to keep track
-            # of when they start and end
+            # There are no new namespaces for this tag, but namespaces
+            # are in play, so we need a separate tag stack to know
+            # when they end.
             self.nsmaps.append(None)
         elif len(nsmap) > 0:
             # A new namespace mapping has come into play.
@@ -109,8 +110,9 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         if self.nsmaps != None:
             self.nsmaps.pop()
             if len(self.nsmaps) == 0:
+                # Namespaces are no longer in play, so don't bother keeping
+                # track of the namespace stack.
                 self.nsmaps = None
-
 
     def pi(self, target, data):
         pass
