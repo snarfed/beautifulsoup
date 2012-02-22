@@ -27,3 +27,11 @@ class LXMLTreeBuilderSmokeTest(SoupTest, HTMLTreeBuilderSmokeTest):
     @property
     def default_builder(self):
         return LXMLTreeBuilder()
+
+    def test_out_of_range_entity(self):
+        self.assertSoupEquals(
+            "<p>foo&#10000000000000;bar</p>", "<p>foobar</p>")
+        self.assertSoupEquals(
+            "<p>foo&#x10000000000000;bar</p>", "<p>foobar</p>")
+        self.assertSoupEquals(
+            "<p>foo&#1000000000;bar</p>", "<p>foobar</p>")

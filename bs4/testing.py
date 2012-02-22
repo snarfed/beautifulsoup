@@ -105,6 +105,16 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertFalse(soup.p.is_empty_element)
         self.assertEqual(str(soup.p), "<p></p>")
 
+    def test_unclosed_tags_get_closed(self):
+        """A tag that's not closed by the end of the document should be closed.
+
+        This applies to all tags except empty-element tags.
+        """
+        self.assertSoupEquals("<p>", "<p></p>")
+        self.assertSoupEquals("<b>", "<b></b>")
+
+        self.assertSoupEquals("<br>", "<br/>")
+
     def test_br_is_always_empty_element_tag(self):
         """A <br> tag is designated as an empty-element tag.
 
@@ -167,15 +177,32 @@ class HTMLTreeBuilderSmokeTest(object):
             "<tbody><tr><td>Bar</td></tr></tbody>"
             "<tfoot><tr><td>Baz</td></tr></tfoot></table>")
 
-    def test_hex_entities_in_text(self):
-        """This mainly tests a BS workaround for a bug in HTMLParser."""
-        self.assertSoupEquals("<p>&#xf1;</p>", u"<p>\xf1</p>")
+    def test_angle_brackets_in_attribute_values_are_escaped(self):
+        self.assertSoupEquals('<a b="<a>"></a>', '<a b="&lt;a&gt;"></a>')
+
+    def test_entities_in_attributes_converted_to_unicode(self):
+        expect = u'<p id="pi\N{LATIN SMALL LETTER N WITH TILDE}ata"></p>'
+        self.assertSoupEquals('<p id="pi&#241;ata"></p>', expect)
+        self.assertSoupEquals('<p id="pi&#xf1;ata"></p>', expect)
+        self.assertSoupEquals('<p id="pi&ntilde;ata"></p>', expect)
+
+    def test_entities_in_text_converted_to_unicode(self):
+        expect = u'<p>pi\N{LATIN SMALL LETTER N WITH TILDE}ata</p>'
+        self.assertSoupEquals("<p>pi&#241;ata</p>", expect)
+        self.assertSoupEquals("<p>pi&#xf1;ata</p>", expect)
+        self.assertSoupEquals("<p>pi&ntilde;ata</p>", expect)
+
+    def test_out_of_range_entity(self):
+        expect = u"\N{REPLACEMENT CHARACTER}"
+        self.assertSoupEquals("&#10000000000000;", expect)
+        self.assertSoupEquals("&#x10000000000000;", expect)
+        self.assertSoupEquals("&#1000000000;", expect)
 
     #
     # Generally speaking, tests below this point are more tests of
     # Beautiful Soup than tests of the tree builders. But parsers are
     # weird, so we run these tests separately for every tree builder
-    # to detect any differences.
+    # to detect any differences between them.
     #
 
     def test_soupstrainer(self):
@@ -201,9 +228,16 @@ class HTMLTreeBuilderSmokeTest(object):
             soup.foo.decode(),
             """<foo attr="Brawls happen at &quot;Bob\'s Bar&quot;">a</foo>""")
 
-    def test_ampersand_in_attribute_value_gets_quoted(self):
+    def test_ampersand_in_attribute_value_gets_escaped(self):
         self.assertSoupEquals('<this is="really messed up & stuff"></this>',
                               '<this is="really messed up &amp; stuff"></this>')
+
+        self.assertSoupEquals(
+            '<a href="http://example.org?a=1&b=2;3">foo</a>',
+            '<a href="http://example.org?a=1&amp;b=2;3">foo</a>')
+
+    def test_escaped_ampersand_in_attribute_value_is_left_alone(self):
+        self.assertSoupEquals('<a href="http://example.org?a=1&amp;b=2;3"></a>')
 
     def test_entities_in_strings_converted_during_parsing(self):
         # Both XML and HTML entities are converted to Unicode characters
