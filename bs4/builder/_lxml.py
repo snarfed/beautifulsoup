@@ -5,7 +5,7 @@ __all__ = [
 
 import collections
 from lxml import etree
-from bs4.element import Comment, Doctype
+from bs4.element import Comment, Doctype, NamespacedAttribute
 from bs4.builder import (
     FAST,
     HTML,
@@ -42,7 +42,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
             parser = parser(target=self, strip_cdata=False)
         self.parser = parser
         self.soup = None
-        self.nsmaps = []
+        self.nsmaps = None
 
     def _getNsTag(self, tag):
         # Split the namespace URL out of a fully-qualified lxml tag
@@ -77,13 +77,23 @@ class LXMLTreeBuilderForXML(TreeBuilder):
     def start(self, name, attrs, nsmap={}):
         nsprefix = None
         # Invert each namespace map as it comes in.
-        if len(nsmap) == 0:
+        if len(nsmap) == 0 and self.nsmaps != None:
+            # There are namespaces in play, so we need to keep track
+            # of when they start and end
             self.nsmaps.append(None)
-        else:
+        elif len(nsmap) > 0:
+            # A new namespace mapping has come into play.
+            if self.nsmaps is None:
+                self.nsmaps = []
             inverted_nsmap = dict((value, key) for key, value in nsmap.items())
             self.nsmaps.append(inverted_nsmap)
-        if "{" in name:
-            import pdb; pdb.set_trace()
+            # Also treat the namespace mapping as a set of attributes on the
+            # tag, so we can recreate it later.
+            attrs = attrs.copy()
+            for prefix, namespace in nsmap.items():
+                attribute = NamespacedAttribute(
+                    "xmlns", prefix, "http://www.w3.org/2000/xmlns/")
+                attrs[attribute] = namespace
         namespace, name = self._getNsTag(name)
         if namespace is not None:
             for inverted_nsmap in reversed(self.nsmaps):
@@ -96,7 +106,11 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         self.soup.endData()
         completed_tag = self.soup.tagStack[-1]
         self.soup.handle_endtag(name)
-        self.nsmaps.pop()
+        if self.nsmaps != None:
+            self.nsmaps.pop()
+            if len(self.nsmaps) == 0:
+                self.nsmaps = None
+
 
     def pi(self, target, data):
         pass
