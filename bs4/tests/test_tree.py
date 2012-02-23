@@ -97,8 +97,8 @@ class TestFindAllBasicNamespaces(TreeTest):
 
     def test_find_by_namespaced_name(self):
         soup = self.soup('<mathml:msqrt>4</mathml:msqrt><a svg:fill="red">')
-        self.assertEquals("4", soup.find("mathml:msqrt").string)
-        self.assertEquals("a", soup.find(attrs= { "svg:fill" : "red" }).name)
+        self.assertEqual("4", soup.find("mathml:msqrt").string)
+        self.assertEqual("a", soup.find(attrs= { "svg:fill" : "red" }).name)
 
 
 class TestFindAllByName(TreeTest):

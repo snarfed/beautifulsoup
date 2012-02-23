@@ -22,29 +22,14 @@ def _alias(attr):
     return alias
 
 
-class NamespacedAttribute(object):
+class NamespacedAttribute(unicode):
 
-    def __init__(self, namespace_abbreviation, name, namespace=None):
-        self.namespace_abbreviation = namespace_abbreviation
-        self.name = name
-        self.namespace = namespace
-
-    def __eq__(self, other):
-        if isinstance(other, NamespacedAttribute):
-            return (
-                self.namespace_abbreviation == other.namespace_abbreviation
-                and self.name == other.name
-                and self.namespace == other.namespace)
-        elif isinstance(other, basestring):
-            return str(self) == other
-        else:
-            return super(NamespacedAttribute, self).__eq__(other)
-
-    def __str__(self):
-        name = self.name
-        if self.namespace_abbreviation:
-            name = self.namespace_abbreviation + ":" + name
-        return name
+    def __new__(cls, prefix, name, namespace=None):
+        obj = unicode.__new__(cls, prefix + ":" + name)
+        obj.prefix = prefix
+        obj.name = name
+        obj.namespace = namespace
+        return obj
 
 
 class PageElement(object):
@@ -685,6 +670,9 @@ class Tag(PageElement):
 
     def has_attr(self, key):
         return key in self.attrs
+
+    def __hash__(self):
+        return str(self).__hash__()
 
     def __getitem__(self, key):
         """tag[key] returns the value of the 'key' attribute for the tag,

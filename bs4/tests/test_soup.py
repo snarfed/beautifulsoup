@@ -19,7 +19,7 @@ class TestDeprecatedConstructorArguments(SoupTest):
         msg = str(w[0].message)
         self.assertTrue("parseOnlyThese" in msg)
         self.assertTrue("parse_only" in msg)
-        self.assertEquals(b"<b></b>", soup.encode())
+        self.assertEqual(b"<b></b>", soup.encode())
 
     def test_fromEncoding_renamed_to_from_encoding(self):
         with warnings.catch_warnings(record=True) as w:
@@ -28,7 +28,7 @@ class TestDeprecatedConstructorArguments(SoupTest):
         msg = str(w[0].message)
         self.assertTrue("fromEncoding" in msg)
         self.assertTrue("from_encoding" in msg)
-        self.assertEquals("utf8", soup.original_encoding)
+        self.assertEqual("utf8", soup.original_encoding)
 
     def test_unrecognized_keyword_argument(self):
         self.assertRaises(
@@ -209,7 +209,7 @@ class TestUnicodeDammit(unittest.TestCase):
             b"<html><meta charset=euc-jp /></html>",
             b"<html><meta charset=euc-jp/></html>"):
             dammit = UnicodeDammit(data, is_html=True)
-            self.assertEquals(
+            self.assertEqual(
                 "euc-jp", dammit.original_encoding)
 
     def test_last_ditch_entity_replacement(self):
@@ -244,9 +244,18 @@ class TestNamedspacedAttribute(SoupTest):
         a = NamespacedAttribute("a", "b")
         self.assertEqual("a:b", a)
 
-    def test_attributes_are_equivalent_if_all_members_identical(self):
+    def test_attributes_are_equivalent_if_prefix_and_name_identical(self):
         a = NamespacedAttribute("a", "b", "c")
         b = NamespacedAttribute("a", "b", "c")
         self.assertEqual(a, b)
-        b.namespace = "d"
-        self.assertNotEqual(a, b)
+
+        # The actual namespace is not considered.
+        c = NamespacedAttribute("a", "b", None)
+        self.assertEqual(a, c)
+
+        # But name and prefix are important.
+        d = NamespacedAttribute("a", "z", "c")
+        self.assertNotEqual(a, d)
+
+        e = NamespacedAttribute("z", "b", "c")
+        self.assertNotEqual(a, e)

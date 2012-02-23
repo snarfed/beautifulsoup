@@ -10,11 +10,7 @@ from bs4.builder import (
     )
 from bs4.element import NamespacedAttribute
 import html5lib
-from html5lib.constants import (
-    DataLossWarning,
-    namespaces,
-    )
-import warnings
+from html5lib.constants import namespaces
 from bs4.element import (
     Comment,
     Doctype,

@@ -360,16 +360,28 @@ class HTMLTreeBuilderSmokeTest(object):
 
 class XMLTreeBuilderSmokeTest(object):
 
+    def test_docstring_generated(self):
+        soup = self.soup("<root/>")
+        self.assertEqual(
+            soup.encode(), b'<?xml version="1.0" encoding="utf-8">\n<root/>')
+
+    def test_docstring_includes_correct_encoding(self):
+        soup = self.soup("<root/>")
+        self.assertEqual(
+            soup.encode("latin1"),
+            b'<?xml version="1.0" encoding="latin1">\n<root/>')
+
+
+    def test_tags_are_empty_element_if_and_only_if_they_are_empty(self):
+        self.assertSoupEquals("<p>", "<p/>")
+        self.assertSoupEquals("<p>foo</p>")
+
     def test_namespaces_are_preserved(self):
-        markup = '<root xmlns:a="http://www.example.com/" xmlns:b="http://example.net/"><a:foo>This tag is in the a namespace</a:foo><b:foo>This tag is in the b namespace</b:foo></root>'
+        markup = '<root xmlns:a="http://example.com/" xmlns:b="http://example.net/"><a:foo>This tag is in the a namespace</a:foo><b:foo>This tag is in the b namespace</b:foo></root>'
         soup = self.soup(markup)
         root = soup.root
-        import pdb; pdb.set_trace()
-        self.assertEquals("http://www.example.com/", root['xmlns:a'])
-        self.assertEquals("http://www.example.net/", root['xmlns:b'])
-
-
-        pass
+        self.assertEquals("http://example.com/", root['xmlns:a'])
+        self.assertEquals("http://example.net/", root['xmlns:b'])
 
 
 

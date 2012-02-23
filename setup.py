@@ -7,7 +7,7 @@ except ImportError:
     from distutils.command.build_py import build_py
 
 setup(name="beautifulsoup4",
-      version = "4.0.0b7",
+      version = "4.0.0b8",
       author="Leonard Richardson",
       author_email='leonardr@segfault.org',
       url="http://www.crummy.com/software/BeautifulSoup/bs4/",

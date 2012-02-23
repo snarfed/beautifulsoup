@@ -1,3 +1,13 @@
+= 4.0.0b8 () =
+
+* All tree builders now preserve namespace information in the
+  documents they parse.
+
+  However, there is no special support for namespace-oriented
+  searching or tree manipulation. When you search the tree, you need
+  to use namespace prefixes exactly as they're used in the original
+  document.
+
 = 4.0.0b7 (20110223) =
 
 * Upon decoding to string, any characters that can't be represented in
