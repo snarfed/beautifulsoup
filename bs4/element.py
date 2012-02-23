@@ -25,7 +25,10 @@ def _alias(attr):
 class NamespacedAttribute(unicode):
 
     def __new__(cls, prefix, name, namespace=None):
-        obj = unicode.__new__(cls, prefix + ":" + name)
+        if name is None:
+            obj = unicode.__new__(cls, prefix)
+        else:
+            obj = unicode.__new__(cls, prefix + ":" + name)
         obj.prefix = prefix
         obj.name = name
         obj.namespace = namespace
@@ -510,7 +513,7 @@ class Doctype(NavigableString):
         return Doctype(value)
 
     PREFIX = u'<!DOCTYPE '
-    SUFFIX = u'>'
+    SUFFIX = u'>\n'
 
 
 class Tag(PageElement):

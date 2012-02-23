@@ -249,7 +249,7 @@ class BeautifulSoup(Tag):
         self.previous_element = o
         self.currentTag.contents.append(o)
 
-    def _popToTag(self, name, inclusivePop=True):
+    def _popToTag(self, name, nsprefix=None, inclusivePop=True):
         """Pops the tag stack up to and including the most recent
         instance of the given tag. If inclusivePop is false, pops the tag
         stack up to but *not* including the most recent instqance of
@@ -262,7 +262,8 @@ class BeautifulSoup(Tag):
         mostRecentTag = None
 
         for i in range(len(self.tagStack) - 1, 0, -1):
-            if name == self.tagStack[i].name:
+            if (name == self.tagStack[i].name
+                and nsprefix == self.tagStack[i].nsprefix == nsprefix):
                 numPops = len(self.tagStack) - i
                 break
         if not inclusivePop:
@@ -299,10 +300,10 @@ class BeautifulSoup(Tag):
         self.pushTag(tag)
         return tag
 
-    def handle_endtag(self, name):
+    def handle_endtag(self, name, nsprefix=None):
         #print "End tag: " + name
         self.endData()
-        self._popToTag(name)
+        self._popToTag(name, nsprefix)
 
     def handle_data(self, data):
         self.currentData.append(data)

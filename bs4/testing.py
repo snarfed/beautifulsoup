@@ -371,6 +371,17 @@ class XMLTreeBuilderSmokeTest(object):
             soup.encode("latin1"),
             b'<?xml version="1.0" encoding="latin1">\n<root/>')
 
+    def test_real_xhtml_document(self):
+        """A real XHTML document should come out the same as it went in."""
+        markup = b"""<?xml version="1.0" encoding="utf-8">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Hello.</title></head>
+<body>Goodbye.</body>
+</html>"""
+        soup = self.soup(markup)
+        self.assertEqual(soup.encode("utf-8"), markup)
+
 
     def test_tags_are_empty_element_if_and_only_if_they_are_empty(self):
         self.assertSoupEquals("<p>", "<p/>")

@@ -106,7 +106,14 @@ class LXMLTreeBuilderForXML(TreeBuilder):
     def end(self, name):
         self.soup.endData()
         completed_tag = self.soup.tagStack[-1]
-        self.soup.handle_endtag(name)
+        namespace, name = self._getNsTag(name)
+        nsprefix = None
+        if namespace is not None:
+            for inverted_nsmap in reversed(self.nsmaps):
+                if inverted_nsmap is not None and namespace in inverted_nsmap:
+                    nsprefix = inverted_nsmap[namespace]
+                    break
+        self.soup.handle_endtag(name, nsprefix)
         if self.nsmaps != None:
             # This tag, or one of its parents, introduced a namespace
             # mapping, so pop it off the stack.

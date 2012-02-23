@@ -8,6 +8,8 @@
   to use namespace prefixes exactly as they're used in the original
   document.
 
+* The string representation of a DOCTYPE always ends in a newline.
+
 = 4.0.0b7 (20110223) =
 
 * Upon decoding to string, any characters that can't be represented in
