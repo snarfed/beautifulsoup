@@ -358,6 +358,20 @@ class HTMLTreeBuilderSmokeTest(object):
         # For the rest of the story, see TestSubstitutions in
         # test_tree.py.
 
+class XMLTreeBuilderSmokeTest(object):
+
+    def test_namespaces_are_preserved(self):
+        markup = '<root xmlns:a="http://www.example.com/" xmlns:b="http://example.net/"><a:foo>This tag is in the a namespace</a:foo><b:foo>This tag is in the b namespace</b:foo></root>'
+        soup = self.soup(markup)
+        root = soup.root
+        import pdb; pdb.set_trace()
+        self.assertEquals("http://www.example.com/", root['xmlns:a'])
+        self.assertEquals("http://www.example.net/", root['xmlns:b'])
+
+
+        pass
+
+
 
 def skipIf(condition, reason):
    def nothing(test, *args, **kwargs):

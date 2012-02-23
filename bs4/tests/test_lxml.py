@@ -14,6 +14,7 @@ from bs4.testing import skipIf
 from bs4.tests import test_htmlparser
 from bs4.testing import (
     HTMLTreeBuilderSmokeTest,
+    XMLTreeBuilderSmokeTest,
     SoupTest,
     skipIf,
 )
@@ -35,3 +36,14 @@ class LXMLTreeBuilderSmokeTest(SoupTest, HTMLTreeBuilderSmokeTest):
             "<p>foo&#x10000000000000;bar</p>", "<p>foobar</p>")
         self.assertSoupEquals(
             "<p>foo&#1000000000;bar</p>", "<p>foobar</p>")
+
+@skipIf(
+    not LXML_PRESENT,
+    "lxml seems not to be present, not testing its XML tree builder.")
+class LXMLXMLTreeBuilderSmokeTest(SoupTest, XMLTreeBuilderSmokeTest):
+    """See ``HTMLTreeBuilderSmokeTest``."""
+
+    @property
+    def default_builder(self):
+        return LXMLTreeBuilderForXML()
+

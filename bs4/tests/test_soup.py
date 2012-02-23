@@ -3,7 +3,10 @@
 
 import unittest
 from bs4 import BeautifulSoup
-from bs4.element import SoupStrainer
+from bs4.element import (
+    SoupStrainer,
+    NamespacedAttribute,
+    )
 from bs4.dammit import EntitySubstitution, UnicodeDammit
 from bs4.testing import SoupTest
 import warnings
@@ -233,3 +236,17 @@ class TestUnicodeDammit(unittest.TestCase):
             msg = w[0].message
             self.assertTrue(isinstance(msg, UnicodeWarning))
             self.assertTrue("Some characters could not be decoded" in str(msg))
+
+
+class TestNamedspacedAttribute(SoupTest):
+
+    def test_attribute_is_equivalent_to_colon_separated_string(self):
+        a = NamespacedAttribute("a", "b")
+        self.assertEqual("a:b", a)
+
+    def test_attributes_are_equivalent_if_all_members_identical(self):
+        a = NamespacedAttribute("a", "b", "c")
+        b = NamespacedAttribute("a", "b", "c")
+        self.assertEqual(a, b)
+        b.namespace = "d"
+        self.assertNotEqual(a, b)

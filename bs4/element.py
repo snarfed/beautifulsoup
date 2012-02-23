@@ -24,10 +24,21 @@ def _alias(attr):
 
 class NamespacedAttribute(object):
 
-    def __init__(self, namespace_abbreviation, name, namespace):
+    def __init__(self, namespace_abbreviation, name, namespace=None):
         self.namespace_abbreviation = namespace_abbreviation
         self.name = name
         self.namespace = namespace
+
+    def __eq__(self, other):
+        if isinstance(other, NamespacedAttribute):
+            return (
+                self.namespace_abbreviation == other.namespace_abbreviation
+                and self.name == other.name
+                and self.namespace == other.namespace)
+        elif isinstance(other, basestring):
+            return str(self) == other
+        else:
+            return super(NamespacedAttribute, self).__eq__(other)
 
     def __str__(self):
         name = self.name
