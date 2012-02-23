@@ -404,16 +404,19 @@ class HTML5TreeBuilderSmokeTest(HTMLTreeBuilderSmokeTest):
         self.assertEqual("http://www.w3.org/1999/xhtml", soup.a.namespace)
 
     def test_svg_tags_have_namespace(self):
-        markup = '<svg>'
+        markup = '<svg><circle/></svg>'
         soup = self.soup(markup)
-        self.assertEqual("http://www.w3.org/2000/svg", soup.svg.namespace)
+        namespace = "http://www.w3.org/2000/svg"
+        self.assertEqual(namespace, soup.svg.namespace)
+        self.assertEqual(namespace, soup.circle.namespace)
+
 
     def test_mathml_tags_have_namespace(self):
-        markup = '<math>'
+        markup = '<math><sqrt>5</sqrt></math>'
         soup = self.soup(markup)
-        self.assertEqual(
-            'http://www.w3.org/1998/Math/MathML', soup.math.namespace)
-
+        namespace = 'http://www.w3.org/1998/Math/MathML'
+        self.assertEqual(namespace, soup.math.namespace)
+        self.assertEqual(namespace, soup.sqrt.namespace)
 
 def skipIf(condition, reason):
    def nothing(test, *args, **kwargs):
