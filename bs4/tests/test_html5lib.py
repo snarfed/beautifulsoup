@@ -7,7 +7,7 @@ except ImportError, e:
     HTML5LIB_PRESENT = False
 from bs4.element import SoupStrainer
 from bs4.testing import (
-    HTMLTreeBuilderSmokeTest,
+    HTML5TreeBuilderSmokeTest,
     SoupTest,
     skipIf,
 )
@@ -15,8 +15,8 @@ from bs4.testing import (
 @skipIf(
     not HTML5LIB_PRESENT,
     "html5lib seems not to be present, not testing its tree builder.")
-class HTML5LibBuilderSmokeTest(SoupTest, HTMLTreeBuilderSmokeTest):
-    """See ``HTMLTreeBuilderSmokeTest``."""
+class HTML5LibBuilderSmokeTest(SoupTest, HTML5TreeBuilderSmokeTest):
+    """See ``HTML5TreeBuilderSmokeTest``."""
 
     @property
     def default_builder(self):

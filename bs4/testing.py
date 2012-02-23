@@ -391,9 +391,28 @@ class XMLTreeBuilderSmokeTest(object):
         markup = '<root xmlns:a="http://example.com/" xmlns:b="http://example.net/"><a:foo>This tag is in the a namespace</a:foo><b:foo>This tag is in the b namespace</b:foo></root>'
         soup = self.soup(markup)
         root = soup.root
-        self.assertEquals("http://example.com/", root['xmlns:a'])
-        self.assertEquals("http://example.net/", root['xmlns:b'])
+        self.assertEqual("http://example.com/", root['xmlns:a'])
+        self.assertEqual("http://example.net/", root['xmlns:b'])
 
+
+class HTML5TreeBuilderSmokeTest(HTMLTreeBuilderSmokeTest):
+    """Smoke test for a tree builder that supports HTML5."""
+
+    def test_html_tags_have_namespace(self):
+        markup = "<a>"
+        soup = self.soup(markup)
+        self.assertEqual("http://www.w3.org/1999/xhtml", soup.a.namespace)
+
+    def test_svg_tags_have_namespace(self):
+        markup = '<svg>'
+        soup = self.soup(markup)
+        self.assertEqual("http://www.w3.org/2000/svg", soup.svg.namespace)
+
+    def test_mathml_tags_have_namespace(self):
+        markup = '<math>'
+        soup = self.soup(markup)
+        self.assertEqual(
+            'http://www.w3.org/1998/Math/MathML', soup.math.namespace)
 
 
 def skipIf(condition, reason):
