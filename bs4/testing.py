@@ -418,6 +418,7 @@ class HTML5TreeBuilderSmokeTest(HTMLTreeBuilderSmokeTest):
         self.assertEqual(namespace, soup.math.namespace)
         self.assertEqual(namespace, soup.sqrt.namespace)
 
+
 def skipIf(condition, reason):
    def nothing(test, *args, **kwargs):
        return None
