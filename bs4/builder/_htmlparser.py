@@ -40,7 +40,8 @@ HTMLPARSER = 'html.parser'
 
 class BeautifulSoupHTMLParser(HTMLParser):
     def handle_starttag(self, name, attrs):
-        self.soup.handle_starttag(name, dict(attrs))
+        # XXX namespace
+        self.soup.handle_starttag(name, None, None, dict(attrs))
 
     def handle_endtag(self, name):
         self.soup.handle_endtag(name)

@@ -358,6 +358,66 @@ class HTMLTreeBuilderSmokeTest(object):
         # For the rest of the story, see TestSubstitutions in
         # test_tree.py.
 
+class XMLTreeBuilderSmokeTest(object):
+
+    def test_docstring_generated(self):
+        soup = self.soup("<root/>")
+        self.assertEqual(
+            soup.encode(), b'<?xml version="1.0" encoding="utf-8">\n<root/>')
+
+    def test_docstring_includes_correct_encoding(self):
+        soup = self.soup("<root/>")
+        self.assertEqual(
+            soup.encode("latin1"),
+            b'<?xml version="1.0" encoding="latin1">\n<root/>')
+
+    def test_real_xhtml_document(self):
+        """A real XHTML document should come out the same as it went in."""
+        markup = b"""<?xml version="1.0" encoding="utf-8">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Hello.</title></head>
+<body>Goodbye.</body>
+</html>"""
+        soup = self.soup(markup)
+        self.assertEqual(soup.encode("utf-8"), markup)
+
+
+    def test_tags_are_empty_element_if_and_only_if_they_are_empty(self):
+        self.assertSoupEquals("<p>", "<p/>")
+        self.assertSoupEquals("<p>foo</p>")
+
+    def test_namespaces_are_preserved(self):
+        markup = '<root xmlns:a="http://example.com/" xmlns:b="http://example.net/"><a:foo>This tag is in the a namespace</a:foo><b:foo>This tag is in the b namespace</b:foo></root>'
+        soup = self.soup(markup)
+        root = soup.root
+        self.assertEqual("http://example.com/", root['xmlns:a'])
+        self.assertEqual("http://example.net/", root['xmlns:b'])
+
+
+class HTML5TreeBuilderSmokeTest(HTMLTreeBuilderSmokeTest):
+    """Smoke test for a tree builder that supports HTML5."""
+
+    def test_html_tags_have_namespace(self):
+        markup = "<a>"
+        soup = self.soup(markup)
+        self.assertEqual("http://www.w3.org/1999/xhtml", soup.a.namespace)
+
+    def test_svg_tags_have_namespace(self):
+        markup = '<svg><circle/></svg>'
+        soup = self.soup(markup)
+        namespace = "http://www.w3.org/2000/svg"
+        self.assertEqual(namespace, soup.svg.namespace)
+        self.assertEqual(namespace, soup.circle.namespace)
+
+
+    def test_mathml_tags_have_namespace(self):
+        markup = '<math><msqrt>5</msqrt></math>'
+        soup = self.soup(markup)
+        namespace = 'http://www.w3.org/1998/Math/MathML'
+        self.assertEqual(namespace, soup.math.namespace)
+        self.assertEqual(namespace, soup.msqrt.namespace)
+
 
 def skipIf(condition, reason):
    def nothing(test, *args, **kwargs):

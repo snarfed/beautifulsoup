@@ -3,7 +3,10 @@
 
 import unittest
 from bs4 import BeautifulSoup
-from bs4.element import SoupStrainer
+from bs4.element import (
+    SoupStrainer,
+    NamespacedAttribute,
+    )
 from bs4.dammit import EntitySubstitution, UnicodeDammit
 from bs4.testing import SoupTest
 import warnings
@@ -16,7 +19,7 @@ class TestDeprecatedConstructorArguments(SoupTest):
         msg = str(w[0].message)
         self.assertTrue("parseOnlyThese" in msg)
         self.assertTrue("parse_only" in msg)
-        self.assertEquals(b"<b></b>", soup.encode())
+        self.assertEqual(b"<b></b>", soup.encode())
 
     def test_fromEncoding_renamed_to_from_encoding(self):
         with warnings.catch_warnings(record=True) as w:
@@ -25,7 +28,7 @@ class TestDeprecatedConstructorArguments(SoupTest):
         msg = str(w[0].message)
         self.assertTrue("fromEncoding" in msg)
         self.assertTrue("from_encoding" in msg)
-        self.assertEquals("utf8", soup.original_encoding)
+        self.assertEqual("utf8", soup.original_encoding)
 
     def test_unrecognized_keyword_argument(self):
         self.assertRaises(
@@ -206,7 +209,7 @@ class TestUnicodeDammit(unittest.TestCase):
             b"<html><meta charset=euc-jp /></html>",
             b"<html><meta charset=euc-jp/></html>"):
             dammit = UnicodeDammit(data, is_html=True)
-            self.assertEquals(
+            self.assertEqual(
                 "euc-jp", dammit.original_encoding)
 
     def test_last_ditch_entity_replacement(self):
@@ -233,3 +236,30 @@ class TestUnicodeDammit(unittest.TestCase):
             msg = w[0].message
             self.assertTrue(isinstance(msg, UnicodeWarning))
             self.assertTrue("Some characters could not be decoded" in str(msg))
+
+
+class TestNamedspacedAttribute(SoupTest):
+
+    def test_name_may_be_none(self):
+        a = NamespacedAttribute("xmlns", None)
+        self.assertEqual(a, "xmlns")
+
+    def test_attribute_is_equivalent_to_colon_separated_string(self):
+        a = NamespacedAttribute("a", "b")
+        self.assertEqual("a:b", a)
+
+    def test_attributes_are_equivalent_if_prefix_and_name_identical(self):
+        a = NamespacedAttribute("a", "b", "c")
+        b = NamespacedAttribute("a", "b", "c")
+        self.assertEqual(a, b)
+
+        # The actual namespace is not considered.
+        c = NamespacedAttribute("a", "b", None)
+        self.assertEqual(a, c)
+
+        # But name and prefix are important.
+        d = NamespacedAttribute("a", "z", "c")
+        self.assertNotEqual(a, d)
+
+        e = NamespacedAttribute("z", "b", "c")
+        self.assertNotEqual(a, e)

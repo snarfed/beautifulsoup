@@ -18,7 +18,13 @@ from bs4.builder import (
     builder_registry,
     HTMLParserTreeBuilder,
 )
-from bs4.element import CData, NavigableString, SoupStrainer, Tag
+from bs4.element import (
+    CData,
+    Doctype,
+    NavigableString,
+    SoupStrainer,
+    Tag,
+)
 from bs4.testing import (
     SoupTest,
     skipIf,
@@ -97,8 +103,8 @@ class TestFindAllBasicNamespaces(TreeTest):
 
     def test_find_by_namespaced_name(self):
         soup = self.soup('<mathml:msqrt>4</mathml:msqrt><a svg:fill="red">')
-        self.assertEquals("4", soup.find("mathml:msqrt").string)
-        self.assertEquals("a", soup.find(attrs= { "svg:fill" : "red" }).name)
+        self.assertEqual("4", soup.find("mathml:msqrt").string)
+        self.assertEqual("a", soup.find(attrs= { "svg:fill" : "red" }).name)
 
 
 class TestFindAllByName(TreeTest):
@@ -1277,3 +1283,12 @@ class TestNavigableStringSubclasses(SoupTest):
         self.assertEqual(str(soup), "<![CDATA[foo]]>")
         self.assertEqual(soup.find(text="foo"), "foo")
         self.assertEqual(soup.contents[0], "foo")
+
+    def test_doctype_ends_in_newline(self):
+        # Unlike other NavigableString subclasses, a DOCTYPE always ends
+        # in a newline.
+        doctype = Doctype("foo")
+        soup = self.soup("")
+        soup.insert(1, doctype)
+        self.assertEqual(soup.encode(), b"<!DOCTYPE foo>\n")
+
