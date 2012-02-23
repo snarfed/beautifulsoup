@@ -198,6 +198,21 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertSoupEquals("&#x10000000000000;", expect)
         self.assertSoupEquals("&#1000000000;", expect)
 
+    def test_basic_namespaces(self):
+        """Parsers don't need to *understand* namespaces, but at the
+        very least they should not choke on namespaces or lose
+        data."""
+
+        markup = b'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:svg="http://www.w3.org/2000/svg"><head></head><body><mathml:msqrt>4</mathml:msqrt><b svg:fill="red"></b></body></html>'
+        soup = self.soup(markup)
+        self.assertEquals(markup, soup.encode())
+        html = soup.html
+        self.assertEquals('http://www.w3.org/1999/xhtml', soup.html['xmlns'])
+        self.assertEquals(
+            'http://www.w3.org/1998/Math/MathML', soup.html['xmlns:mathml'])
+        self.assertEquals(
+            'http://www.w3.org/2000/svg', soup.html['xmlns:svg'])
+
     #
     # Generally speaking, tests below this point are more tests of
     # Beautiful Soup than tests of the tree builders. But parsers are

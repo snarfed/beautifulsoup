@@ -17,3 +17,4 @@ class HTMLParserTreeBuilderSmokeTest(SoupTest, HTMLTreeBuilderSmokeTest):
     def test_namespaced_public_doctype(self):
         # html.parser can't handle namespaced doctypes, so skip this one.
         pass
+

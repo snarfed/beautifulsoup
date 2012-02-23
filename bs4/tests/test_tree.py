@@ -63,7 +63,6 @@ class TestFind(TreeTest):
         soup = self.soup(u'<h1>Räksmörgås</h1>')
         self.assertEqual(soup.find(text=u'Räksmörgås'), u'Räksmörgås')
 
-
 class TestFindAll(TreeTest):
     """Basic tests of the find_all() method."""
 
@@ -93,6 +92,14 @@ class TestFindAll(TreeTest):
         # A limit of 0 means no limit.
         self.assertSelects(
             soup.find_all('a', limit=0), ["1", "2", "3", "4", "5"])
+
+class TestFindAllBasicNamespaces(TreeTest):
+
+    def test_find_by_namespaced_name(self):
+        soup = self.soup('<mathml:msqrt>4</mathml:msqrt><a svg:fill="red">')
+        self.assertEquals("4", soup.find("mathml:msqrt").string)
+        self.assertEquals("a", soup.find(attrs= { "svg:fill" : "red" }).name)
+
 
 class TestFindAllByName(TreeTest):
     """Test ways of finding tags by tag name."""
