@@ -1007,7 +1007,7 @@ class SoupStrainer(object):
     searchTag = search_tag
 
     def search(self, markup):
-        #print 'looking for %s in %s' % (self, markup)
+        # print 'looking for %s in %s' % (self, markup)
         found = None
         # If given a list of items, scan it for a text element that
         # matches.
@@ -1033,7 +1033,7 @@ class SoupStrainer(object):
         return found
 
     def _matches(self, markup, match_against):
-        #print "Matching %s against %s" % (markup, match_against)
+        # print "Matching %s against %s" % (markup, match_against)
         result = False
 
         if isinstance(markup, list) or isinstance(markup, tuple):

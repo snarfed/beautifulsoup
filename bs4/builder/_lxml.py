@@ -72,7 +72,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         self.parser.close()
 
     def close(self):
-        self.namespaces.clear()
+        self.nsmaps = None
 
     def start(self, name, attrs, nsmap={}):
         nsprefix = None
@@ -108,6 +108,8 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         completed_tag = self.soup.tagStack[-1]
         self.soup.handle_endtag(name)
         if self.nsmaps != None:
+            # This tag, or one of its parents, introduced a namespace
+            # mapping, so pop it off the stack.
             self.nsmaps.pop()
             if len(self.nsmaps) == 0:
                 # Namespaces are no longer in play, so don't bother keeping
