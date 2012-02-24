@@ -205,12 +205,12 @@ class HTMLTreeBuilderSmokeTest(object):
 
         markup = b'<html xmlns="http://www.w3.org/1999/xhtml" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:svg="http://www.w3.org/2000/svg"><head></head><body><mathml:msqrt>4</mathml:msqrt><b svg:fill="red"></b></body></html>'
         soup = self.soup(markup)
-        self.assertEquals(markup, soup.encode())
+        self.assertEqual(markup, soup.encode())
         html = soup.html
-        self.assertEquals('http://www.w3.org/1999/xhtml', soup.html['xmlns'])
-        self.assertEquals(
+        self.assertEqual('http://www.w3.org/1999/xhtml', soup.html['xmlns'])
+        self.assertEqual(
             'http://www.w3.org/1998/Math/MathML', soup.html['xmlns:mathml'])
-        self.assertEquals(
+        self.assertEqual(
             'http://www.w3.org/2000/svg', soup.html['xmlns:svg'])
 
     #

@@ -1,7 +1,8 @@
 = 4.0.0b8 (20110224) =
 
 * All tree builders now preserve namespace information in the
-  documents they parse.
+  documents they parse. If you use the html5lib parser or lxml's XML
+  parser, you can access the namespace URL for a tag as tag.namespace.
 
   However, there is no special support for namespace-oriented
   searching or tree manipulation. When you search the tree, you need
