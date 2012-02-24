@@ -1,3 +1,8 @@
+= 4.0.0b9 () =
+
+* Renamed Tag.nsprefix to Tag.prefix, for consistency with
+  NamespacedAttribute.
+
 = 4.0.0b8 (20110224) =
 
 * All tree builders now preserve namespace information in the
