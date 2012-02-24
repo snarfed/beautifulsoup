@@ -8,8 +8,17 @@ from bs4.element import (
     NamespacedAttribute,
     )
 from bs4.dammit import EntitySubstitution, UnicodeDammit
-from bs4.testing import SoupTest
+from bs4.testing import (
+    SoupTest,
+    skipIf,
+)
 import warnings
+
+try:
+    import chardet
+    CHARDET_PRESENT = True
+except ImportError, e:
+    CHARDET_PRESENT = False
 
 class TestDeprecatedConstructorArguments(SoupTest):
 
@@ -212,16 +221,23 @@ class TestUnicodeDammit(unittest.TestCase):
             self.assertEqual(
                 "euc-jp", dammit.original_encoding)
 
+    @skipIf(
+        CHARDET_PRESENT,
+        "Not testing last-ditch entity replacement because chardet is present and will find an encoding.")
     def test_last_ditch_entity_replacement(self):
         # This is a UTF-8 document that contains bytestrings
-        # completely incompatible with UTF-8 (encoded with some other
+        # completely incompatible with UTF-8 (ie. encoded with some other
         # encoding).
         #
         # Since there is no consistent encoding for the document,
         # Unicode, Dammit will eventually encode the document as UTF-8
         # and encode the incompatible characters as REPLACEMENT
         # CHARACTER.
-
+        #
+        # If chardet is installed, it will detect that the document
+        # can be converted into ISO-8859-1 without errors. This happens
+        # to be the wrong encoding, but it is a consistent encoding, so the
+        # code we're testing here won't run.
         doc = b"""\357\273\277<?xml version="1.0" encoding="UTF-8"?>
 <html><b>\330\250\330\252\330\261</b>
 <i>\310\322\321\220\312\321\355\344</i></html>"""

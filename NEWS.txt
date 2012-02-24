@@ -3,6 +3,9 @@
 * Renamed Tag.nsprefix to Tag.prefix, for consistency with
   NamespacedAttribute.
 
+* Fixed a test failure that occured on Python 3.x when chardet was
+  installed.
+
 = 4.0.0b8 (20110224) =
 
 * All tree builders now preserve namespace information in the
