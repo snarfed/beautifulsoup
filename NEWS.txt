@@ -1,4 +1,4 @@
-= 4.0.0b8 () =
+= 4.0.0b8 (20110224) =
 
 * All tree builders now preserve namespace information in the
   documents they parse.
@@ -9,6 +9,10 @@
   document.
 
 * The string representation of a DOCTYPE always ends in a newline.
+
+* Issue a warning if the user tries to use a SoupStrainer in
+  conjunction with the html5lib tree builder, which doesn't support
+  them.
 
 = 4.0.0b7 (20110223) =
 

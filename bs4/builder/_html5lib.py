@@ -2,6 +2,7 @@ __all__ = [
     'HTML5TreeBuilder',
     ]
 
+import warnings
 from bs4.builder import (
     PERMISSIVE,
     HTML,
@@ -30,6 +31,8 @@ class HTML5TreeBuilder(HTMLTreeBuilder):
 
     # These methods are defined by Beautiful Soup.
     def feed(self, markup):
+        if self.soup.parse_only is not None:
+            warnings.warn("You provided a value for parse_only, but the html5lib tree builder doesn't support parse_only. The entire document will be parsed.")
         parser = html5lib.HTMLParser(tree=self.create_treebuilder)
         doc = parser.parse(markup, encoding=self.user_specified_encoding)
 

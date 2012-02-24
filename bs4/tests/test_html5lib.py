@@ -1,5 +1,7 @@
 """Tests to ensure that the html5lib tree builder generates good trees."""
 
+import warnings
+
 try:
     from bs4.builder import HTML5TreeBuilder
     HTML5LIB_PRESENT = True
@@ -26,10 +28,14 @@ class HTML5LibBuilderSmokeTest(SoupTest, HTML5TreeBuilderSmokeTest):
         # The html5lib tree builder does not support SoupStrainers.
         strainer = SoupStrainer("b")
         markup = "<p>A <b>bold</b> statement.</p>"
-        soup = self.soup(markup,
-                         parse_only=strainer)
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup(markup, parse_only=strainer)
         self.assertEqual(
             soup.decode(), self.document_for(markup))
+
+        self.assertTrue(
+            "the html5lib tree builder doesn't support parse_only" in
+            str(w[0].message))
 
     def test_correctly_nested_tables(self):
         """html5lib inserts <tbody> tags where other parsers don't."""
