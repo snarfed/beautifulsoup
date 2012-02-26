@@ -507,7 +507,9 @@ class Doctype(NavigableString):
         value = name
         if pub_id is not None:
             value += ' PUBLIC "%s"' % pub_id
-        if system_id is not None:
+            if system_id is not None:
+                value += ' "%s"' % system_id
+        elif system_id is not None:
             value += ' SYSTEM "%s"' % system_id
 
         return Doctype(value)

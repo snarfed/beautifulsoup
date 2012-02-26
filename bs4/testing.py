@@ -79,6 +79,13 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertDoctypeHandled(
             'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"')
 
+    def test_public_doctype_with_url(self):
+        doctype = 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"'
+        self.assertDoctypeHandled(doctype)
+
+    def test_system_doctype(self):
+        self.assertDoctypeHandled('foo SYSTEM "http://www.example.com/"')
+
     def test_namespaced_system_doctype(self):
         # We can handle a namespaced doctype with a system ID.
         self.assertDoctypeHandled('xsl:stylesheet SYSTEM "htmlent.dtd"')

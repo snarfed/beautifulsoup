@@ -7,6 +7,7 @@ from bs4.element import (
     SoupStrainer,
     NamespacedAttribute,
     )
+import bs4.dammit
 from bs4.dammit import EntitySubstitution, UnicodeDammit
 from bs4.testing import (
     SoupTest,
@@ -221,9 +222,6 @@ class TestUnicodeDammit(unittest.TestCase):
             self.assertEqual(
                 "euc-jp", dammit.original_encoding)
 
-    @skipIf(
-        CHARDET_PRESENT,
-        "Not testing last-ditch entity replacement because chardet is present and will find an encoding.")
     def test_last_ditch_entity_replacement(self):
         # This is a UTF-8 document that contains bytestrings
         # completely incompatible with UTF-8 (ie. encoded with some other
@@ -238,20 +236,27 @@ class TestUnicodeDammit(unittest.TestCase):
         # can be converted into ISO-8859-1 without errors. This happens
         # to be the wrong encoding, but it is a consistent encoding, so the
         # code we're testing here won't run.
+        #
+        # So we temporarily disable chardet if it's present.
         doc = b"""\357\273\277<?xml version="1.0" encoding="UTF-8"?>
 <html><b>\330\250\330\252\330\261</b>
 <i>\310\322\321\220\312\321\355\344</i></html>"""
-        with warnings.catch_warnings(record=True) as w:
-            dammit = UnicodeDammit(doc)
-            self.assertEqual(True, dammit.contains_replacement_characters)
-            self.assertTrue(u"\ufffd" in dammit.unicode_markup)
+        chardet = bs4.dammit.chardet
+        try:
+            bs4.dammit.chardet = None
+            with warnings.catch_warnings(record=True) as w:
+                dammit = UnicodeDammit(doc)
+                self.assertEqual(True, dammit.contains_replacement_characters)
+                self.assertTrue(u"\ufffd" in dammit.unicode_markup)
 
-            soup = BeautifulSoup(doc, "html.parser")
-            self.assertTrue(soup.contains_replacement_characters)
+                soup = BeautifulSoup(doc, "html.parser")
+                self.assertTrue(soup.contains_replacement_characters)
 
-            msg = w[0].message
-            self.assertTrue(isinstance(msg, UnicodeWarning))
-            self.assertTrue("Some characters could not be decoded" in str(msg))
+                msg = w[0].message
+                self.assertTrue(isinstance(msg, UnicodeWarning))
+                self.assertTrue("Some characters could not be decoded" in str(msg))
+        finally:
+            bs4.dammit.chardet = chardet
 
 
 class TestNamedspacedAttribute(SoupTest):
