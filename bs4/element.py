@@ -848,9 +848,11 @@ class Tag(PageElement):
             s = ''.join(s)
         return s
 
-    def prettify(self, encoding=DEFAULT_OUTPUT_ENCODING,
-                 formatter="minimal"):
-        return self.encode(encoding, True, formatter)
+    def prettify(self, encoding=None, formatter="minimal"):
+        if encoding is None:
+            return self.decode(True, formatter=formatter)
+        else:
+            return self.encode(encoding, True, formatter=formatter)
 
     def decode_contents(self, indent_level=None,
                        eventual_encoding=DEFAULT_OUTPUT_ENCODING,

@@ -1201,7 +1201,15 @@ class TestSubstitutions(SoupTest):
     def test_prettify_accepts_formatter(self):
         soup = BeautifulSoup("<html><body>foo</body></html>")
         pretty = soup.prettify(formatter = lambda x: x.upper())
-        self.assertTrue(b"FOO" in pretty)
+        self.assertTrue("FOO" in pretty)
+
+    def test_prettify_outputs_unicode_by_default(self):
+        soup = self.soup("<a></a>")
+        self.assertEqual(unicode, type(soup.prettify()))
+
+    def test_prettify_can_encode_data(self):
+        soup = self.soup("<a></a>")
+        self.assertEqual(bytes, type(soup.prettify("utf-8")))
 
     def test_html_entity_substitution_off_by_default(self):
         markup = u"<b>Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!</b>"

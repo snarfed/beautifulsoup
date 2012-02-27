@@ -9,6 +9,9 @@
 * Fixed a test failure that occured on Python 3.x when chardet was
   installed.
 
+* Made prettify() return Unicode by default, so it will look nice on
+  Python 3 when passed into print().
+
 = 4.0.0b8 (20110224) =
 
 * All tree builders now preserve namespace information in the
