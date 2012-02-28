@@ -370,17 +370,17 @@ class XMLTreeBuilderSmokeTest(object):
     def test_docstring_generated(self):
         soup = self.soup("<root/>")
         self.assertEqual(
-            soup.encode(), b'<?xml version="1.0" encoding="utf-8">\n<root/>')
+            soup.encode(), b'<?xml version="1.0" encoding="utf-8"?>\n<root/>')
 
     def test_docstring_includes_correct_encoding(self):
         soup = self.soup("<root/>")
         self.assertEqual(
             soup.encode("latin1"),
-            b'<?xml version="1.0" encoding="latin1">\n<root/>')
+            b'<?xml version="1.0" encoding="latin1"?>\n<root/>')
 
     def test_real_xhtml_document(self):
         """A real XHTML document should come out the same as it went in."""
-        markup = b"""<?xml version="1.0" encoding="utf-8">
+        markup = b"""<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>Hello.</title></head>
