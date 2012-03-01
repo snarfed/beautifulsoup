@@ -2,6 +2,9 @@
 
 * Added support for simple CSS selectors, taken from the soupselect project.
 
+* In HTML5-style <meta charset="foo"> tags, the value of the "charset"
+  attribute is now replaced with the appropriate encoding on output.
+
 = 4.0.0b9 (20110228) =
 
 * Fixed the string representation of DOCTYPEs that have both a public

@@ -368,6 +368,24 @@ class HTMLTreeBuilderSmokeTest(object):
         # For the rest of the story, see TestSubstitutions in
         # test_tree.py.
 
+    def test_html5_style_meta_tag_reflects_current_encoding(self):
+        # Here's the <meta> tag saying that a document is
+        # encoded in Shift-JIS.
+        meta_tag = ('<meta id="encoding" charset="x-sjis" />')
+
+        # Here's a document incorporating that meta tag.
+        shift_jis_html = (
+            '<html><head>\n%s\n'
+            '<meta http-equiv="Content-language" content="ja"/>'
+            '</head><body>Shift-JIS markup goes here.') % meta_tag
+        soup = self.soup(shift_jis_html)
+
+        # Parse the document, and the charset is replaced with a
+        # generic value.
+        parsed_meta = soup.find('meta', id="encoding")
+        self.assertEqual('%SOUP-ENCODING%', parsed_meta['charset'])
+        self.assertEqual(True, parsed_meta.contains_substitutions)
+
 class XMLTreeBuilderSmokeTest(object):
 
     def test_docstring_generated(self):

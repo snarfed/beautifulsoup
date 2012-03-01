@@ -135,7 +135,7 @@ class TreeBuilder(object):
         return fragment
 
     def set_up_substitutions(self, tag):
-        pass
+        return False
 
 
 class SAXTreeBuilder(TreeBuilder):
@@ -222,41 +222,42 @@ class HTMLTreeBuilder(TreeBuilder):
     CHARSET_RE = re.compile("((^|;)\s*charset=)([^;]*)", re.M)
 
     def set_up_substitutions(self, tag):
+        # We are only interested in <meta> tags
         if tag.name != 'meta':
             return False
 
         http_equiv = tag.get('http-equiv')
         content = tag.get('content')
+        charset = tag.get('charset')
 
-        if (http_equiv is not None
-            and content is not None
-            and http_equiv.lower() == 'content-type'):
-            # This is an interesting meta tag.
+        # We are interested in <meta> tags that say what encoding the
+        # document was originally in. This means HTML 5-style <meta>
+        # tags that provide the "charset" attribute. It also means
+        # HTML 4-style <meta> tags that provide the "content"
+        # attribute and have "http-equiv" set to "content-type".
+        meta_encoding = None
+        if charset is not None:
+            # HTML 5 style:
+            # <meta charset="utf8">
+            meta_encoding = charset
+
+            # Modify the tag.
+            tag['charset'] = "%SOUP-ENCODING%"
+
+        elif (content is not None and http_equiv is not None
+              and http_equiv.lower() == 'content-type'):
+            # HTML 4 style:
+            # <meta http-equiv="content-type" content="text/html; charset=utf8">
             match = self.CHARSET_RE.search(content)
-            if match:
-                if (self.soup.declared_html_encoding is not None or
-                    self.soup.original_encoding == self.soup.from_encoding):
-                    # An HTML encoding was sniffed while converting
-                    # the document to Unicode, or an HTML encoding was
-                    # sniffed during a previous pass through the
-                    # document, or an encoding was specified
-                    # explicitly and it worked. Rewrite the meta tag.
-                    def rewrite(match):
-                        return match.group(1) + "%SOUP-ENCODING%"
-                    tag['content'] = self.CHARSET_RE.sub(rewrite, content)
-                    return True
-                else:
-                    # This is our first pass through the document.
-                    # Go through it again with the encoding information.
-                    new_charset = match.group(3)
-                    if (new_charset is not None
-                        and new_charset != self.soup.original_encoding):
-                        self.soup.declared_html_encoding = new_charset
-                        self.soup._feed(self.soup.declared_html_encoding)
-                        raise StopParsing
-                    pass
-        return False
+            if match is not None:
+                meta_encoding = match.group(3)
 
+                # Modify the tag.
+                def rewrite(match):
+                    return match.group(1) + "%SOUP-ENCODING%"
+                tag['content'] = self.CHARSET_RE.sub(rewrite, content)
+
+        return (meta_encoding is not None)
 
 def register_treebuilders_from(module):
     """Copy TreeBuilders from the given module into this module."""
