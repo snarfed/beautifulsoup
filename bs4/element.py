@@ -411,6 +411,132 @@ class PageElement(object):
             yield i
             i = i.parent
 
+    # Methods for supporting CSS selectors.
+
+    tag_name_re = re.compile('^[a-z0-9]+$')
+
+    # /^(\w+)\[(\w+)([=~\|\^\$\*]?)=?"?([^\]"]*)"?\]$/
+    #   \---/  \---/\-------------/    \-------/
+    #     |      |         |               |
+    #     |      |         |           The value
+    #     |      |    ~,|,^,$,* or =
+    #     |   Attribute
+    #    Tag
+    attribselect_re = re.compile(
+        r'^(?P<tag>\w+)?\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)' +
+        r'=?"?(?P<value>[^\]"]*)"?\]$'
+        )
+
+    def _attr_value_as_string(self, value, default=None):
+        """Force an attribute value into a string representation.
+
+        A multi-valued attribute will be converted into a
+        space-separated stirng.
+        """
+        value = self.get(value, default)
+        if isinstance(value, list) or isinstance(value, tuple):
+            value =" ".join(value)
+        return value
+
+    def _attribute_checker(self, operator, attribute, value=''):
+        """Create a function that performs a CSS selector operation.
+
+        Takes an operator, attribute and optional value. Returns a
+        function that will return True for elements that match that
+        combination.
+        """
+        if operator == '=':
+            # string representation of `attribute` is equal to `value`
+            return lambda el: el._attr_value_as_string(attribute) == value
+        elif operator == '~':
+            # space-separated list representation of `attribute`
+            # contains `value`
+            def _includes_value(element):
+                attribute_value = element.get(attribute, [])
+                if not isinstance(attribute_value, list):
+                    attribute_value = attribute_value.split()
+                return value in attribute_value
+            return _includes_value
+        elif operator == '^':
+            # string representation of `attribute` starts with `value`
+            return lambda el: el._attr_value_as_string(
+                attribute, '').startswith(value)
+        elif operator == '$':
+            # string represenation of `attribute` ends with `value`
+            return lambda el: el._attr_value_as_string(
+                attribute, '').endswith(value)
+        elif operator == '*':
+            # string representation of `attribute` contains `value`
+            return lambda el: value in el._attr_value_as_string(attribute, '')
+        elif operator == '|':
+            # string representation of `attribute` is either exactly
+            # `value` or starts with `value` and then a dash.
+            def _is_or_starts_with_dash(element):
+                attribute_value = element._attr_value_as_string(attribute, '')
+                return (attribute_value == value or attribute_value.startswith(
+                        value + '-'))
+            return _is_or_starts_with_dash
+        else:
+            return lambda el: el.has_attr(attribute)
+
+    def select(self, selector):
+        """Perform a CSS selection operation on the current element."""
+        tokens = selector.split()
+        current_context = [self]
+        for token in tokens:
+            m = self.attribselect_re.match(token)
+            if m is not None:
+                # Attribute selector
+                tag, attribute, operator, value = m.groups()
+                if not tag:
+                    tag = True
+                checker = self._attribute_checker(operator, attribute, value)
+                found = []
+                for context in current_context:
+                    found.extend([el for el in context.find_all(tag) if checker(el)])
+                current_context = found
+                continue
+            if '#' in token:
+                # ID selector
+                tag, id = token.split('#', 1)
+                if tag == "":
+                    tag = True
+                el = current_context[0].find(tag, {'id': id})
+                if el is None:
+                    return [] # No match
+                current_context = [el]
+                continue
+            if '.' in token:
+                # Class selector
+                tag, klass = token.split('.', 1)
+                if not tag:
+                    tag = True
+                found = []
+                for context in current_context:
+                    found.extend(
+                        context.find_all(
+                            tag,
+                            {'class': lambda attr: attr and klass in attr.split()}
+                            )
+                        )
+                current_context = found
+                continue
+            if token == '*':
+                # Star selector
+                found = []
+                for context in current_context:
+                    found.extend(context.findAll(True))
+                current_context = found
+                continue
+            # Here we should just have a regular tag
+            if not self.tag_name_re.match(token):
+                return []
+            found = []
+            for context in current_context:
+                found.extend(context.findAll(token))
+            current_context = found
+        return current_context
+
     # Old non-property versions of the generators, for backwards
     # compatibility with BS3.
     def nextGenerator(self):
