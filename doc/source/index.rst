@@ -1499,6 +1499,80 @@ that show up earlier in the document than the one we started with. A
 <p> tag that contains an <a> tag must have shown up earlier in the
 document.
 
+CSS selectors
+-------------
+
+Beautiful Soup supports a subset of the `CSS selector standard
+<http://www.w3.org/TR/CSS2/selector.html>`_. Just construct the
+selector as a string and pass it into the ``.select()`` method of a
+``Tag`` or the ``BeautifulSoup`` object itself.
+
+You can find tags::
+
+ soup.select("title")
+ # [<title>The Dormouse's story</title>]
+
+Find tags beneath other tags::
+
+ soup.select("p a")
+ # [<a class="sister" href="http://example.com/elsie"
+ id="link1">Elsie</a>, <a class="sister"
+ href="http://example.com/lacie" id="link2">Lacie</a>, <a
+ class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+ soup.select("html head title")
+ # [<title>The Dormouse's story</title>]
+
+Find tags by CSS class::
+
+ soup.select(".sister")
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+ soup.select("[class~=sister]")
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+Find tags by ID::
+
+ soup.select("#link1")
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>]
+
+ soup.select("a#link2")
+ # [<a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>]
+
+Test for the existence of an attribute::
+
+ soup.select('a[href]')
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+Find tags by attribute value::
+
+ soup.select('a[href="http://example.com/elsie"]')
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>]
+
+ soup.select('a[href^="http://example.com/"]')
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+ soup.select('a[href$="tillie"]')
+ # [<a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+ soup.select('a[href*=".com/el"]')
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>]
+
+This is a convenience for users who know the CSS selector syntax. You
+can do all this stuff with the Beautiful Soup API. And if CSS
+selectors are all you need, you might as well use lxml directly,
+because it's faster. But this lets you `combine` simple CSS selectors
+with the Beautiful Soup API.
+
+
 Modifying the tree
 ==================
 

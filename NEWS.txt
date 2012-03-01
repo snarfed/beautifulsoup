@@ -1,6 +1,6 @@
 = 4.0.0b10 () =
 
-* Added support for CSS selectors, taken from the soupselect project.
+* Added support for simple CSS selectors, taken from the soupselect project.
 
 = 4.0.0b9 (20110228) =
 
