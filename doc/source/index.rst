@@ -175,22 +175,13 @@ should work with other recent versions.
 
 .. _parser-installation:
 
-Be sure to install a good parser!
----------------------------------
+Choosing a parser
+-----------------
 
-Beautiful Soup uses a plugin system that supports a number of popular
-Python parsers. If no third-party parsers are installed, Beautiful
-Soup uses the HTML parser that comes with Python. In recent releases
-of Python (2.7.3 and 3.2.2), this parser is excellent at handling bad
-HTML. Unfortunately, in older releases, it's not very good at all.
-
-Even if you're using a recent release of Python, I recommend you
-install the `lxml parser <http://lxml.de/>`_ if you can. Its
-reliability is good on both HTML and XML, and it's much faster than
-Python's built-in parser. Beautiful Soup will detect that you have
-lxml installed, and use it instead of Python's built-in parser.
-
-Depending on your setup, you might install lxml with one of these commands:
+Beautiful Soup supports the HTML parser included in Python's standard
+library, but it also supports a number of third-party Python parsers.
+One is the `lxml parser <http://lxml.de/>`_. Depending on your setup,
+you might install lxml with one of these commands:
 
 :kbd:`$ apt-get install python-lxml`
 
@@ -208,6 +199,39 @@ install html5lib with one of these commands:
 :kbd:`$ easy_install html5lib`
 
 :kbd:`$ pip install html5lib`
+
+This table summarizes the advantages and disadvantages of each parser library:
+
++----------------------+--------------------------------------------+--------------------------------+--------------------------+
+| Parser               | Typical usage                              | Advantages                     | Disadvantages            |
++----------------------+--------------------------------------------+--------------------------------+--------------------------+
+| Python's html.parser | ``BeautifulSoup(markup, "html.parser")``   | * Batteries included           | * Not very lenient       |
+|                      |                                            | * Decent speed                 |   (before Python 2.7.3   |
+|                      |                                            | * Lenient (as of Python 2.7.3  |   or 3.2.2)              |
+|                      |                                            |   and 3.2.)                    |                          |
++----------------------+--------------------------------------------+--------------------------------+--------------------------+
+| lxml's HTML parser   | ``BeautifulSoup(markup, "lxml")``          | * Very fast                    | * External C dependency  |
+|                      |                                            | * Lenient                      |                          |
++----------------------+--------------------------------------------+--------------------------------+--------------------------+
+| lxml's XML parser    | ``BeautifulSoup(markup, ["lxml", "xml"])`` | * Very fast                    |                          |
+|                      | ``BeautifulSoup(markup, "xml")``           | * The only currently supported |                          |
+|                      |                                            |   XML parser                   |                          |
++----------------------+--------------------------------------------+--------------------------------+--------------------------+
+| html5lib             | ``BeautifulSoup(markup, html5lib)``        | * Extremely lenient            | * Very slow              |
+|                      |                                            | * Parses pages the same way a  | * External Python        |
+|                      |                                            |   web browser does             |   dependency             |
+|                      |                                            | * Creates valid HTML5          | * Python 2 only          |
++----------------------+--------------------------------------------+--------------------------------+--------------------------+
+
+If you can, I recommend you install and use lxml for speed. If you're
+using a version of Python 2 earlier than 2.7.3, or a version of Python
+3 earlier than 3.2.2, it's `essential` that you install lxml or
+html5lib--Python's built-in HTML parser is just not very good in older
+versions.
+
+Note that if a document is invalid, different parsers will generate
+different Beautiful Soup trees for the same document. See `Differences
+between parsers`_ for details.
 
 Making the soup
 ===============
@@ -2013,8 +2037,8 @@ generator instead, and process the text yourself::
  [text for text in soup.stripped_strings]
  # [u'I linked to', u'example.com']
 
-Choosing a parser
-=================
+Specifying the parser to use
+============================
 
 If you just need to parse some HTML, you can dump the markup into the
 ``BeautifulSoup`` constructor, and it'll probably be fine. Beautiful
@@ -2038,28 +2062,21 @@ specifying one of the following:
   options are "lxml", "html5lib", and "html.parser" (Python's
   built-in HTML parser).
 
-Some examples::
-
- BeautifulSoup(markup, "lxml")
- BeautifulSoup(markup, "xml")
- BeautifulSoup(markup, "html5")
-
-You can specify a list of the parser features you want, instead of
-just one. Right now this is mostly useful for distinguishing between
-lxml's HTML parser and its XML parser::
-
- BeautifulSoup(markup, ["html", "lxml"])
- BeautifulSoup(markup, ["xml", "lxml"])
+The section `Choosing a parser`_ contrasts the supported parsers.
 
 If you don't have an appropriate parser installed, Beautiful Soup will
-ignore your request and pick a different parser. For instance, right
-now the only supported XML parser is lxml, so if you don't have lxml
-installed, asking for an XML parser won't give you one, and asking for
-"lxml" won't work either.
+ignore your request and pick a different parser. Right now, the only
+supported XML parser is lxml. If you don't have lxml installed, asking
+for an XML parser won't give you one, and asking for "lxml" won't work
+either.
 
-Why would you use one parser over another? Because different parsers
-will create different parse trees from the same document. The biggest
-differences are between HTML parsers and XML parsers. Here's a short
+Differences between parsers
+---------------------------
+
+Beautiful Soup presents the same interface to a number of different
+parsers, but each parser is different. Different parsers will create
+different parse trees from the same document. The biggest differences
+are between the HTML parsers and the XML parsers. Here's a short
 document, parsed as HTML::
 
  BeautifulSoup("<a><b /></a>")
@@ -2079,7 +2096,7 @@ into an <html> tag.::
 
 There are also differences between HTML parsers. If you give Beautiful
 Soup a perfectly-formed HTML document, these differences won't
-matter. One parser may be faster than another, but they'll all give
+matter. One parser will be faster than another, but they'll all give
 you a data structure that looks exactly like the original HTML
 document.
 
@@ -2121,7 +2138,6 @@ on distributing your script to other people, you might want to specify
 in the ``BeautifulSoup`` constructor which parser you used during
 development. That will reduce the chances that your users parse a
 document differently from the way you parse it.
-
 
 Encodings
 =========
@@ -2491,9 +2507,7 @@ You need a parser
 Beautiful Soup 3 used Python's ``SGMLParser``, a module that was
 deprecated and removed in Python 3.0. Beautiful Soup 4 uses
 ``html.parser`` by default, but you can plug in lxml or html5lib and
-use that instead. Until ``html.parser`` is improved to handle
-real-world HTML better, that's what I recommend you do. See `Be sure
-to install a good parser!`_
+use that instead. See `Choosing a parser`_ for a comparison.
 
 Method names
 ^^^^^^^^^^^^
