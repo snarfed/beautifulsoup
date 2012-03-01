@@ -132,6 +132,9 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertTrue(soup.br.is_empty_element)
         self.assertEqual(str(soup.br), "<br/>")
 
+    def test_nested_formatting_elements(self):
+        self.assertSoupEquals("<em><em></em></em>")
+
     def test_comment(self):
         # Comments are represented as Comment objects.
         markup = "<p>foo<!--foobar-->baz</p>"

@@ -107,6 +107,8 @@ class AttrList(object):
         return list(self.attrs.items())
     def keys(self):
         return list(self.attrs.keys())
+    def __len__(self):
+        return len(self.attrs)
     def __getitem__(self, name):
         return self.attrs[name]
     def __contains__(self, name):
