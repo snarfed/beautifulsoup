@@ -446,9 +446,11 @@ class PageElement(object):
         combination.
         """
         if operator == '=':
-            # string representation of attribute is equal to value
+            # string representation of `attribute` is equal to `value`
             return lambda el: el._attr_value_as_string(attribute) == value
         elif operator == '~':
+            # space-separated list representation of `attribute`
+            # contains `value`
             def _includes_value(element):
                 attribute_value = element.get(attribute, [])
                 if not isinstance(attribute_value, list):
@@ -456,17 +458,19 @@ class PageElement(object):
                 return value in attribute_value
             return _includes_value
         elif operator == '^':
-            # string representation of attribute starts with value
-            return lambda el: el._attr_value_as_string(attribute, '').startswith(value)
+            # string representation of `attribute` starts with `value`
+            return lambda el: el._attr_value_as_string(
+                attribute, '').startswith(value)
         elif operator == '$':
-            # string represenation of attribute ends with value
-            return lambda el: el._attr_value_as_string(attribute, '').endswith(value)
+            # string represenation of `attribute` ends with `value`
+            return lambda el: el._attr_value_as_string(
+                attribute, '').endswith(value)
         elif operator == '*':
-            # string representation of attribute contains value
+            # string representation of `attribute` contains `value`
             return lambda el: value in el._attr_value_as_string(attribute, '')
         elif operator == '|':
-            # string representation of attribute is either exactly
-            # value or starts with value-
+            # string representation of `attribute` is either exactly
+            # `value` or starts with `value` and then a dash.
             def _is_or_starts_with_dash(element):
                 attribute_value = element._attr_value_as_string(attribute, '')
                 return (attribute_value == value or attribute_value.startswith(

@@ -11,12 +11,16 @@ of UnicodeDammit.
 Thomas Kluyver and Ezio Melotti finished the work of getting Beautiful
 Soup 4 working under Python 3.
 
+Simon Willison wrote soupselect, which was used to make Beautiful Soup
+support CSS selectors.
+
 Sam Ruby helped with a lot of edge cases.
 
 Jonathan Ellis was awarded the prestigous Beau Potage D'Or for his
 work in solving the nestable tags conundrum.
 
-The following people have contributed patches to Beautiful Soup:
+An incomplete list of people have contributed patches to Beautiful
+Soup:
 
  Istvan Albert, Andrew Lin, Anthony Baxter, Andrew Boyko, Tony Chang,
  Zephyr Fang, Fuzzy, Roman Gaufman, Yoni Gilad, Richie Hindle, Peteris
@@ -26,8 +30,8 @@ The following people have contributed patches to Beautiful Soup:
  Samastur, Jouni Seppänen, Alexander Schmolck, Andy Theyers, Glyn
  Webster, Paul Wright, Danny Yoo
 
-The following people made suggestions or found bugs or found ways to
-break Beautiful Soup:
+An incomplete list of people who made suggestions or found bugs or
+found ways to break Beautiful Soup:
 
  Hanno Böck, Matteo Bertini, Chris Curvey, Simon Cusack, Bruce Eckel,
  Matt Ernst, Michael Foord, Tom Harris, Bill de hOra, Donald Howes,

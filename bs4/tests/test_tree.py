@@ -1301,7 +1301,7 @@ class TestNavigableStringSubclasses(SoupTest):
         self.assertEqual(soup.encode(), b"<!DOCTYPE foo>\n")
 
 
-class TestSoupSelector(SoupTest):
+class TestSoupSelector(TreeTest):
 
     HTML = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
     "http://www.w3.org/TR/html4/strict.dtd">
@@ -1528,3 +1528,12 @@ class TestSoupSelector(SoupTest):
             ('[blah]', []),
             ('p[blah]', []),
         )
+
+    def test_select_on_element(self):
+        # Other tests operate on the tree; this operates on an element
+        # within the tree.
+        inner = self.soup.find("div", id="main")
+        selected = inner.select("div")
+        # The <div id="inner"> tag was selected. The <div id="footer">
+        # tag was not.
+        self.assertSelectsIDs(selected, ['inner'])
