@@ -329,6 +329,16 @@ class BeautifulSoup(Tag):
         return prefix + super(BeautifulSoup, self).decode(
             indent_level, eventual_encoding, formatter)
 
+class BeautifulStoneSoup(BeautifulSoup):
+    """Deprecated interface to an XML parser."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs['features'] = 'xml'
+        warnings.warn(
+            'The BeautifulStoneSoup class is deprecated. Instead of using '
+            'it, pass features="xml" into the BeautifulSoup constructor.')
+        super(BeautifulStoneSoup, self).__init__(*args, **kwargs)
+
 
 class StopParsing(Exception):
     pass

@@ -2,7 +2,10 @@
 """Tests of Beautiful Soup as a whole."""
 
 import unittest
-from bs4 import BeautifulSoup
+from bs4 import (
+    BeautifulSoup,
+    BeautifulStoneSoup,
+)
 from bs4.element import (
     SoupStrainer,
     NamespacedAttribute,
@@ -43,6 +46,12 @@ class TestDeprecatedConstructorArguments(SoupTest):
     def test_unrecognized_keyword_argument(self):
         self.assertRaises(
             TypeError, self.soup, "<a>", no_such_argument=True)
+
+    def test_beautifulstonesoup(self):
+        with warnings.catch_warnings(record=True) as w:
+            soup = BeautifulStoneSoup("<markup>")
+            self.assertTrue(isinstance(soup, BeautifulSoup))
+            self.assertTrue("BeautifulStoneSoup class is deprecated")
 
 class TestSelectiveParsing(SoupTest):
 

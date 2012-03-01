@@ -1,6 +1,7 @@
 """Tests to ensure that the lxml tree builder generates good trees."""
 
 import re
+import warnings
 
 try:
     from bs4.builder import LXMLTreeBuilder, LXMLTreeBuilderForXML
@@ -8,7 +9,10 @@ try:
 except ImportError, e:
     LXML_PRESENT = False
 
-from bs4 import BeautifulSoup
+from bs4 import (
+    BeautifulSoup,
+    BeautifulStoneSoup,
+    )
 from bs4.element import Comment, Doctype, SoupStrainer
 from bs4.testing import skipIf
 from bs4.tests import test_htmlparser
@@ -36,6 +40,13 @@ class LXMLTreeBuilderSmokeTest(SoupTest, HTMLTreeBuilderSmokeTest):
             "<p>foo&#x10000000000000;bar</p>", "<p>foobar</p>")
         self.assertSoupEquals(
             "<p>foo&#1000000000;bar</p>", "<p>foobar</p>")
+
+    def test_beautifulstonesoup_is_xml_parser(self):
+        # Make sure that the deprecated BSS class uses an xml builder
+        # if one is installed.
+        with warnings.catch_warnings(record=False) as w:
+            soup = BeautifulStoneSoup("<b />")
+            self.assertEqual(u"<b/>", unicode(soup.b))
 
 @skipIf(
     not LXML_PRESENT,

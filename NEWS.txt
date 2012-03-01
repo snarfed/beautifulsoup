@@ -5,6 +5,9 @@
 * In HTML5-style <meta charset="foo"> tags, the value of the "charset"
   attribute is now replaced with the appropriate encoding on output.
 
+* For backwards compatibility, brought back the BeautifulStoneSoup
+  class as a deprecated wrapper around BeautifulSoup.
+
 = 4.0.0b9 (20110228) =
 
 * Fixed the string representation of DOCTYPEs that have both a public
