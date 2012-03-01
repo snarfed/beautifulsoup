@@ -427,6 +427,17 @@ class PageElement(object):
         r'=?"?(?P<value>[^\]"]*)"?\]$'
         )
 
+    def _attr_value_as_string(self, value, default=None):
+        """Force an attribute value into a string representation.
+
+        A multi-valued attribute will be converted into a
+        space-separated stirng.
+        """
+        value = self.get(value, default)
+        if isinstance(value, list) or isinstance(value, tuple):
+            value =" ".join(value)
+        return value
+
     def _attribute_checker(self, operator, attribute, value=''):
         """Create a function that performs a CSS selector operation.
 
@@ -436,33 +447,36 @@ class PageElement(object):
         """
         if operator == '=':
             # string representation of attribute is equal to value
-            return lambda el: str(el.get(attribute)) == value
+            return lambda el: el._attr_value_as_string(attribute) == value
         elif operator == '~':
-            # string representation of attribute includes value as one
-            # of a set of space separated tokens
-            return lambda el: value in str(el.get(attribute, '')).split()
+            def _includes_value(element):
+                attribute_value = element.get(attribute, [])
+                if not isinstance(attribute_value, list):
+                    attribute_value = attribute_value.split()
+                return value in attribute_value
+            return _includes_value
         elif operator == '^':
             # string representation of attribute starts with value
-            return lambda el: str(el.get(attribute, '')).startswith(value)
+            return lambda el: el._attr_value_as_string(attribute, '').startswith(value)
         elif operator == '$':
             # string represenation of attribute ends with value
-            return lambda el: str(el.get(attribute, '')).endswith(value)
+            return lambda el: el._attr_value_as_string(attribute, '').endswith(value)
         elif operator == '*':
             # string representation of attribute contains value
-            return lambda el: value in str(el.get(attribute, ''))
+            return lambda el: value in el._attr_value_as_string(attribute, '')
         elif operator == '|':
             # string representation of attribute is either exactly
             # value or starts with value-
-            return lambda el: (
-                str(el.get(attribute, '')) == value
-                or str(el.get(attribute, '')).startswith('%s-' % value))
+            def _is_or_starts_with_dash(element):
+                attribute_value = element._attr_value_as_string(attribute, '')
+                return (attribute_value == value or attribute_value.startswith(
+                        value + '-'))
+            return _is_or_starts_with_dash
         else:
-            return lambda el: el.has_key(attribute)
+            return lambda el: el.has_attr(attribute)
 
     def select(self, selector):
         """Perform a CSS selection operation on the current element."""
-        if selector == 'p[class~="class1"]':
-            import pdb; pdb.set_trace()
         tokens = selector.split()
         current_context = [self]
         for token in tokens:

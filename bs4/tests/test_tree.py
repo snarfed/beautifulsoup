@@ -1412,7 +1412,7 @@ class TestSoupSelector(SoupTest):
         for el in els:
             self.assertEqual(el.name, 'p')
         self.assertEqual(els[1]['class'], ['onep'])
-        self.assert_(not els[0].has_key('class'))
+        self.assertFalse(els[0].has_key('class'))
 
     def test_a_bunch_of_emptys(self):
         for selector in ('div#main del', 'div#main div.oops', 'div div#main'):
