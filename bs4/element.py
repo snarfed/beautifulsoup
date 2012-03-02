@@ -838,7 +838,7 @@ class Tag(PageElement):
         """Calling a tag like a function is the same as calling its
         find_all() method. Eg. tag('a') returns a list of all the A tags
         found within this tag."""
-        return self.find_all(args, kwargs)
+        return self.find_all(*args, **kwargs)
 
     def __getattr__(self, tag):
         #print "Getattr %s.%s" % (self.__class__, tag)

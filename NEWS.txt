@@ -1,14 +1,20 @@
-= 4.0.0b10 () =
+= 4.0.0b10 (20120302) =
 
 * Added support for simple CSS selectors, taken from the soupselect project.
 
+* Fixed a crash when using html5lib. [bug=943246]
+
 * In HTML5-style <meta charset="foo"> tags, the value of the "charset"
-  attribute is now replaced with the appropriate encoding on output.
+  attribute is now replaced with the appropriate encoding on
+  output. [bug=942714]
+
+* Fixed a bug that caused calling a tag to sometimes call find_all()
+  with the wrong arguments. [bug=944426]
 
 * For backwards compatibility, brought back the BeautifulStoneSoup
   class as a deprecated wrapper around BeautifulSoup.
 
-= 4.0.0b9 (20110228) =
+= 4.0.0b9 (20120228) =
 
 * Fixed the string representation of DOCTYPEs that have both a public
   ID and a system ID.
@@ -24,7 +30,7 @@
 * Made prettify() return Unicode by default, so it will look nice on
   Python 3 when passed into print().
 
-= 4.0.0b8 (20110224) =
+= 4.0.0b8 (20120224) =
 
 * All tree builders now preserve namespace information in the
   documents they parse. If you use the html5lib parser or lxml's XML
@@ -41,7 +47,7 @@
   conjunction with the html5lib tree builder, which doesn't support
   them.
 
-= 4.0.0b7 (20110223) =
+= 4.0.0b7 (20120223) =
 
 * Upon decoding to string, any characters that can't be represented in
   your chosen encoding will be converted into numeric XML entity
@@ -70,7 +76,7 @@
   This makes Beautiful Soup compatible with html5lib version 0.95 and
   future versions of HTMLParser.
 
-= 4.0.0b6 (20110216) =
+= 4.0.0b6 (20120216) =
 
 * Multi-valued attributes like "class" always have a list of values,
   even if there's only one value in the list.

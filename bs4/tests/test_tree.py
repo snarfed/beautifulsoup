@@ -99,6 +99,11 @@ class TestFindAll(TreeTest):
         self.assertSelects(
             soup.find_all('a', limit=0), ["1", "2", "3", "4", "5"])
 
+    def test_calling_a_tag_is_calling_findall(self):
+        soup = self.soup("<a>1</a><b>2<a id='foo'>3</a></b>")
+        self.assertSelects(soup('a', limit=1), ["1"])
+        self.assertSelects(soup.b(id="foo"), ["3"])
+
 class TestFindAllBasicNamespaces(TreeTest):
 
     def test_find_by_namespaced_name(self):
