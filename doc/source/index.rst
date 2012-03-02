@@ -2251,8 +2251,8 @@ element in the soup, just as if it were a Python string::
  # '<p>Sacr\xc3\xa9 bleu!</p>'
 
 Any characters that can't be represented in your chosen encoding will
-be converted into numeric XML entity references. For instance, here's
-a document that includes the Unicode character SNOWMAN::
+be converted into numeric XML entity references. Here's a document
+that includes the Unicode character SNOWMAN::
 
  markup = u"<b>\N{SNOWMAN}</b>"
  snowman_soup = BeautifulSoup(markup)
@@ -2328,8 +2328,10 @@ to the ``BeautifulSoup`` constructor as the ``parse_only`` argument.
 
 (Note that *this feature won't work if you're using the html5lib
 parser*. If you use html5lib, the whole document will be parsed, no
-matter what. In the examples below, I'll be forcing Beautiful Soup to
-use Python's built-in parser.)
+matter what. This is because html5lib constantly rearranges the parse
+tree as it works, and if some part of the document didn't actually
+make it into the parse tree, it'll crash. In the examples below, I'll
+be forcing Beautiful Soup to use Python's built-in parser.)
 
 ``SoupStrainer``
 ----------------
