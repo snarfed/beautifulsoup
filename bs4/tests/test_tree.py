@@ -1308,37 +1308,43 @@ class TestNavigableStringSubclasses(SoupTest):
 
 class TestSoupSelector(TreeTest):
 
-    HTML = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-    "http://www.w3.org/TR/html4/strict.dtd">
+    HTML = """
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-  <title>The title</title>
-  <link rel="stylesheet" href="blah.css" type="text/css" id="l1">
+<title>The title</title>
+<link rel="stylesheet" href="blah.css" type="text/css" id="l1">
 </head>
 <body>
 
 <div id="main">
-    <div id="inner">
-        <h1 id="header1">An H1</h1>
-        <p>Some text</p>
-        <p class="onep" id="p1">Some more text</p>
-        <h2 id="header2">An H2</h2>
-        <p class="class1 class2 class3" id="pmulti">Another</p>
-        <a href="http://bob.example.org/" rel="friend met" id="bob">Bob</a>
-        <h2 id="header3">Another H2</h2>
-        <a id="me" href="http://simonwillison.net/" rel="me">me</a>
-    </div>
-    <p lang="en" id="lang-en">English</p>
-    <p lang="en-gb" id="lang-en-gb">English UK</p>
-    <p lang="en-us" id="lang-en-us">English US</p>
-    <p lang="fr" id="lang-fr">French</p>
+<div id="inner">
+<h1 id="header1">An H1</h1>
+<p>Some text</p>
+<p class="onep" id="p1">Some more text</p>
+<h2 id="header2">An H2</h2>
+<p class="class1 class2 class3" id="pmulti">Another</p>
+<a href="http://bob.example.org/" rel="friend met" id="bob">Bob</a>
+<h2 id="header3">Another H2</h2>
+<a id="me" href="http://simonwillison.net/" rel="me">me</a>
+<span class="s1">
+<a href="#" id="s1a1">span1a1</a>
+<a href="#" id="s1a2">span1a2 <span id="s1a2s1">test</span></a>
+<span class="span2">
+<a href="#" id="s2a1">span2a1</a>
+</span>
+<span class="span3"></span>
+</span>
+</div>
+<p lang="en" id="lang-en">English</p>
+<p lang="en-gb" id="lang-en-gb">English UK</p>
+<p lang="en-us" id="lang-en-us">English US</p>
+<p lang="fr" id="lang-fr">French</p>
 </div>
 
 <div id="footer">
 </div>
-
-</body>
-</html>
 """
 
     def setUp(self):
@@ -1428,6 +1434,16 @@ class TestSoupSelector(TreeTest):
             '.class3', 'p.class3', 'html p.class2', 'div#inner .class2'):
             self.assertSelects(selector, ['pmulti'])
 
+    def test_multi_class_selection(self):
+        for selector in ('.class1.class3', '.class3.class2',
+                         '.class1.class2.class3'):
+            self.assertSelects(selector, ['pmulti'])
+
+    def test_child_selector(self):
+        self.assertSelects('.s1 > a', ['s1a1', 's1a2'])
+        self.assertSelects('.s1 > a span', ['s1a2s1'])
+
+
     def test_attribute_equals(self):
         self.assertSelectMultiple(
             ('p[class="onep"]', ['p1']),
@@ -1481,7 +1497,7 @@ class TestSoupSelector(TreeTest):
             ('[href$=".css"]', ['l1']),
             ('link[href$=".css"]', ['l1']),
             ('link[id$="1"]', ['l1']),
-            ('[id$="1"]', ['l1', 'p1', 'header1']),
+            ('[id$="1"]', ['l1', 'p1', 'header1', 's1a1', 's2a1', 's1a2s1']),
             ('div[id$="1"]', []),
             ('[id$="noending"]', []),
         )
@@ -1504,7 +1520,7 @@ class TestSoupSelector(TreeTest):
             ('[href*=".css"]', ['l1']),
             ('link[href*=".css"]', ['l1']),
             ('link[id*="1"]', ['l1']),
-            ('[id*="1"]', ['l1', 'p1', 'header1']),
+            ('[id*="1"]', ['l1', 'p1', 'header1', 's1a1', 's1a2', 's2a1', 's1a2s1']),
             ('div[id*="1"]', []),
             ('[id*="noending"]', []),
             # New for this test

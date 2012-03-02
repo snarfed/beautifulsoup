@@ -1,3 +1,9 @@
+= 4.0.0b11 () =
+
+* Brought BS up to date with the latest release of soupselect, adding
+  CSS selector support for direct descendant matches and multiple CSS
+  class matches.
+
 = 4.0.0b10 (20120302) =
 
 * Added support for simple CSS selectors, taken from the soupselect project.

@@ -483,7 +483,11 @@ class PageElement(object):
         """Perform a CSS selection operation on the current element."""
         tokens = selector.split()
         current_context = [self]
-        for token in tokens:
+        for index, token in enumerate(tokens):
+            if tokens[index - 1] == '>':
+                # already found direct descendants in last step. skip this
+                # step.
+                continue
             m = self.attribselect_re.match(token)
             if m is not None:
                 # Attribute selector
@@ -493,9 +497,11 @@ class PageElement(object):
                 checker = self._attribute_checker(operator, attribute, value)
                 found = []
                 for context in current_context:
-                    found.extend([el for el in context.find_all(tag) if checker(el)])
+                    found.extend(
+                        [el for el in context.find_all(tag) if checker(el)])
                 current_context = found
                 continue
+
             if '#' in token:
                 # ID selector
                 tag, id = token.split('#', 1)
@@ -506,21 +512,25 @@ class PageElement(object):
                     return [] # No match
                 current_context = [el]
                 continue
+
             if '.' in token:
                 # Class selector
-                tag, klass = token.split('.', 1)
-                if not tag:
-                    tag = True
+                tag_name, klass = token.split('.', 1)
+                if not tag_name:
+                    tag_name = True
+                classes = set(klass.split('.'))
                 found = []
+                def classes_match(tag):
+                    if tag_name is not True and tag.name != tag_name:
+                        return False
+                    if not tag.has_attr('class'):
+                        return False
+                    return classes.issubset(tag['class'])
                 for context in current_context:
-                    found.extend(
-                        context.find_all(
-                            tag,
-                            {'class': lambda attr: attr and klass in attr.split()}
-                            )
-                        )
+                    found.extend(context.find_all(classes_match))
                 current_context = found
                 continue
+
             if token == '*':
                 # Star selector
                 found = []
@@ -528,6 +538,19 @@ class PageElement(object):
                     found.extend(context.findAll(True))
                 current_context = found
                 continue
+
+            if token == '>':
+                # Child selector
+                tag = tokens[index + 1]
+                if not tag:
+                    tag = True
+
+                found = []
+                for context in current_context:
+                    found.extend(context.find_all(tag, recursive=False))
+                current_context = found
+                continue
+
             # Here we should just have a regular tag
             if not self.tag_name_re.match(token):
                 return []

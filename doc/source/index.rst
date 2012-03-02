@@ -1538,14 +1538,26 @@ You can find tags::
 
 Find tags beneath other tags::
 
- soup.select("p a")
- # [<a class="sister" href="http://example.com/elsie"
- id="link1">Elsie</a>, <a class="sister"
- href="http://example.com/lacie" id="link2">Lacie</a>, <a
- class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+ soup.select("body a")
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie"  id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
 
  soup.select("html head title")
  # [<title>The Dormouse's story</title>]
+
+Find tags `directly` beneath other tags::
+
+ soup.select("head > title")
+ # [<title>The Dormouse's story</title>]
+
+ soup.select("p > a")
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie"  id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+ soup.select("body > a")
+ # []
 
 Find tags by CSS class::
 
@@ -1589,6 +1601,20 @@ Find tags by attribute value::
 
  soup.select('a[href*=".com/el"]')
  # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>]
+
+Match language codes::
+
+ multilingual_markup = """
+  <p lang="en">Hello</p>
+  <p lang="en-us">Howdy, y'all</p>
+  <p lang="en-gb">Pip-pip, old fruit</p>
+  <p lang="fr">Bonjour mes amis</p>
+ """
+ multilingual_soup = BeautifulSoup(multilingual_markup)
+ multilingual_soup.select('p[lang|=en]')
+ # [<p lang="en">Hello</p>,
+ #  <p lang="en-us">Howdy, y'all</p>,
+ #  <p lang="en-gb">Pip-pip, old fruit</p>]
 
 This is a convenience for users who know the CSS selector syntax. You
 can do all this stuff with the Beautiful Soup API. And if CSS
