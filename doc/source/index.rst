@@ -151,9 +151,15 @@ Does this look like what you need? If so, read on.
 Installing Beautiful Soup
 =========================
 
-Beautiful Soup 4 is published through PyPi, so you can install it with
-``easy_install`` or ``pip``. The package name is ``beautifulsoup4``,
-and the same package works on Python 2 and Python 3.
+If you're using a recent version of Debian or Ubuntu Linux, you can
+install Beautiful Soup with the system package manager:
+
+:kbd:`$ apt-get install python-beautifulsoup4`
+
+Beautiful Soup 4 is published through PyPi, so if you can't install it
+with the system packager, you can install it with ``easy_install`` or
+``pip``. The package name is ``beautifulsoup4``, and the same package
+works on Python 2 and Python 3.
 
 :kbd:`$ easy_install beautifulsoup4`
 
@@ -164,19 +170,47 @@ the previous major release, `Beautiful Soup 3`_. Lots of software uses
 BS3, so it's still available, but if you're writing new code you
 should install ``beautifulsoup4``.)
 
-You can also `download the Beautiful Soup 4 source tarball
+If you don't have ``easy_install`` or ``pip`` installed, you can
+`download the Beautiful Soup 4 source tarball
 <http://www.crummy.com/software/BeautifulSoup/download/4.x/>`_ and
-install it with ``setup.py``. The license for Beautiful Soup allows
-you to package the entire library with your application, allowing you
-to copy the ``bs4`` directory into your application's codebase.
+install it with ``setup.py``.
+
+:kbd:`$ python setup.py install`
+
+If all else fails, the license for Beautiful Soup allows you to
+package the entire library with your application. You can download the
+tarball, copy its ``bs4`` directory into your application's codebase,
+and use Beautiful Soup without installing it at all.
 
 I use Python 2.7 and Python 3.2 to develop Beautiful Soup, but it
 should work with other recent versions.
 
+Problems after installation
+---------------------------
+
+Beautiful Soup is packaged as Python 2 code. When you install it for
+use with Python 3, it's automatically converted to Python 3
+code. Unfortunately, sometimes this doesn't happen, and the wrong
+version of the code is installed. This problem seems to occur mainly
+on Windows systems.
+
+If you get the ``ImportError`` "No module named HTMLParser", your
+problem is that you're running the Python 2 version of the code under
+Python 3.
+
+If you get the ``ImportError`` "No module named html.parser", your
+problem is that you're running the Python 3 version of the code under
+Python 2.
+
+In both cases, your best bet is to completely remove the Beautiful
+Soup installation from your system (including any directory created
+when you unzipped the tarball) and try the installation again.
+
 .. _parser-installation:
 
-Choosing a parser
------------------
+
+Installing a parser
+-------------------
 
 Beautiful Soup supports the HTML parser included in Python's standard
 library, but it also supports a number of third-party Python parsers.
@@ -213,7 +247,7 @@ This table summarizes the advantages and disadvantages of each parser library:
 | lxml's HTML parser   | ``BeautifulSoup(markup, "lxml")``          | * Very fast                    | * External C dependency  |
 |                      |                                            | * Lenient                      |                          |
 +----------------------+--------------------------------------------+--------------------------------+--------------------------+
-| lxml's XML parser    | ``BeautifulSoup(markup, ["lxml", "xml"])`` | * Very fast                    |                          |
+| lxml's XML parser    | ``BeautifulSoup(markup, ["lxml", "xml"])`` | * Very fast                    | * External C dependency  |
 |                      | ``BeautifulSoup(markup, "xml")``           | * The only currently supported |                          |
 |                      |                                            |   XML parser                   |                          |
 +----------------------+--------------------------------------------+--------------------------------+--------------------------+
@@ -230,7 +264,7 @@ html5lib--Python's built-in HTML parser is just not very good in older
 versions.
 
 Note that if a document is invalid, different parsers will generate
-different Beautiful Soup trees for the same document. See `Differences
+different Beautiful Soup trees for it. See `Differences
 between parsers`_ for details.
 
 Making the soup
@@ -253,7 +287,7 @@ converted to Unicode characters::
 
 Beautiful Soup then parses the document using the best available
 parser. It will use an HTML parser unless you specifically tell it to
-use an XML parser. (See `Choosing a parser`_.)
+use an XML parser. (See `Parsing XML`_.)
 
 Kinds of objects
 ================
@@ -322,6 +356,11 @@ done by treating the tag as a dictionary::
  tag
  # <blockquote>Extremely bold</blockquote>
 
+ tag['class']
+ # KeyError: 'class'
+ print(tag.get('class'))
+ # None
+
 .. _multivalue:
 
 Multi-valued attributes
@@ -372,7 +411,7 @@ If you parse a document as XML, there are no multi-valued attributes::
 -------------------
 
 A string corresponds to a bit of text within a tag. Beautiful Soup
-defines the ``NavigableString`` class to contain these bits of text::
+uses the ``NavigableString`` class to contain these bits of text::
 
  tag.string
  # u'Extremely bold'
@@ -401,7 +440,7 @@ another, using :ref:`replace_with`::
 `Navigating the tree`_ and `Searching the tree`_, but not all of
 them. In particular, since a string can't contain anything (the way a
 tag may contain a string or another tag), strings don't support the
-``.contents`` or ``.string`` attributes, or the `find()` method.
+``.contents`` or ``.string`` attributes, or the ``find()`` method.
 
 ``BeautifulSoup``
 -----------------
@@ -607,8 +646,8 @@ descendants::
 ``.string``
 ^^^^^^^^^^^
 
-If a tag has only one child, and that child is a string, the string is
-made available as ``.string``::
+If a tag has only one child, and that child is a ``NavigableString``,
+the child is made available as ``.string``::
 
  title_tag.string
  # u'The Dormouse's story'
@@ -1122,15 +1161,15 @@ True`_.
 The keyword arguments
 ^^^^^^^^^^^^^^^^^^^^^
 
-Any argument that's not recognized will be turned into a filter on tag
-attributes. If you pass in a value for an argument called ``id``,
-Beautiful Soup will filter against the tag's 'id' attribute::
+Any argument that's not recognized will be turned into a filter on one
+of a tag's attributes. If you pass in a value for an argument called ``id``,
+Beautiful Soup will filter against each tag's 'id' attribute::
 
  soup.find_all(id='link2')
  # [<a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>]
 
 If you pass in a value for ``href``, Beautiful Soup will filter
-against the tag's 'href' attribute::
+against each tag's 'href' attribute::
 
  soup.find_all(href=re.compile("elsie"))
  # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>]
@@ -1520,8 +1559,8 @@ the document (the one with class="title"), but it also finds the
 second paragraph, the <p> tag that contains the <a> tag we started
 with. This shouldn't be too surprising: we're looking at all the tags
 that show up earlier in the document than the one we started with. A
-<p> tag that contains an <a> tag must have shown up earlier in the
-document.
+<p> tag that contains an <a> tag must have shown up before the <a>
+tag it contains.
 
 CSS selectors
 -------------
@@ -1919,6 +1958,8 @@ The ``str()`` function returns a string encoded in UTF-8. See
 You can also call ``encode()`` to get a bytestring, and ``decode()``
 to get Unicode.
 
+.. _output_formatters:
+
 Output formatters
 -----------------
 
@@ -2012,10 +2053,10 @@ implements Beautiful Soup's standard formatters as class methods: the
 "html" formatter is ``EntitySubstitution.substitute_html``, and the
 "minimal" formatter is ``EntitySubstitution.substitute_xml``. You can
 use these functions to simulate ``formatter=html`` or
-``formatter==minimal`` but and then do something in addition.
+``formatter==minimal``, but then do something extra.
 
-Here's an example that converts strings to uppercase, `and` replaces
-Unicode characters with HTML entities whenever possible::
+Here's an example that replaces Unicode characters with HTML entities
+whenever possible, but `also` converts all strings to uppercase::
 
  from bs4.dammit import EntitySubstitution
  def uppercase_and_substitute_html_entities(str):
@@ -2088,7 +2129,7 @@ specifying one of the following:
   options are "lxml", "html5lib", and "html.parser" (Python's
   built-in HTML parser).
 
-The section `Choosing a parser`_ contrasts the supported parsers.
+The section `Installing a parser`_ contrasts the supported parsers.
 
 If you don't have an appropriate parser installed, Beautiful Soup will
 ignore your request and pick a different parser. Right now, the only
@@ -2157,7 +2198,7 @@ to add an <html> tag.
 Since the document "<a></p>" is invalid, none of these techniques is
 the "correct" way to handle it. The html5lib parser uses techniques
 that are part of the HTML5 standard, so it has the best claim on being
-the "correct" way, but all three techniques are leigtimate.
+the "correct" way, but all three techniques are legitimate.
 
 Differences between parsers can affect your script. If you're planning
 on distributing your script to other people, you might want to specify
@@ -2221,9 +2262,9 @@ this, it will set the ``.contains_replacement_characters`` attribute
 to ``True`` on the ``UnicodeDammit`` or ``BeautifulSoup`` object. This
 lets you know that the Unicode representation is not an exact
 representation of the original--some data was lost. If a document
-contains �, but ``.contains_replacement_characters`` if ``False``,
+contains �, but ``.contains_replacement_characters`` is ``False``,
 you'll know that the � was there originally (as it is in this
-paragrpah) and doesn't stand in for missing data.
+paragraph) and doesn't stand in for missing data.
 
 Output encoding
 ---------------
@@ -2347,7 +2388,7 @@ Parsing only part of a document
 Let's say you want to use Beautiful Soup look at a document's <a>
 tags. It's a waste of time and memory to parse the entire document and
 then go over it again looking for <a> tags. It would be much faster to
-ignore everthing that wasn't an <a> tag in the first place. The
+ignore everything that wasn't an <a> tag in the first place. The
 ``SoupStrainer`` class allows you to choose which parts of an incoming
 document are parsed. You just create a ``SoupStrainer`` and pass it in
 to the ``BeautifulSoup`` constructor as the ``parse_only`` argument.
@@ -2356,8 +2397,9 @@ to the ``BeautifulSoup`` constructor as the ``parse_only`` argument.
 parser*. If you use html5lib, the whole document will be parsed, no
 matter what. This is because html5lib constantly rearranges the parse
 tree as it works, and if some part of the document didn't actually
-make it into the parse tree, it'll crash. In the examples below, I'll
-be forcing Beautiful Soup to use Python's built-in parser.)
+make it into the parse tree, it'll crash. To avoid confusion, in the
+examples below I'll be forcing Beautiful Soup to use Python's
+built-in parser.)
 
 ``SoupStrainer``
 ----------------
@@ -2474,9 +2516,9 @@ the document, but it can save a lot of memory, and it'll make
 Beautiful Soup 3
 ================
 
-Beautiful Soup 3.2.0 is the old version, the last release of the
-Beautiful Soup 3 series. It's currently the version packaged with all
-major Linux distributions::
+Beautiful Soup 3 is the previous release series, and is no longer
+being actively developed. It's currently packaged with all major Linux
+distributions::
 
 :kbd:`$ apt-get install python-beautifulsoup`
 
@@ -2535,7 +2577,7 @@ You need a parser
 Beautiful Soup 3 used Python's ``SGMLParser``, a module that was
 deprecated and removed in Python 3.0. Beautiful Soup 4 uses
 ``html.parser`` by default, but you can plug in lxml or html5lib and
-use that instead. See `Choosing a parser`_ for a comparison.
+use that instead. See `Installing a parser`_ for a comparison.
 
 Method names
 ^^^^^^^^^^^^
@@ -2643,8 +2685,7 @@ smart quotes into Unicode.)
 
 If you want to turn those Unicode characters back into HTML entities
 on output, rather than turning them into UTF-8 characters, you need to
-use ``.encode``, as described in `Substituting HTML entities`. This
-may change before the final release.
+use an :ref:`output formatter <output_formatters>`.
 
 Miscellaneous
 ^^^^^^^^^^^^^
