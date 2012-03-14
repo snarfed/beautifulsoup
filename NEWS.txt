@@ -1,4 +1,8 @@
-= 4.0.0b11 () =
+= 4.0.1 (20120314) =
+
+* This is the first official release of Beautiful Soup 4. There is no
+  4.0.0 release, to eliminate any possibility that packaging software
+  might treat "4.0.0" as being an earlier version than "4.0.0b10".
 
 * Brought BS up to date with the latest release of soupselect, adding
   CSS selector support for direct descendant matches and multiple CSS
