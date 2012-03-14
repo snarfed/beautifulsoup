@@ -2518,11 +2518,11 @@ Beautiful Soup 3
 
 Beautiful Soup 3 is the previous release series, and is no longer
 being actively developed. It's currently packaged with all major Linux
-distributions::
+distributions:
 
 :kbd:`$ apt-get install python-beautifulsoup`
 
-It's also published through PyPi as `BeautifulSoup`.::
+It's also published through PyPi as ``BeautifulSoup``.:
 
 :kbd:`$ easy_install BeautifulSoup`
 
