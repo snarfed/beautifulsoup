@@ -1248,7 +1248,7 @@ arguments for finding tags, Beautiful Soup will find all tags whose
 ``.string`` matches your value for ``text``. This code finds the <a>
 tags whose ``.string`` is "Elsie"::
 
- soup.find_all("a", "Elsie")
+ soup.find_all("a", text="Elsie")
  # [<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>]
 
 .. _limit:
