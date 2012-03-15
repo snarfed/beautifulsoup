@@ -126,6 +126,18 @@ class TestFindAllByName(TreeTest):
         self.assertSelects(
             self.tree.find_all('a'), ['First tag.', 'Nested tag.'])
 
+    def test_find_all_by_name_and_text(self):
+        self.assertSelects(
+            self.tree.find_all('a', text='First tag.'), ['First tag.'])
+
+        self.assertSelects(
+            self.tree.find_all('a', text=True), ['First tag.', 'Nested tag.'])
+
+        self.assertSelects(
+            self.tree.find_all('a', text=re.compile("tag")),
+            ['First tag.', 'Nested tag.'])
+
+
     def test_find_all_on_non_root_element(self):
         # You can call find_all on any node, not just the root.
         self.assertSelects(self.tree.c.find_all('a'), ['Nested tag.'])

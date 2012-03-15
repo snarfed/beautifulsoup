@@ -1156,7 +1156,7 @@ class SoupStrainer(object):
                     found = markup
                 else:
                     found = markup_name
-        if found and self.text and self.text != found.string:
+        if found and self.text and not self._matches(found.string, self.text):
             found = None
         return found
     searchTag = search_tag
@@ -1188,7 +1188,7 @@ class SoupStrainer(object):
         return found
 
     def _matches(self, markup, match_against):
-        # print "Matching %s against %s" % (markup, match_against)
+        #print "Matching %s against %s" % (markup, match_against)
         result = False
 
         if isinstance(markup, list) or isinstance(markup, tuple):

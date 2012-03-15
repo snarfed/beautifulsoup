@@ -1,3 +1,8 @@
+= 4.0.2 () =
+
+* Fixed a bug where specifying `text` while searching for a tag only
+  worked if `text` specified an exact string match. [bug=955942]
+
 = 4.0.1 (20120314) =
 
 * This is the first official release of Beautiful Soup 4. There is no
