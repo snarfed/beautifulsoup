@@ -410,6 +410,14 @@ class XMLTreeBuilderSmokeTest(object):
         soup = self.soup(markup)
         self.assertEqual(soup.encode("utf-8"), markup)
 
+    def test_large_xml_document(self):
+        """A large XML document should come out the same as it went in."""
+        markup = (b'<?xml version="1.0" encoding="utf-8"?>\n<root>'
+                  + b'0' * (2**12)
+                  + b'</root>')
+        soup = self.soup(markup)
+        self.assertEqual(soup.encode("utf-8"), markup)
+
 
     def test_tags_are_empty_element_if_and_only_if_they_are_empty(self):
         self.assertSoupEquals("<p>", "<p/>")

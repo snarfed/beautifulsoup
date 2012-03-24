@@ -3,6 +3,7 @@ __all__ = [
     'LXMLTreeBuilder',
     ]
 
+from StringIO import StringIO
 import collections
 from lxml import etree
 from bs4.element import Comment, Doctype, NamespacedAttribute
@@ -24,6 +25,8 @@ class LXMLTreeBuilderForXML(TreeBuilder):
 
     # Well, it's permissive by XML parser standards.
     features = [LXML, XML, FAST, PERMISSIVE]
+
+    CHUNK_SIZE = 512
 
     @property
     def default_parser(self):
@@ -68,7 +71,16 @@ class LXMLTreeBuilderForXML(TreeBuilder):
                 dammit.contains_replacement_characters)
 
     def feed(self, markup):
-        self.parser.feed(markup)
+        if isinstance(markup, basestring):
+            markup = StringIO(markup)
+        # Call feed() at least once, even if the markup is empty,
+        # or the parser won't be initialized.
+        data = markup.read(self.CHUNK_SIZE)
+        self.parser.feed(data)
+        while data != '':
+            # Now call feed() on the rest of the data, chunk by chunk.
+            data = markup.read(self.CHUNK_SIZE)
+            self.parser.feed(data)
         self.parser.close()
 
     def close(self):
