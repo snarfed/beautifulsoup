@@ -1,10 +1,10 @@
-= 4.0.2 () =
+= 4.0.2 (20120326) =
 
 * Worked around a possible bug in lxml that prevents non-tiny XML
   documents from being parsed. [bug=963880, bug=963936]
 
-* Fixed a bug where specifying `text` while searching for a tag only
-  worked if `text` specified an exact string match. [bug=955942]
+* Fixed a bug where specifying `text` while also searching for a tag
+  only worked if `text` wanted an exact string match. [bug=955942]
 
 = 4.0.1 (20120314) =
 
