@@ -1,3 +1,8 @@
+= 4.0.3 () =
+
+* Fixed a typo that caused some versions of Python 3 to convert the
+  Beautiful Soup codebase incorrectly.
+
 = 4.0.2 (20120326) =
 
 * Worked around a possible bug in lxml that prevents non-tiny XML
