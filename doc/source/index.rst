@@ -2475,6 +2475,34 @@ thought I'd mention it::
 Troubleshooting
 ===============
 
+Common Errors
+-------------
+
+``ImportError: No module named HTMLParser`` - Caused by running the
+Python 2 version of Beautiful Soup under Python 3.
+
+``ImportError: No module named html.parser`` - Caused by running the
+Python 3 version of Beautiful Soup under Python 2.
+
+``ImportError: No module named BeautifulSoup`` - Caused by running
+Beautiful Soup 3 code on a system that doesn't have BS3 installed. Or,
+by writing Beautiful Soup 4 code without knowing that the package name
+has changed to ``bs4``.
+
+``ImportError: No module named bs4`` - Caused by running Beautiful
+Soup 4 code on a system that doesn't have BS4 installed.
+
+``HTMLParser.HTMLParseError: malformed start tag`` - Caused by giving
+Python's built-in HTML parser a document it can't
+handle. :ref:`Install lxml or html5lib. <parser-installation>` Any other
+``HTMLParseError`` is probably the same problem.
+
+``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
+tag in question doesn't define the ``attr`` attribute. The most common
+errors are ``KeyError: 'href'`` and ``KeyError: 'class'``. Use
+``tag.get('attr')`` if you're not sure ``attr`` is defined, just as
+you would with a Python dictionary.
+
 Parsing XML
 -----------
 
