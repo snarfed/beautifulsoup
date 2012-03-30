@@ -2475,8 +2475,8 @@ thought I'd mention it::
 Troubleshooting
 ===============
 
-Common Errors
--------------
+Common Problems
+---------------
 
 ``ImportError: No module named HTMLParser`` - Caused by running the
 Python 2 version of Beautiful Soup under Python 3.
@@ -2496,6 +2496,12 @@ Soup 4 code on a system that doesn't have BS4 installed.
 Python's built-in HTML parser a document it can't
 handle. :ref:`Install lxml or html5lib. <parser-installation>` Any other
 ``HTMLParseError`` is probably the same problem.
+
+If you can't find a tag that you know is in the document (that is,
+``find_all()`` returned `[]`` or ``find()`` returned ``None``), you're
+probably using Python's built-in HTML parser, which sometimes skips
+tags it doesn't understand. :ref:`Install lxml or
+html5lib. <parser-installation>`
 
 ``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
 tag in question doesn't define the ``attr`` attribute. The most common
