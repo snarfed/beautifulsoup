@@ -2498,7 +2498,7 @@ handle. :ref:`Install lxml or html5lib. <parser-installation>` Any other
 ``HTMLParseError`` is probably the same problem.
 
 If you can't find a tag that you know is in the document (that is,
-``find_all()`` returned `[]`` or ``find()`` returned ``None``), you're
+``find_all()`` returned ``[]`` or ``find()`` returned ``None``), you're
 probably using Python's built-in HTML parser, which sometimes skips
 tags it doesn't understand. :ref:`Install lxml or
 html5lib. <parser-installation>`
