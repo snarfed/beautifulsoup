@@ -166,6 +166,10 @@ class LXMLTreeBuilder(HTMLTreeBuilder, LXMLTreeBuilderForXML):
     def default_parser(self):
         return etree.HTMLParser
 
+    def feed(self, markup):
+        self.parser.feed(markup)
+        self.parser.close()
+
     def test_fragment_to_document(self, fragment):
         """See `TreeBuilder`."""
         return u'<html><body>%s</body></html>' % fragment
