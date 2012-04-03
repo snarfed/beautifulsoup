@@ -3,6 +3,10 @@
 * Fixed a typo that caused some versions of Python 3 to convert the
   Beautiful Soup codebase incorrectly.
 
+* Got rid of the 4.0.2 workaround for HTML documents--it was
+  unnecessary and the workaround was triggering a (possibly different,
+  but related) bug in lxml. [bug=972466]
+
 = 4.0.2 (20120326) =
 
 * Worked around a possible bug in lxml that prevents non-tiny XML

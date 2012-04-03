@@ -80,7 +80,8 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         while data != '':
             # Now call feed() on the rest of the data, chunk by chunk.
             data = markup.read(self.CHUNK_SIZE)
-            self.parser.feed(data)
+            if data != '':
+                self.parser.feed(data)
         self.parser.close()
 
     def close(self):
