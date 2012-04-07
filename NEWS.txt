@@ -1,3 +1,7 @@
+= 4.0.4 () =
+
+* Fixed a bug that sometimes created disconnected trees.
+
 = 4.0.3 (20120403) =
 
 * Fixed a typo that caused some versions of Python 3 to convert the

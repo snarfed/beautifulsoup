@@ -62,6 +62,8 @@ class PageElement(object):
         other elements."""
         self.parent = parent
         self.previous_element = previous_element
+        if previous_element is not None:
+            self.previous_element.next_element = self
         self.next_element = None
         self.previous_sibling = None
         self.next_sibling = None
