@@ -2478,6 +2478,20 @@ Troubleshooting
 Common Problems
 ---------------
 
+If your script works on one computer but not another, it's probably
+because the two computers have different parser libraries
+available. For instance, you may have developed the script on a
+computer that has lxml installed, and then tried to run it on a
+computer that only has html5lib installed. See `Differences between
+parsers`_ for why this matters, and fix the problem by mentioning a
+specific parser library in the ``BeautifulSoup`` constructor.
+
+If you can't find a tag that you know is in the document (that is,
+``find_all()`` returned ``[]`` or ``find()`` returned ``None``), you're
+probably using Python's built-in HTML parser, which sometimes skips
+tags it doesn't understand. Solution: :ref:`Install lxml or
+html5lib. <parser-installation>`
+
 ``ImportError: No module named HTMLParser`` - Caused by running the
 Python 2 version of Beautiful Soup under Python 3.
 
@@ -2497,26 +2511,19 @@ Python's built-in HTML parser a document it can't handle. Any other
 ``HTMLParseError`` is probably the same problem. Solution:
 :ref:`Install lxml or html5lib. <parser-installation>`
 
-If you can't find a tag that you know is in the document (that is,
-``find_all()`` returned ``[]`` or ``find()`` returned ``None``), you're
-probably using Python's built-in HTML parser, which sometimes skips
-tags it doesn't understand. Solution: :ref:`Install lxml or
-html5lib. <parser-installation>`
-
-If your script works on one computer but not another, it's probably
-because the two computers have different sets of parser libraries
-available. For instance, you may have developed the script on a
-computer that has lxml installed, and then tried to run it on a
-computer that only has html5lib installed. See `Differences between
-parsers`_ for why this matters, and fix the problem by mentioning a
-specific parser library in the ``BeautifulSoup`` constructor.
-
 ``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
 tag in question doesn't define the ``attr`` attribute. The most common
 errors are ``KeyError: 'href'`` and ``KeyError: 'class'``. Use
 ``tag.get('attr')`` if you're not sure ``attr`` is defined, just as
 you would with a Python dictionary.
 
+``UnicodeEncodeError: 'charmap' codec can't encode character u'\xfoo'
+in position bar`` (or just about any other ``UnicodeEncodeError``) -
+This is not a problem with Beautiful Soup: you're trying to print a
+Unicode character that your console doesn't know how to display. See
+`this page on the Python wiki
+<http://wiki.python.org/moin/PrintFails>`_ for help. One easy solution
+is to write the text to a file and then look at the file.
 
 Parsing XML
 -----------
