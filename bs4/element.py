@@ -1036,6 +1036,21 @@ class Tag(PageElement):
                     s.append("\n")
         return ''.join(s)
 
+    def encode_contents(
+        self, indent_level=None, encoding=DEFAULT_OUTPUT_ENCODING,
+        formatter="minimal"):
+        """Renders the contents of this tag as a bytestring."""
+        contents = self.decode_contents(indent_level, encoding, formatter)
+        return contents.encode(encoding)
+
+    # Old method for BS3 compatibility
+    def renderContents(self, encoding=DEFAULT_OUTPUT_ENCODING,
+                       prettyPrint=False, indentLevel=0):
+        if not prettyPrint:
+            indentLevel = None
+        return self.encode_contents(
+            indent_level=indentLevel, encoding=encoding)
+
     #Soup methods
 
     def find(self, name=None, attrs={}, recursive=True, text=None,

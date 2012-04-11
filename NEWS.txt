@@ -2,6 +2,9 @@
 
 * Fixed a bug that sometimes created disconnected trees.
 
+* Added the missing renderContents method from Beautiful Soup 3. Also
+  added an encode_contents() method to go along with decode_contents().
+
 = 4.0.3 (20120403) =
 
 * Fixed a typo that caused some versions of Python 3 to convert the

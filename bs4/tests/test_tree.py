@@ -1297,6 +1297,23 @@ class TestEncoding(SoupTest):
         self.assertRaises(
             UnicodeEncodeError, soup.encode, "ascii", errors="strict")
 
+    def test_decode_contents(self):
+        html = u"<b>\N{SNOWMAN}</b>"
+        soup = self.soup(html)
+        self.assertEquals(u"\N{SNOWMAN}", soup.b.decode_contents())
+
+    def test_encode_contents(self):
+        html = u"<b>\N{SNOWMAN}</b>"
+        soup = self.soup(html)
+        self.assertEquals(
+            u"\N{SNOWMAN}".encode("utf8"), soup.b.encode_contents(
+                encoding="utf8"))
+
+    def test_deprecated_renderContents(self):
+        html = u"<b>\N{SNOWMAN}</b>"
+        soup = self.soup(html)
+        self.assertEquals(u"\N{SNOWMAN}".encode("utf8"), soup.b.renderContents())
+
 class TestNavigableStringSubclasses(SoupTest):
 
     def test_cdata(self):
