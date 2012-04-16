@@ -2,6 +2,9 @@
 
 * Fixed a bug that sometimes created disconnected trees.
 
+* Fixed a bug with the string setter that moved a string around the
+  tree instead of copying it. [bug=983050]
+
 * Added the missing renderContents method from Beautiful Soup 3. Also
   added an encode_contents() method to go along with decode_contents().
 

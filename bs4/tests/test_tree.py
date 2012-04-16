@@ -990,6 +990,10 @@ class TestTreeModification(SoupTest):
         soup.b.string = "bar"
         self.assertEqual(soup.b.contents, ["bar"])
 
+    def test_string_set_does_not_affect_original_string(self):
+        soup = self.soup("<a><b>foo</b><c>bar</c>")
+        soup.b.string = soup.c.string
+        self.assertEqual(soup.a.encode(), b"<a><b>bar</b><c>bar</c></a>")
 
 class TestElementObjects(SoupTest):
     """Test various features of element objects."""
@@ -1300,7 +1304,7 @@ class TestEncoding(SoupTest):
     def test_decode_contents(self):
         html = u"<b>\N{SNOWMAN}</b>"
         soup = self.soup(html)
-        self.assertEquals(u"\N{SNOWMAN}", soup.b.decode_contents())
+        self.assertEqual(u"\N{SNOWMAN}", soup.b.decode_contents())
 
     def test_encode_contents(self):
         html = u"<b>\N{SNOWMAN}</b>"
@@ -1312,7 +1316,8 @@ class TestEncoding(SoupTest):
     def test_deprecated_renderContents(self):
         html = u"<b>\N{SNOWMAN}</b>"
         soup = self.soup(html)
-        self.assertEquals(u"\N{SNOWMAN}".encode("utf8"), soup.b.renderContents())
+        self.assertEqual(
+            u"\N{SNOWMAN}".encode("utf8"), soup.b.renderContents())
 
 class TestNavigableStringSubclasses(SoupTest):
 

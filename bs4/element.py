@@ -758,7 +758,7 @@ class Tag(PageElement):
     @string.setter
     def string(self, string):
         self.clear()
-        self.append(string)
+        self.append(unicode(string))
 
     def _all_strings(self, strip=False):
         """Yield all child strings, possibly stripping them."""
