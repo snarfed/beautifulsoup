@@ -1,4 +1,4 @@
-= 4.0.4 () =
+= 4.0.4 (20120416) =
 
 * Fixed a bug that sometimes created disconnected trees.
 
