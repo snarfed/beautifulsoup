@@ -2505,59 +2505,26 @@ thought I'd mention it::
 Troubleshooting
 ===============
 
-Common Problems
----------------
+Version mismatch problems
+-------------------------
 
-If your script works on one computer but not another, it's probably
-because the two computers have different parser libraries
-available. For example, you may have developed the script on a
-computer that has lxml installed, and then tried to run it on a
-computer that only has html5lib installed. See `Differences between
-parsers`_ for why this matters, and fix the problem by mentioning a
-specific parser library in the ``BeautifulSoup`` constructor.
+* ``SyntaxError: Invalid syntax`` (on the line ``ROOT_TAG_NAME =
+  u'[document]'``): Caused by running the Python 2 version of
+  Beautiful Soup under Python 3, without converting the code.
 
-If you can't find a tag that you know is in the document (that is,
-``find_all()`` returned ``[]`` or ``find()`` returned ``None``), you're
-probably using Python's built-in HTML parser, which sometimes skips
-tags it doesn't understand. Solution: :ref:`Install lxml or
-html5lib. <parser-installation>`
+* ``ImportError: No module named HTMLParser`` - Caused by running the
+  Python 2 version of Beautiful Soup under Python 3.
 
-``SyntaxError: Invalid syntax`` (on the line ``ROOT_TAG_NAME =
-u'[document]'``): Caused by the Python 2 version of Beautiful Soup
-under Python 3.
+* ``ImportError: No module named html.parser`` - Caused by running the
+  Python 3 version of Beautiful Soup under Python 2.
 
-``ImportError: No module named HTMLParser`` - Caused by running the
-Python 2 version of Beautiful Soup under Python 3.
+* ``ImportError: No module named BeautifulSoup`` - Caused by running
+  Beautiful Soup 3 code on a system that doesn't have BS3
+  installed. Or, by writing Beautiful Soup 4 code without knowing that
+  the package name has changed to ``bs4``.
 
-``ImportError: No module named html.parser`` - Caused by running the
-Python 3 version of Beautiful Soup under Python 2.
-
-``ImportError: No module named BeautifulSoup`` - Caused by running
-Beautiful Soup 3 code on a system that doesn't have BS3 installed. Or,
-by writing Beautiful Soup 4 code without knowing that the package name
-has changed to ``bs4``.
-
-``ImportError: No module named bs4`` - Caused by running Beautiful
-Soup 4 code on a system that doesn't have BS4 installed.
-
-``HTMLParser.HTMLParseError: malformed start tag`` - Caused by giving
-Python's built-in HTML parser a document it can't handle. Any other
-``HTMLParseError`` is probably the same problem. Solution:
-:ref:`Install lxml or html5lib. <parser-installation>`
-
-``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
-tag in question doesn't define the ``attr`` attribute. The most common
-errors are ``KeyError: 'href'`` and ``KeyError: 'class'``. Use
-``tag.get('attr')`` if you're not sure ``attr`` is defined, just as
-you would with a Python dictionary.
-
-``UnicodeEncodeError: 'charmap' codec can't encode character u'\xfoo'
-in position bar`` (or just about any other ``UnicodeEncodeError``) -
-This is not a problem with Beautiful Soup: you're trying to print a
-Unicode character that your console doesn't know how to display. See
-`this page on the Python wiki
-<http://wiki.python.org/moin/PrintFails>`_ for help. One easy solution
-is to write the text to a file and then look at the file.
+* ``ImportError: No module named bs4`` - Caused by running Beautiful
+  Soup 4 code on a system that doesn't have BS4 installed.
 
 Parsing XML
 -----------
@@ -2566,9 +2533,48 @@ By default, Beautiful Soup parses documents as HTML. To parse a
 document as XML, pass in "xml" as the second argument to the
 ``BeautifulSoup`` constructor::
 
- soup = BeautifulSoup(markup, "xml")
+soup = BeautifulSoup(markup, "xml")
 
 You'll need to :ref:`have lxml installed <parser-installation>`.
+
+Other parser problems
+---------------------
+
+* If your script works on one computer but not another, it's probably
+  because the two computers have different parser libraries
+  available. For example, you may have developed the script on a
+  computer that has lxml installed, and then tried to run it on a
+  computer that only has html5lib installed. See `Differences between
+  parsers`_ for why this matters, and fix the problem by mentioning a
+  specific parser library in the ``BeautifulSoup`` constructor.
+
+* ``HTMLParser.HTMLParseError: malformed start tag`` - Caused by
+  giving Python's built-in HTML parser a document it can't handle. Any
+  other ``HTMLParseError`` is probably the same problem. Solution:
+  :ref:`Install lxml or html5lib. <parser-installation>`
+
+* If you can't find a tag that you know is in the document (that is,
+  ``find_all()`` returned ``[]`` or ``find()`` returned ``None``),
+  you're probably using Python's built-in HTML parser, which sometimes
+  skips tags it doesn't understand. Solution: :ref:`Install lxml or
+  html5lib. <parser-installation>`
+
+Miscellaneous
+-------------
+
+* ``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
+  tag in question doesn't define the ``attr`` attribute. The most
+  common errors are ``KeyError: 'href'`` and ``KeyError:
+  'class'``. Use ``tag.get('attr')`` if you're not sure ``attr`` is
+  defined, just as you would with a Python dictionary.
+
+* ``UnicodeEncodeError: 'charmap' codec can't encode character
+  u'\xfoo' in position bar`` (or just about any other
+  ``UnicodeEncodeError``) - This is not a problem with Beautiful Soup:
+  you're trying to print a Unicode character that your console doesn't
+  know how to display. See `this page on the Python wiki
+  <http://wiki.python.org/moin/PrintFails>`_ for help. One easy
+  solution is to write the text to a file and then look at the file.
 
 Improving Performance
 ---------------------
