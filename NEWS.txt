@@ -5,6 +5,9 @@
 * Added the missing renderContents method from Beautiful Soup 3. Also
   added an encode_contents() method to go along with decode_contents().
 
+* Give a more useful error when the user tries to run the Python 2
+  version of BS under Python 3.
+
 = 4.0.3 (20120403) =
 
 * Fixed a typo that caused some versions of Python 3 to convert the

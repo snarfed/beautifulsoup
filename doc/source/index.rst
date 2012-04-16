@@ -189,10 +189,10 @@ Problems after installation
 ---------------------------
 
 Beautiful Soup is packaged as Python 2 code. When you install it for
-use with Python 3, it's automatically converted to Python 3
-code. Unfortunately, sometimes this doesn't happen, and the wrong
-version of the code is installed. This problem seems to occur mainly
-on Windows systems.
+use with Python 3, it's automatically converted to Python 3 code. If
+you don't install the package, the code won't be converted. There have
+also been reports on Windows machines of the wrong version being
+installed.
 
 If you get the ``ImportError`` "No module named HTMLParser", your
 problem is that you're running the Python 2 version of the code under
@@ -205,6 +205,17 @@ Python 2.
 In both cases, your best bet is to completely remove the Beautiful
 Soup installation from your system (including any directory created
 when you unzipped the tarball) and try the installation again.
+
+If you get the ``SyntaxError`` "Invalid syntax" on the line
+``ROOT_TAG_NAME = u'[document]'``, you need to convert the Python 2
+code to Python 3. You can do this either by installing the package:
+
+:kbd:`$ python3 setup.py install`
+
+or by manually running Python's ``2to3`` conversion script on the
+``bs4`` directory:
+
+:kbd:`$ 2to3-3.2 -w bs4`
 
 .. _parser-installation:
 
@@ -2480,7 +2491,7 @@ Common Problems
 
 If your script works on one computer but not another, it's probably
 because the two computers have different parser libraries
-available. For instance, you may have developed the script on a
+available. For example, you may have developed the script on a
 computer that has lxml installed, and then tried to run it on a
 computer that only has html5lib installed. See `Differences between
 parsers`_ for why this matters, and fix the problem by mentioning a
@@ -2491,6 +2502,10 @@ If you can't find a tag that you know is in the document (that is,
 probably using Python's built-in HTML parser, which sometimes skips
 tags it doesn't understand. Solution: :ref:`Install lxml or
 html5lib. <parser-installation>`
+
+``SyntaxError: Invalid syntax`` (on the line ``ROOT_TAG_NAME =
+u'[document]'``): Caused by the Python 2 version of Beautiful Soup
+under Python 3.
 
 ``ImportError: No module named HTMLParser`` - Caused by running the
 Python 2 version of Beautiful Soup under Python 3.
