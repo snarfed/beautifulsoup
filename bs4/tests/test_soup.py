@@ -191,6 +191,12 @@ class TestUnicodeDammit(unittest.TestCase):
         self.assertEqual(
             dammit.unicode_markup, "<foo>&lsquo;&rsquo;&ldquo;&rdquo;</foo>")
 
+    def test_smart_quotes_to_ascii(self):
+        markup = b"<foo>\x91\x92\x93\x94</foo>"
+        dammit = UnicodeDammit(markup, smart_quotes_to="ascii")
+        self.assertEqual(
+            dammit.unicode_markup, """<foo>''""</foo>""")
+
     def test_detect_utf8(self):
         utf8 = b"\xc3\xa9"
         dammit = UnicodeDammit(utf8)

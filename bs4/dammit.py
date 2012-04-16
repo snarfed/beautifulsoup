@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Beautiful Soup bonus library: Unicode, Dammit
 
 This class forces XML data into a standard format (usually to UTF-8 or
@@ -232,16 +233,19 @@ class UnicodeDammit:
 
     def _sub_ms_char(self, match):
         """Changes a MS smart quote character to an XML or HTML
-        entity."""
+        entity, or an ASCII character."""
         orig = match.group(1)
-        sub = self.MS_CHARS.get(orig)
-        if type(sub) == tuple:
-            if self.smart_quotes_to == 'xml':
-                sub = '&#x'.encode() + sub[1].encode() + ';'.encode()
-            else:
-                sub = '&'.encode() + sub[0].encode() + ';'.encode()
+        if self.smart_quotes_to == 'ascii':
+            sub = self.MS_CHARS_TO_ASCII.get(orig).encode()
         else:
-            sub = sub.encode()
+            sub = self.MS_CHARS.get(orig)
+            if type(sub) == tuple:
+                if self.smart_quotes_to == 'xml':
+                    sub = '&#x'.encode() + sub[1].encode() + ';'.encode()
+                else:
+                    sub = '&'.encode() + sub[0].encode() + ';'.encode()
+            else:
+                sub = sub.encode()
         return sub
 
     def _convert_from(self, proposed, errors="strict"):
@@ -407,6 +411,7 @@ class UnicodeDammit:
             ''.join(map(chr, list(range(256)))), ''.join(map(chr, emap)))
         return s.translate(c.EBCDIC_TO_ASCII_MAP)
 
+    # A partial mapping of ISO-Latin-1 to HTML entities/XML numeric entities.
     MS_CHARS = {b'\x80': ('euro', '20AC'),
                 b'\x81': ' ',
                 b'\x82': ('sbquo', '201A'),
@@ -439,3 +444,138 @@ class UnicodeDammit:
                 b'\x9d': '?',
                 b'\x9e': ('#x17E', '17E'),
                 b'\x9f': ('Yuml', ''),}
+
+    # A parochial partial mapping of ISO-Latin-1 to ASCII. Contains
+    # horrors like stripping diacritical marks to turn á into a, but also
+    # contains non-horrors like turning “ into ".
+    MS_CHARS_TO_ASCII = {
+        b'\x80' : 'EUR',
+        b'\x81' : ' ',
+        b'\x82' : ',',
+        b'\x83' : 'f',
+        b'\x84' : ',,',
+        b'\x85' : '...',
+        b'\x86' : '+',
+        b'\x87' : '++',
+        b'\x88' : '^',
+        b'\x89' : '%',
+        b'\x8a' : 'S',
+        b'\x8b' : '<',
+        b'\x8c' : 'OE',
+        b'\x8d' : '?',
+        b'\x8e' : 'Z',
+        b'\x8f' : '?',
+        b'\x90' : '?',
+        b'\x91' : "'",
+        b'\x92' : "'",
+        b'\x93' : '"',
+        b'\x94' : '"',
+        b'\x95' : '*',
+        b'\x96' : '-',
+        b'\x97' : '--',
+        b'\x98' : '~',
+        b'\x99' : '(TM)',
+        b'\x9a' : 's',
+        b'\x9b' : '>',
+        b'\x9c' : 'oe',
+        b'\x9d' : '?',
+        b'\x9e' : 'z',
+        b'\x9f' : 'Y',
+        b'\xa0' : ' ',
+        b'\xa1' : '!',
+        b'\xa2' : 'c',
+        b'\xa3' : 'GBP',
+        b'\xa4' : '$', #This approximation is especially parochial--this is the
+                       #generic currency symbol.
+        b'\xa5' : 'YEN',
+        b'\xa6' : '|',
+        b'\xa7' : 'S',
+        b'\xa8' : '..',
+        b'\xa9' : '',
+        b'\xaa' : '(th)',
+        b'\xab' : '<<',
+        b'\xac' : '!',
+        b'\xad' : ' ',
+        b'\xae' : '(R)',
+        b'\xaf' : '-',
+        b'\xb0' : 'o',
+        b'\xb1' : '+-',
+        b'\xb2' : '2',
+        b'\xb3' : '3',
+        b'\xb4' : ("'", 'acute'),
+        b'\xb5' : 'u',
+        b'\xb6' : 'P',
+        b'\xb7' : '*',
+        b'\xb8' : ',',
+        b'\xb9' : '1',
+        b'\xba' : '(th)',
+        b'\xbb' : '>>',
+        b'\xbc' : '1/4',
+        b'\xbd' : '1/2',
+        b'\xbe' : '3/4',
+        b'\xbf' : '?',
+        b'\xc0' : 'A',
+        b'\xc1' : 'A',
+        b'\xc2' : 'A',
+        b'\xc3' : 'A',
+        b'\xc4' : 'A',
+        b'\xc5' : 'A',
+        b'\xc6' : 'AE',
+        b'\xc7' : 'C',
+        b'\xc8' : 'E',
+        b'\xc9' : 'E',
+        b'\xca' : 'E',
+        b'\xcb' : 'E',
+        b'\xcc' : 'I',
+        b'\xcd' : 'I',
+        b'\xce' : 'I',
+        b'\xcf' : 'I',
+        b'\xd0' : 'D',
+        b'\xd1' : 'N',
+        b'\xd2' : 'O',
+        b'\xd3' : 'O',
+        b'\xd4' : 'O',
+        b'\xd5' : 'O',
+        b'\xd6' : 'O',
+        b'\xd7' : '*',
+        b'\xd8' : 'O',
+        b'\xd9' : 'U',
+        b'\xda' : 'U',
+        b'\xdb' : 'U',
+        b'\xdc' : 'U',
+        b'\xdd' : 'Y',
+        b'\xde' : 'b',
+        b'\xdf' : 'B',
+        b'\xe0' : 'a',
+        b'\xe1' : 'a',
+        b'\xe2' : 'a',
+        b'\xe3' : 'a',
+        b'\xe4' : 'a',
+        b'\xe5' : 'a',
+        b'\xe6' : 'ae',
+        b'\xe7' : 'c',
+        b'\xe8' : 'e',
+        b'\xe9' : 'e',
+        b'\xea' : 'e',
+        b'\xeb' : 'e',
+        b'\xec' : 'i',
+        b'\xed' : 'i',
+        b'\xee' : 'i',
+        b'\xef' : 'i',
+        b'\xf0' : 'o',
+        b'\xf1' : 'n',
+        b'\xf2' : 'o',
+        b'\xf3' : 'o',
+        b'\xf4' : 'o',
+        b'\xf5' : 'o',
+        b'\xf6' : 'o',
+        b'\xf7' : '/',
+        b'\xf8' : 'o',
+        b'\xf9' : 'u',
+        b'\xfa' : 'u',
+        b'\xfb' : 'u',
+        b'\xfc' : 'u',
+        b'\xfd' : 'y',
+        b'\xfe' : 'b',
+        b'\xff' : 'y',
+        }

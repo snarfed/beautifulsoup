@@ -2391,21 +2391,26 @@ Unicode, Dammit has one special feature that Beautiful Soup doesn't
 use. You can use it to convert Microsoft smart quotes to HTML or XML
 entities::
 
- markup = b"<p>I just \x93love\x94 Microsoft Word</p>"
+ markup = b"<p>I just \x93love\x94 Microsoft Word\x92s smart quotes</p>"
 
  UnicodeDammit(markup, ["windows-1252"], smart_quotes_to="html").unicode_markup
- # u'<p>I just &ldquo;love&rdquo; Microsoft Word</p>'
+ # u'<p>I just &ldquo;love&rdquo; Microsoft Word&rsquo;s smart quotes</p>'
 
  UnicodeDammit(markup, ["windows-1252"], smart_quotes_to="xml").unicode_markup
- # u'<p>I just &#x201C;love&#x201D; Microsoft Word</p>'
+ # u'<p>I just &#x201C;love&#x201D; Microsoft Word&#x2019;s smart quotes</p>'
 
-You might find this feature useful, but Beautiful Soup doesn't use
-it. Beautiful Soup prefers the default behavior, which is to convert
-Microsoft smart quotes to Unicode characters along with everything
-else::
+You can also convert Microsoft smart quotes to ASCII quotes::
+
+ UnicodeDammit(markup, ["windows-1252"], smart_quotes_to="ascii").unicode_markup
+ # u'<p>I just "love" Microsoft Word\'s smart quotes</p>'
+
+Hopefully you'll find this feature useful, but Beautiful Soup doesn't
+use it. Beautiful Soup prefers the default behavior, which is to
+convert Microsoft smart quotes to Unicode characters along with
+everything else::
 
  UnicodeDammit(markup, ["windows-1252"]).unicode_markup
- # u'<p>I just \u201clove\u201d Microsoft Word</p>'
+ # u'<p>I just \u201clove\u201d Microsoft Word\u2019s smart quotes</p>'
 
 Parsing only part of a document
 ===============================

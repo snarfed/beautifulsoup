@@ -17,6 +17,9 @@
 * Give a more useful error when the user tries to run the Python 2
   version of BS under Python 3.
 
+* UnicodeDammit can now convert Microsoft smart quotes to ASCII with
+  UnicodeDammit(markup, smart_quotes_to="ascii").
+
 = 4.0.3 (20120403) =
 
 * Fixed a typo that caused some versions of Python 3 to convert the
