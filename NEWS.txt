@@ -5,6 +5,12 @@
 * Fixed a bug with the string setter that moved a string around the
   tree instead of copying it. [bug=983050]
 
+* Attribute values are now run through the provided output formatter.
+  Previously they were always run through the 'minimal' formatter. In
+  the future I may make it possible to specify different formatters
+  for attribute values and strings, but for now, consistent behavior
+  is better than inconsistent behavior. [bug=980237]
+
 * Added the missing renderContents method from Beautiful Soup 3. Also
   added an encode_contents() method to go along with decode_contents().
 

@@ -1996,6 +1996,10 @@ invalid HTML or XML::
  soup.p
  # <p>The law firm of Dewey, Cheatem, &amp; Howe</p>
 
+ soup = BeautifulSoup('<a href="http://example.com/?foo=val1&bar=val2">A link</a>')
+ soup.a
+ # <a href="http://example.com/?foo=val1&amp;bar=val2">A link</a>
+
 You can change this behavior by providing a value for the
 ``formatter`` argument to ``prettify()``, ``encode()``, or
 ``decode()``. Beautiful Soup recognizes four possible values for
@@ -2029,7 +2033,7 @@ Unicode characters to HTML entities whenever possible::
 
 If you pass in ``formatter=None``, Beautiful Soup will not modify
 strings at all on output. This is the fastest option, but it may lead
-to Beautiful Soup generating invalid HTML/XML, as in this example::
+to Beautiful Soup generating invalid HTML/XML, as in these examples::
 
  print(soup.prettify(formatter=None))
  # <html>
@@ -2040,11 +2044,16 @@ to Beautiful Soup generating invalid HTML/XML, as in this example::
  #  </body>
  # </html>
 
+ link_soup = BeautifulSoup('<a href="http://example.com/?foo=val1&bar=val2">A link</a>')
+ print(link_soup.a.encode(formatter=None))
+ # <a href="http://example.com/?foo=val1&bar=val2">A link</a>
+
 
 Finally, if you pass in a function for ``formatter``, Beautiful Soup
-will call that function once for every string in the document. You can
-do whatever you want in this function. Here's a formatter that
-converts strings to uppercase and does absolutely nothing else::
+will call that function once for every string and attribute value in
+the document. You can do whatever you want in this function. Here's a
+formatter that converts strings to uppercase and does absolutely
+nothing else::
 
  def uppercase(str):
      return str.upper()
@@ -2057,6 +2066,11 @@ converts strings to uppercase and does absolutely nothing else::
  #   </p>
  #  </body>
  # </html>
+
+ print(link_soup.a.prettify(formatter=uppercase))
+ # <a href="HTTP://EXAMPLE.COM/?FOO=VAL1&BAR=VAL2">
+ #  A LINK
+ # </a>
 
 If you're writing your own function, you should know about the
 ``EntitySubstitution`` class in the ``bs4.dammit`` module. This class

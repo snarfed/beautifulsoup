@@ -57,6 +57,18 @@ class PageElement(object):
         None : None
         }
 
+    @classmethod
+    def format_string(self, s, formatter='minimal'):
+        """Format the given string using the given formatter."""
+        if not callable(formatter):
+            formatter = self.FORMATTERS.get(
+                formatter, EntitySubstitution.substitute_xml)
+        if formatter is None:
+            output = s
+        else:
+            output = formatter(s)
+        return output
+
     def setup(self, parent=None, previous_element=None):
         """Sets up the initial relations between this element and
         other elements."""
@@ -617,14 +629,7 @@ class NavigableString(unicode, PageElement):
                     self.__class__.__name__, attr))
 
     def output_ready(self, formatter="minimal"):
-        if not callable(formatter):
-            formatter = self.FORMATTERS.get(
-                formatter, EntitySubstitution.substitute_xml)
-        if formatter is None:
-            output = self
-        else:
-            output = formatter(self)
-
+        output = self.format_string(self, formatter)
         return self.PREFIX + output + self.SUFFIX
 
 
@@ -950,8 +955,10 @@ class Tag(PageElement):
                         and '%SOUP-ENCODING%' in val):
                         val = self.substitute_encoding(val, eventual_encoding)
 
-                    decoded = (str(key) + '='
-                               + EntitySubstitution.substitute_xml(val, True))
+                    text = self.format_string(val, formatter)
+                    decoded = (
+                        str(key) + '='
+                        + EntitySubstitution.quoted_attribute_value(text))
                 attrs.append(decoded)
         close = ''
         closeTag = ''

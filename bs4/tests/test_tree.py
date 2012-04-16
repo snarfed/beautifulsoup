@@ -1219,6 +1219,23 @@ class TestSubstitutions(SoupTest):
             decoded,
             self.document_for(u"<b><FOO></b><b>BAR</b>"))
 
+    def test_formatter_is_run_on_attribute_values(self):
+        markup = u'<a href="http://a.com?a=b&c=é">e</a>'
+        soup = self.soup(markup)
+        a = soup.a
+
+        expect_minimal = u'<a href="http://a.com?a=b&amp;c=é">e</a>'
+
+        self.assertEqual(expect_minimal, a.decode())
+        self.assertEqual(expect_minimal, a.decode(formatter="minimal"))
+
+        expect_html = u'<a href="http://a.com?a=b&amp;c=&eacute;">e</a>'
+        self.assertEqual(expect_html, a.decode(formatter="html"))
+
+        self.assertEqual(markup, a.decode(formatter=None))
+        expect_upper = u'<a href="HTTP://A.COM?A=B&C=É">E</a>'
+        self.assertEqual(expect_upper, a.decode(formatter=lambda x: x.upper()))
+
     def test_prettify_accepts_formatter(self):
         soup = BeautifulSoup("<html><body>foo</body></html>")
         pretty = soup.prettify(formatter = lambda x: x.upper())
@@ -1309,7 +1326,7 @@ class TestEncoding(SoupTest):
     def test_encode_contents(self):
         html = u"<b>\N{SNOWMAN}</b>"
         soup = self.soup(html)
-        self.assertEquals(
+        self.assertEqual(
             u"\N{SNOWMAN}".encode("utf8"), soup.b.encode_contents(
                 encoding="utf8"))
 
