@@ -2548,7 +2548,8 @@ Other parser problems
   parsers`_ for why this matters, and fix the problem by mentioning a
   specific parser library in the ``BeautifulSoup`` constructor.
 
-* ``HTMLParser.HTMLParseError: malformed start tag`` - Caused by
+* ``HTMLParser.HTMLParseError: malformed start tag`` or
+  ``HTMLParser.HTMLParseError: bad end tag`` - Caused by
   giving Python's built-in HTML parser a document it can't handle. Any
   other ``HTMLParseError`` is probably the same problem. Solution:
   :ref:`Install lxml or html5lib. <parser-installation>`

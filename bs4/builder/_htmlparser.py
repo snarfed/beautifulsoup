@@ -4,8 +4,12 @@ __all__ = [
     'HTMLParserTreeBuilder',
     ]
 
-from HTMLParser import HTMLParser
+from HTMLParser import (
+    HTMLParser,
+    HTMLParseError,
+    )
 import sys
+import warnings
 
 # Starting in Python 3.2, the HTMLParser constructor takes a 'strict'
 # argument, which we'd like to set to False. Unfortunately,
@@ -138,8 +142,12 @@ class HTMLParserTreeBuilder(HTMLTreeBuilder):
         args, kwargs = self.parser_args
         parser = BeautifulSoupHTMLParser(*args, **kwargs)
         parser.soup = self.soup
-        parser.feed(markup)
-
+        try:
+            parser.feed(markup)
+        except HTMLParseError, e:
+            warnings.warn(RuntimeWarning(
+                "Python's built-in HTMLParser cannot parse this document. This is not a bug in Beautiful Soup. The best solution is to install an external parser (lxml or html5lib), and use Beautiful Soup with that parser. See http://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser for help."))
+            raise e
 
 # Patch 3.2 versions of HTMLParser earlier than 3.2.3 to use some
 # 3.2.3 code. This ensures they don't treat markup like <p></p> as a
