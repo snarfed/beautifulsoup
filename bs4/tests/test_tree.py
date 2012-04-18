@@ -1262,10 +1262,8 @@ class TestSubstitutions(SoupTest):
                     'http-equiv="Content-type"/>')
         soup = self.soup(meta_tag)
 
-        # Parse the document, and the charset is replaced with a
-        # generic value.
-        self.assertEqual(soup.meta['content'],
-                          'text/html; charset=%SOUP-ENCODING%')
+        # Parse the document, and the charset apprears unchanged.
+        self.assertEqual(soup.meta['content'], 'text/html; charset=x-sjis')
 
         # Encode the document into some encoding, and the encoding is
         # substituted into the meta tag.

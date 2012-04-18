@@ -6,7 +6,9 @@ import unittest
 from unittest import TestCase
 from bs4 import BeautifulSoup
 from bs4.element import (
+    CharsetMetaAttributeValue,
     Comment,
+    ContentMetaAttributeValue,
     Doctype,
     SoupStrainer,
 )
@@ -371,12 +373,17 @@ class HTMLTreeBuilderSmokeTest(object):
             '</head><body>Shift-JIS markup goes here.') % meta_tag
         soup = self.soup(shift_jis_html)
 
-        # Parse the document, and the charset is replaced with a
-        # generic value.
+        # Parse the document, and the charset is seemingly unaffected.
         parsed_meta = soup.find('meta', {'http-equiv': 'Content-type'})
-        self.assertEqual(parsed_meta['content'],
-                          'text/html; charset=%SOUP-ENCODING%')
-        self.assertEqual(parsed_meta.contains_substitutions, True)
+        content = parsed_meta['content']
+        self.assertEqual('text/html; charset=x-sjis', content)
+
+        # But that value is actually a ContentMetaAttributeValue object.
+        self.assertTrue(isinstance(content, ContentMetaAttributeValue))
+
+        # And it will take on a value that reflects its current
+        # encoding.
+        self.assertEqual('text/html; charset=utf8', content.encode("utf8"))
 
         # For the rest of the story, see TestSubstitutions in
         # test_tree.py.
@@ -393,11 +400,17 @@ class HTMLTreeBuilderSmokeTest(object):
             '</head><body>Shift-JIS markup goes here.') % meta_tag
         soup = self.soup(shift_jis_html)
 
-        # Parse the document, and the charset is replaced with a
-        # generic value.
+        # Parse the document, and the charset is seemingly unaffected.
         parsed_meta = soup.find('meta', id="encoding")
-        self.assertEqual('%SOUP-ENCODING%', parsed_meta['charset'])
-        self.assertEqual(True, parsed_meta.contains_substitutions)
+        charset = parsed_meta['charset']
+        self.assertEqual('x-sjis', charset)
+
+        # But that value is actually a CharsetMetaAttributeValue object.
+        self.assertTrue(isinstance(charset, CharsetMetaAttributeValue))
+
+        # And it will take on a value that reflects its current
+        # encoding.
+        self.assertEqual('utf8', charset.encode("utf8"))
 
 class XMLTreeBuilderSmokeTest(object):
 

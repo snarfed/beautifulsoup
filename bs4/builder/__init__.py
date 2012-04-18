@@ -1,6 +1,9 @@
 from collections import defaultdict
-import re
 import sys
+from bs4.element import (
+    CharsetMetaAttributeValue,
+    ContentMetaAttributeValue,
+    )
 
 __all__ = [
     'HTMLTreeBuilder',
@@ -218,9 +221,6 @@ class HTMLTreeBuilder(TreeBuilder):
         "output" : ["for"],
         }
 
-    # Used by set_up_substitutions to detect the charset in a META tag
-    CHARSET_RE = re.compile("((^|;)\s*charset=)([^;]*)", re.M)
-
     def set_up_substitutions(self, tag):
         # We are only interested in <meta> tags
         if tag.name != 'meta':
@@ -235,27 +235,22 @@ class HTMLTreeBuilder(TreeBuilder):
         # tags that provide the "charset" attribute. It also means
         # HTML 4-style <meta> tags that provide the "content"
         # attribute and have "http-equiv" set to "content-type".
+        #
+        # In both cases we will replace the value of the appropriate
+        # attribute with a standin object that can take on any
+        # encoding.
         meta_encoding = None
         if charset is not None:
             # HTML 5 style:
             # <meta charset="utf8">
             meta_encoding = charset
-
-            # Modify the tag.
-            tag['charset'] = "%SOUP-ENCODING%"
+            tag['charset'] = CharsetMetaAttributeValue(charset)
 
         elif (content is not None and http_equiv is not None
               and http_equiv.lower() == 'content-type'):
             # HTML 4 style:
             # <meta http-equiv="content-type" content="text/html; charset=utf8">
-            match = self.CHARSET_RE.search(content)
-            if match is not None:
-                meta_encoding = match.group(3)
-
-                # Modify the tag.
-                def rewrite(match):
-                    return match.group(1) + "%SOUP-ENCODING%"
-                tag['content'] = self.CHARSET_RE.sub(rewrite, content)
+            tag['content'] = ContentMetaAttributeValue(content)
 
         return (meta_encoding is not None)
 

@@ -34,6 +34,51 @@ class NamespacedAttribute(unicode):
         obj.namespace = namespace
         return obj
 
+class AttributeValueWithCharsetSubstitution(unicode):
+    """A stand-in object for a character encoding specified in HTML."""
+
+class CharsetMetaAttributeValue(AttributeValueWithCharsetSubstitution):
+    """A generic stand-in for the value of a meta tag's 'charset' attribute.
+
+    When Beautiful Soup parses the markup '<meta charset="utf8">', the
+    value of the 'charset' attribute will be one of these objects.
+    """
+
+    def __new__(cls, original_value):
+        obj = unicode.__new__(cls, original_value)
+        obj.original_value = original_value
+        return obj
+
+    def encode(self, encoding):
+        return encoding
+
+
+class ContentMetaAttributeValue(AttributeValueWithCharsetSubstitution):
+    """A generic stand-in for the value of a meta tag's 'content' attribute.
+
+    When Beautiful Soup parses the markup:
+     <meta http-equiv="content-type" content="text/html; charset=utf8">
+
+    The value of the 'content' attribute will be one of these objects.
+    """
+
+    CHARSET_RE = re.compile("((^|;)\s*charset=)([^;]*)", re.M)
+
+    def __new__(cls, original_value):
+        match = cls.CHARSET_RE.search(original_value)
+        if match is None:
+            # No substitution necessary.
+            return unicode.__new__(unicode, original_value)
+
+        obj = unicode.__new__(cls, original_value)
+        obj.original_value = original_value
+        return obj
+
+    def encode(self, encoding):
+        def rewrite(match):
+            return match.group(1) + encoding
+        return self.CHARSET_RE.sub(rewrite, self.original_value)
+
 
 class PageElement(object):
     """Contains the navigational information for some part of the page
@@ -950,10 +995,10 @@ class Tag(PageElement):
                         val = ' '.join(val)
                     elif not isinstance(val, basestring):
                         val = str(val)
-                    if (self.contains_substitutions
-                        and eventual_encoding is not None
-                        and '%SOUP-ENCODING%' in val):
-                        val = self.substitute_encoding(val, eventual_encoding)
+                    elif (
+                        isinstance(val, AttributeValueWithCharsetSubstitution)
+                        and eventual_encoding is not None):
+                        val = val.encode(eventual_encoding)
 
                     text = self.format_string(val, formatter)
                     decoded = (

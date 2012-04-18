@@ -1,5 +1,8 @@
 = 4.0.5 (unreleased) =
 
+* Made encoding substitution in <meta> tags completely transparent (no
+  more %SOUP-ENCODING%).
+
 * Fixed a bug that made the HTMLParser treebuilder generate XML
   definitions ending with two question marks instead of
   one. [bug=984258]

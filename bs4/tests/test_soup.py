@@ -7,6 +7,8 @@ from bs4 import (
     BeautifulStoneSoup,
 )
 from bs4.element import (
+    CharsetMetaAttributeValue,
+    ContentMetaAttributeValue,
     SoupStrainer,
     NamespacedAttribute,
     )
@@ -299,3 +301,19 @@ class TestNamedspacedAttribute(SoupTest):
 
         e = NamespacedAttribute("z", "b", "c")
         self.assertNotEqual(a, e)
+
+
+class TestAttributeValueWithCharsetSubstitution(unittest.TestCase):
+
+    def test_content_meta_attribute_value(self):
+        value = CharsetMetaAttributeValue("euc-jp")
+        self.assertEqual("euc-jp", value)
+        self.assertEqual("euc-jp", value.original_value)
+        self.assertEqual("utf8", value.encode("utf8"))
+
+
+    def test_content_meta_attribute_value(self):
+        value = ContentMetaAttributeValue("text/html; charset=euc-jp")
+        self.assertEqual("text/html; charset=euc-jp", value)
+        self.assertEqual("text/html; charset=euc-jp", value.original_value)
+        self.assertEqual("text/html; charset=utf8", value.encode("utf8"))
