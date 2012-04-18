@@ -636,11 +636,6 @@ class PageElement(object):
     def parentGenerator(self):
         return self.parents
 
-    # Utility methods
-    def substitute_encoding(self, str, encoding=None):
-        encoding = encoding or "utf-8"
-        return str.replace("%SOUP-ENCODING%", encoding)
-
 
 class NavigableString(unicode, PageElement):
 
@@ -761,11 +756,9 @@ class Tag(PageElement):
 
         # Set up any substitutions, such as the charset in a META tag.
         if builder is not None:
-            self.contains_substitutions = builder.set_up_substitutions(self)
-
+            builder.set_up_substitutions(self)
             self.can_be_empty_element = builder.can_be_empty_element(name)
         else:
-            self.contains_substitutions = False
             self.can_be_empty_element = False
 
     parserClass = _alias("parser_class")  # BS3

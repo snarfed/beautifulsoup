@@ -149,9 +149,7 @@ class Element(html5lib.treebuilders._base.Node):
             #
             # The Tag constructor called this method when the Tag was created,
             # but we just set/changed the attributes, so call it again.
-            self.element.contains_substitutions = (
-                self.soup.builder.set_up_substitutions(
-                    self.element))
+            self.soup.builder.set_up_substitutions(self.element)
     attributes = property(getAttributes, setAttributes)
 
     def insertText(self, data, insertBefore=None):
