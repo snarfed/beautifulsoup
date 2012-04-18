@@ -146,7 +146,7 @@ class HTMLParserTreeBuilder(HTMLTreeBuilder):
             parser.feed(markup)
         except HTMLParseError, e:
             warnings.warn(RuntimeWarning(
-                "Python's built-in HTMLParser cannot parse this document. This is not a bug in Beautiful Soup. The best solution is to install an external parser (lxml or html5lib), and use Beautiful Soup with that parser. See http://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser for help."))
+                "Python's built-in HTMLParser cannot parse the given document. This is not a bug in Beautiful Soup. The best solution is to install an external parser (lxml or html5lib), and use Beautiful Soup with that parser. See http://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser for help."))
             raise e
 
 # Patch 3.2 versions of HTMLParser earlier than 3.2.3 to use some
