@@ -96,6 +96,14 @@ class BeautifulSoupHTMLParser(HTMLParser):
 
     def handle_pi(self, data):
         self.soup.endData()
+        if data.endswith("?") and data.lower().startswith("xml"):
+            # "An XHTML processing instruction using the trailing '?'
+            # will cause the '?' to be included in data." - HTMLParser
+            # docs.
+            #
+            # Strip the question mark so we don't end up with two
+            # question marks.
+            data = data[:-1]
         self.soup.handle_data(data)
         self.soup.endData(ProcessingInstruction)
 

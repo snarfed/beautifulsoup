@@ -2183,7 +2183,7 @@ that the document is given an XML declaration instead of being put
 into an <html> tag.::
 
  BeautifulSoup("<a><b /></a>", "xml")
- # <?xml version="1.0" encoding="utf-8">
+ # <?xml version="1.0" encoding="utf-8"?>
  # <a><b /></a>
 
 There are also differences between HTML parsers. If you give Beautiful

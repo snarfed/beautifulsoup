@@ -94,6 +94,19 @@ class HTMLTreeBuilderSmokeTest(object):
         # Test a namespaced doctype with a public id.
         self.assertDoctypeHandled('xsl:stylesheet PUBLIC "htmlent.dtd"')
 
+    def test_real_xhtml_document(self):
+        """A real XHTML document should come out more or less the same as it went in."""
+        markup = b"""<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Hello.</title></head>
+<body>Goodbye.</body>
+</html>"""
+        soup = self.soup(markup)
+        self.assertEqual(
+            soup.encode("utf-8").replace(b"\n", b""),
+            markup.replace(b"\n", b""))
+
     def test_deepcopy(self):
         """Make sure you can copy the tree builder.
 
@@ -393,14 +406,8 @@ class XMLTreeBuilderSmokeTest(object):
         self.assertEqual(
             soup.encode(), b'<?xml version="1.0" encoding="utf-8"?>\n<root/>')
 
-    def test_docstring_includes_correct_encoding(self):
-        soup = self.soup("<root/>")
-        self.assertEqual(
-            soup.encode("latin1"),
-            b'<?xml version="1.0" encoding="latin1"?>\n<root/>')
-
     def test_real_xhtml_document(self):
-        """A real XHTML document should come out the same as it went in."""
+        """A real XHTML document should come out *exactly* the same as it went in."""
         markup = b"""<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -408,7 +415,15 @@ class XMLTreeBuilderSmokeTest(object):
 <body>Goodbye.</body>
 </html>"""
         soup = self.soup(markup)
-        self.assertEqual(soup.encode("utf-8"), markup)
+        self.assertEqual(
+            soup.encode("utf-8"), markup)
+
+
+    def test_docstring_includes_correct_encoding(self):
+        soup = self.soup("<root/>")
+        self.assertEqual(
+            soup.encode("latin1"),
+            b'<?xml version="1.0" encoding="latin1"?>\n<root/>')
 
     def test_large_xml_document(self):
         """A large XML document should come out the same as it went in."""
@@ -433,6 +448,11 @@ class XMLTreeBuilderSmokeTest(object):
 
 class HTML5TreeBuilderSmokeTest(HTMLTreeBuilderSmokeTest):
     """Smoke test for a tree builder that supports HTML5."""
+
+    def test_real_xhtml_document(self):
+        # Since XHTML is not HTML5, HTML5 parsers are not tested to handle
+        # XHTML documents in any particular way.
+        pass
 
     def test_html_tags_have_namespace(self):
         markup = "<a>"
