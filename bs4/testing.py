@@ -238,6 +238,11 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertEqual(
             'http://www.w3.org/2000/svg', soup.html['xmlns:svg'])
 
+    def test_multivalued_attribute_value_becomes_list(self):
+        markup = b'<a class="foo bar">'
+        soup = self.soup(markup)
+        self.assertEqual(['foo', 'bar'], soup.a['class'])
+
     #
     # Generally speaking, tests below this point are more tests of
     # Beautiful Soup than tests of the tree builders. But parsers are

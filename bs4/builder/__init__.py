@@ -1,8 +1,10 @@
 from collections import defaultdict
+import itertools
 import sys
 from bs4.element import (
     CharsetMetaAttributeValue,
     ContentMetaAttributeValue,
+    whitespace_re
     )
 
 __all__ = [
@@ -140,6 +142,24 @@ class TreeBuilder(object):
     def set_up_substitutions(self, tag):
         return False
 
+    def _replace_cdata_list_attribute_values(self, tag_name, attrs):
+        """Replaces class="foo bar" with class=["foo", "bar"]
+
+        Modifies its input in place.
+        """
+        if self.cdata_list_attributes:
+            universal = self.cdata_list_attributes.get('*', [])
+            tag_specific = self.cdata_list_attributes.get(
+                tag_name.lower(), [])
+            for cdata_list_attr in itertools.chain(universal, tag_specific):
+                if cdata_list_attr in dict(attrs):
+                    # Basically, we have a "class" attribute whose
+                    # value is a whitespace-separated list of CSS
+                    # classes. Split it into a list.
+                    value = attrs[cdata_list_attr]
+                    values = whitespace_re.split(value)
+                    attrs[cdata_list_attr] = values
+        return attrs
 
 class SAXTreeBuilder(TreeBuilder):
     """A Beautiful Soup treebuilder that listens for SAX events."""

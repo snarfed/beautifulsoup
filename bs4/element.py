@@ -1,5 +1,4 @@
 import collections
-import itertools
 import re
 import sys
 import warnings
@@ -735,20 +734,11 @@ class Tag(PageElement):
         self.prefix = prefix
         if attrs is None:
             attrs = {}
+        elif builder.cdata_list_attributes:
+            attrs = builder._replace_cdata_list_attribute_values(
+                self.name, attrs)
         else:
             attrs = dict(attrs)
-            if builder.cdata_list_attributes:
-                universal = builder.cdata_list_attributes.get('*', [])
-                tag_specific = builder.cdata_list_attributes.get(
-                    self.name.lower(), [])
-                for cdata_list_attr in itertools.chain(universal, tag_specific):
-                    if cdata_list_attr in attrs:
-                        # Basically, we have a "class" attribute whose
-                        # value is a whitespace-separated list of CSS
-                        # classes. Split it into a list.
-                        value = attrs[cdata_list_attr]
-                        values = whitespace_re.split(value)
-                        attrs[cdata_list_attr] = values
         self.attrs = attrs
         self.contents = []
         self.setup(parent, previous)

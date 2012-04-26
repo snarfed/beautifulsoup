@@ -139,11 +139,20 @@ class Element(html5lib.treebuilders._base.Node):
         return AttrList(self.element)
 
     def setAttributes(self, attributes):
-        if attributes is not None and attributes != {}:
+        if attributes is not None and len(attributes) > 0:
+
+            converted_attributes = []
             for name, value in list(attributes.items()):
                 if isinstance(name, tuple):
-                    name = NamespacedAttribute(*name)
-                self.element[name] =  value
+                    new_name = NamespacedAttribute(*name)
+                    del attributes[name]
+                    attributes[new_name] = value
+
+            self.soup.builder._replace_cdata_list_attribute_values(
+                self.name, attributes)
+            for name, value in attributes.items():
+                self.element[name] = value
+
             # The attributes may contain variables that need substitution.
             # Call set_up_substitutions manually.
             #
