@@ -1,5 +1,8 @@
 = 4.0.5 (unreleased) =
 
+* Renamed replace_with_children() to unwrap(), which is easier to
+  understand and also the jQuery name of the function.
+
 * Made encoding substitution in <meta> tags completely transparent (no
   more %SOUP-ENCODING%).
 

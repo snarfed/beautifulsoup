@@ -1894,21 +1894,21 @@ and replaces it with the tag or string of your choice::
 ``replace_with()`` returns the tag or string that was replaced, so
 that you can examine it or add it back to another part of the tree.
 
-``replace_with_children()``
+``unwrap()``
 ---------------------------
 
-``Tag.replace_with_children()`` replaces a tag with whatever's inside
+``Tag.unwrap()`` replaces a tag with whatever's inside
 that tag. It's good for stripping out markup::
 
   markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
   soup = BeautifulSoup(markup)
   a_tag = soup.a
 
-  a_tag.i.replace_with_children()
+  a_tag.i.unwrap()
   a_tag
   # <a href="http://example.com/">I linked to example.com</a>
 
-Like ``replace_with()``, ``replace_with_children()`` returns the tag
+Like ``replace_with()``, ``unwrap()`` returns the tag
 that was replaced.
 
 Output
@@ -2696,7 +2696,7 @@ Method names
 
 * ``renderContents`` -> ``encode_contents``
 * ``replaceWith`` -> ``replace_with``
-* ``replaceWithChildren`` -> ``replace_with_children``
+* ``replaceWithChildren`` -> ``unwrap``
 * ``findAll`` -> ``find_all``
 * ``findAllNext`` -> ``find_all_next``
 * ``findAllPrevious`` -> ``find_all_previous``

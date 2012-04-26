@@ -150,14 +150,15 @@ class PageElement(object):
         return self
     replaceWith = replace_with  # BS3
 
-    def replace_with_children(self):
+    def unwrap(self):
         my_parent = self.parent
         my_index = self.parent.index(self)
         self.extract()
         for child in reversed(self.contents[:]):
             my_parent.insert(my_index, child)
         return self
-    replaceWithChildren = replace_with_children  # BS3
+    replace_with_children = unwrap
+    replaceWithChildren = unwrap  # BS3
 
     def extract(self):
         """Destructively rips this element out of the tree."""

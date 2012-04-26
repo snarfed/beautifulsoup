@@ -712,11 +712,11 @@ class TestTreeModification(SoupTest):
         new_a = a.replace_with(soup.c)
         self.assertEqual(a, new_a)
 
-    def test_replace_with_children_returns_thing_that_was_replaced(self):
+    def test_unwrap_returns_thing_that_was_replaced(self):
         text = "<a><b></b><c></c></a>"
         soup = self.soup(text)
         a = soup.a
-        new_a = a.replace_with_children()
+        new_a = a.unwrap()
         self.assertEqual(a, new_a)
 
     def test_replace_tag_with_itself(self):
@@ -918,11 +918,11 @@ class TestTreeModification(SoupTest):
         self.assertEqual(g_tag.previous_element, to_text)
         self.assertEqual(g_tag.previous_sibling, to_text)
 
-    def test_replace_with_children(self):
+    def test_unwrap(self):
         tree = self.soup("""
             <p>Unneeded <em>formatting</em> is unneeded</p>
             """)
-        tree.em.replace_with_children()
+        tree.em.unwrap()
         self.assertEqual(tree.em, None)
         self.assertEqual(tree.p.text, "Unneeded formatting is unneeded")
 
