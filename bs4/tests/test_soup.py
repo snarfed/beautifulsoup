@@ -21,10 +21,10 @@ from bs4.testing import (
 import warnings
 
 try:
-    import chardet
-    CHARDET_PRESENT = True
+    from bs4.builder import LXMLTreeBuilder, LXMLTreeBuilderForXML
+    LXML_PRESENT = True
 except ImportError, e:
-    CHARDET_PRESENT = False
+    LXML_PRESENT = False
 
 class TestDeprecatedConstructorArguments(SoupTest):
 
@@ -49,6 +49,9 @@ class TestDeprecatedConstructorArguments(SoupTest):
         self.assertRaises(
             TypeError, self.soup, "<a>", no_such_argument=True)
 
+    @skipIf(
+        not LXML_PRESENT,
+        "lxml not present, not testing BeautifulStoneSoup.")
     def test_beautifulstonesoup(self):
         with warnings.catch_warnings(record=True) as w:
             soup = BeautifulStoneSoup("<markup>")

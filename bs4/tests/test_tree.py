@@ -1492,7 +1492,6 @@ class TestSoupSelector(TreeTest):
         self.assertSelects('.s1 > a', ['s1a1', 's1a2'])
         self.assertSelects('.s1 > a span', ['s1a2s1'])
 
-
     def test_attribute_equals(self):
         self.assertSelectMultiple(
             ('p[class="onep"]', ['p1']),
