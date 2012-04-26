@@ -995,6 +995,12 @@ class TestTreeModification(SoupTest):
         soup.b.string = soup.c.string
         self.assertEqual(soup.a.encode(), b"<a><b>bar</b><c>bar</c></a>")
 
+    def test_set_string_preserves_class_of_string(self):
+        soup = self.soup("<a></a>")
+        cdata = CData("foo")
+        soup.a.string = cdata
+        self.assertTrue(isinstance(soup.a.string, CData))
+
 class TestElementObjects(SoupTest):
     """Test various features of element objects."""
 
@@ -1345,6 +1351,24 @@ class TestNavigableStringSubclasses(SoupTest):
         self.assertEqual(str(soup), "<![CDATA[foo]]>")
         self.assertEqual(soup.find(text="foo"), "foo")
         self.assertEqual(soup.contents[0], "foo")
+
+    def test_cdata_is_never_formatted(self):
+        """Text inside a CData object is passed into the formatter.
+
+        But the return value is ignored.
+        """
+
+        self.count = 0
+        def increment(*args):
+            self.count += 1
+            return "BITTER FAILURE"
+
+        soup = self.soup("")
+        cdata = CData("<><><>")
+        soup.insert(1, cdata)
+        self.assertEqual(
+            b"<![CDATA[<><><>]]>", soup.encode(formatter=increment))
+        self.assertEqual(1, self.count)
 
     def test_doctype_ends_in_newline(self):
         # Unlike other NavigableString subclasses, a DOCTYPE always ends

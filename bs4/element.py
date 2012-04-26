@@ -677,6 +677,12 @@ class CData(NavigableString):
     PREFIX = u'<![CDATA['
     SUFFIX = u']]>'
 
+    def output_ready(self, formatter="minimal"):
+        """CData strings are passed into the formatter.
+        But the return value is ignored."""
+        self.format_string(self, formatter)
+        return self.PREFIX + self + self.SUFFIX
+
 
 class ProcessingInstruction(NavigableString):
 
@@ -791,7 +797,7 @@ class Tag(PageElement):
     @string.setter
     def string(self, string):
         self.clear()
-        self.append(unicode(string))
+        self.append(string.__class__(string))
 
     def _all_strings(self, strip=False):
         """Yield all child strings, possibly stripping them."""

@@ -2048,7 +2048,6 @@ to Beautiful Soup generating invalid HTML/XML, as in these examples::
  print(link_soup.a.encode(formatter=None))
  # <a href="http://example.com/?foo=val1&bar=val2">A link</a>
 
-
 Finally, if you pass in a function for ``formatter``, Beautiful Soup
 will call that function once for every string and attribute value in
 the document. You can do whatever you want in this function. Here's a
@@ -2095,6 +2094,21 @@ whenever possible, but `also` converts all strings to uppercase::
  #   </p>
  #  </body>
  # </html>
+
+One last caveat: if you create a ``CData`` object, the text inside
+that object is always presented `exactly as it appears, with no
+formatting`. Beautiful Soup will call the formatter method, just in
+case you've written a custom method that counts all the strings in the
+document or something, but it will ignore the return value.
+
+ from bs4.element import CData
+ soup = BeautifulSoup("<a></a>")
+ soup.a.string = CData("one < three")
+ print(soup.a.prettify(formatter="xml"))
+ # <a>
+ #  <![CDATA[one < three]]>
+ # </a>
+
 
 ``get_text()``
 --------------
