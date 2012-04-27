@@ -1926,8 +1926,8 @@ whatever's inside that tag. It's good for stripping out markup::
 Like ``replace_with()``, ``unwrap()`` returns the tag
 that was replaced.
 
-In earlier versions of Beautiful Soup, ``unwrap()`` was called
-``replace_with_children()`, and that name will still work.
+(In earlier versions of Beautiful Soup, ``unwrap()`` was called
+``replace_with_children()``, and that name will still work.)
 
 Output
 ======
