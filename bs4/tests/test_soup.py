@@ -286,6 +286,44 @@ class TestUnicodeDammit(unittest.TestCase):
         self.assertEqual(u"<a>áé</a>", dammit.unicode_markup)
         self.assertEqual("utf-16le", dammit.original_encoding)
 
+    def test_fix_embedded_windows_1252(self):
+        # Here's a UTF8 document.
+        utf8 = (u"\N{SNOWMAN}" * 3).encode("utf8")
+
+        # Here's a Windows-1252 document.
+        windows_1252 = (
+            u"\N{LEFT DOUBLE QUOTATION MARK}Hi, I like Windows!"
+            u"\N{RIGHT DOUBLE QUOTATION MARK}").encode("windows_1252")
+
+        # Through some unholy alchemy, they've been stuck together.
+        doc = utf8 + windows_1252 + utf8
+
+        # The document can't be turned into UTF-8:
+        self.assertRaises(UnicodeDecodeError, doc.decode, "utf8")
+
+        # Unicode, Dammit thinks the whole document is Windows-1252,
+        # and decodes it into "â˜ƒâ˜ƒâ˜ƒ“Hi, I like Windows!”â˜ƒâ˜ƒâ˜ƒ"
+
+        # But if we run it through fix_embedded_windows_1252, it's fixed:
+
+        fixed = UnicodeDammit.fix_embedded_windows_1252(doc)
+        self.assertEqual(
+            u"☃☃☃“Hi, I like Windows!”☃☃☃", fixed.decode("utf8"))
+
+    def test_fix_embedded_windows_1252_ignores_multibyte_characters(self):
+        # Each of these characters has a UTF-8 representation ending
+        # in \x93. \x93 is a smart quote if interpreted as
+        # Windows-1252. But our code knows to skip over multibyte
+        # UTF-8 characters, so they'll survive the process unscathed.
+        for tricky_unicode_char in (
+            u"\N{LATIN SMALL LIGATURE OE}", # 2-byte char '\xc5\x93'
+            u"\N{LATIN SUBSCRIPT SMALL LETTER X}", # 3-byte char '\xe2\x82\x93'
+            u"\xf0\x90\x90\x93", # This is a CJK character, not sure which one.
+            ):
+            input = tricky_unicode_char.encode("utf8")
+            self.assertTrue(input.endswith(b'\x93'))
+            output = UnicodeDammit.fix_embedded_windows_1252(input)
+            self.assertEqual(output, input)
 
 class TestNamedspacedAttribute(SoupTest):
 

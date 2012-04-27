@@ -1,3 +1,8 @@
+= 4.1.0 (unreleased) =
+
+* Added experimental support for fixing Windows-1252 characters
+  embedded in UTF-8 documents.
+
 = 4.0.5 (20120427) =
 
 * Added a new method, wrap(), which wraps an element in a tag. Renamed
