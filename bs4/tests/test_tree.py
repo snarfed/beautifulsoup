@@ -352,7 +352,7 @@ class TestFindAllByAttribute(TreeTest):
 class TestIndex(TreeTest):
     """Test Tag.index"""
     def test_index(self):
-        tree = self.soup("""<wrap>
+        tree = self.soup("""<div>
                             <a>Identical</a>
                             <b>Not identical</b>
                             <a>Identical</a>
@@ -360,10 +360,10 @@ class TestIndex(TreeTest):
                             <c><d>Identical with child</d></c>
                             <b>Also not identical</b>
                             <c><d>Identical with child</d></c>
-                            </wrap>""")
-        wrap = tree.wrap
-        for i, element in enumerate(wrap.contents):
-            self.assertEqual(i, wrap.index(element))
+                            </div>""")
+        div = tree.div
+        for i, element in enumerate(div.contents):
+            self.assertEqual(i, div.index(element))
         self.assertRaises(ValueError, tree.index, 1)
 
 
@@ -925,6 +925,27 @@ class TestTreeModification(SoupTest):
         tree.em.unwrap()
         self.assertEqual(tree.em, None)
         self.assertEqual(tree.p.text, "Unneeded formatting is unneeded")
+
+    def test_wrap(self):
+        soup = self.soup("I wish I was bold.")
+        value = soup.string.wrap(soup.new_tag("b"))
+        self.assertEqual(value.decode(), "<b>I wish I was bold.</b>")
+        self.assertEqual(
+            soup.decode(), self.document_for("<b>I wish I was bold.</b>"))
+
+    def test_wrap_extracts_tag_from_elsewhere(self):
+        soup = self.soup("<b></b>I wish I was bold.")
+        soup.b.next_sibling.wrap(soup.b)
+        self.assertEqual(
+            soup.decode(), self.document_for("<b>I wish I was bold.</b>"))
+
+    def test_wrap_puts_new_contents_at_the_end(self):
+        soup = self.soup("<b>I like being bold.</b>I wish I was bold.")
+        soup.b.next_sibling.wrap(soup.b)
+        self.assertEqual(2, len(soup.b.contents))
+        self.assertEqual(
+            soup.decode(), self.document_for(
+                "<b>I like being bold.I wish I was bold.</b>"))
 
     def test_extract(self):
         soup = self.soup(

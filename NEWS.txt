@@ -1,5 +1,7 @@
 = 4.0.5 (unreleased) =
 
+* Added a new method, wrap(), which wraps an element in a tag.
+
 * Renamed replace_with_children() to unwrap(), which is easier to
   understand and also the jQuery name of the function.
 

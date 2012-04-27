@@ -1894,11 +1894,24 @@ and replaces it with the tag or string of your choice::
 ``replace_with()`` returns the tag or string that was replaced, so
 that you can examine it or add it back to another part of the tree.
 
+``wrap()``
+----------
+
+``PageElement.wrap()`` wraps an element in the tag you specify. It
+returns the new wrapper. (New in Beautiful Soup 4.0.5.)
+
+ soup = BeautifulSoup("<p>I wish I was bold.</p>")
+ soup.p.string.wrap(soup.new_tag("b"))
+ # <b>I wish I was bold.</b>
+
+ soup.p.wrap(soup.new_tag("div")
+ # <div><p><b>I wish I was bold.</b></p></div>
+
 ``unwrap()``
 ---------------------------
 
-``Tag.unwrap()`` replaces a tag with whatever's inside
-that tag. It's good for stripping out markup::
+``Tag.unwrap()`` is the opposite of ``wrap()``. It replaces a tag with
+whatever's inside that tag. It's good for stripping out markup::
 
   markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
   soup = BeautifulSoup(markup)
@@ -1910,6 +1923,7 @@ that tag. It's good for stripping out markup::
 
 Like ``replace_with()``, ``unwrap()`` returns the tag
 that was replaced.
+
 
 Output
 ======

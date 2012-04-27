@@ -160,6 +160,11 @@ class PageElement(object):
     replace_with_children = unwrap
     replaceWithChildren = unwrap  # BS3
 
+    def wrap(self, wrap_inside):
+        me = self.replace_with(wrap_inside)
+        wrap_inside.append(me)
+        return wrap_inside
+
     def extract(self):
         """Destructively rips this element out of the tree."""
         if self.parent is not None:
