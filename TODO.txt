@@ -1,7 +1,7 @@
 Additions
 ---------
 
-More of the jQuery API: wrap, unwrap (i.e. replace_with_children), nextUntil?
+More of the jQuery API: nextUntil?
 
 Optimizations
 -------------
