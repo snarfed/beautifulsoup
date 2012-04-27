@@ -1898,7 +1898,7 @@ that you can examine it or add it back to another part of the tree.
 ----------
 
 ``PageElement.wrap()`` wraps an element in the tag you specify. It
-returns the new wrapper. (New in Beautiful Soup 4.0.5.)
+returns the new wrapper::
 
  soup = BeautifulSoup("<p>I wish I was bold.</p>")
  soup.p.string.wrap(soup.new_tag("b"))
@@ -1906,6 +1906,8 @@ returns the new wrapper. (New in Beautiful Soup 4.0.5.)
 
  soup.p.wrap(soup.new_tag("div")
  # <div><p><b>I wish I was bold.</b></p></div>
+
+This method is new in Beautiful Soup 4.0.5.
 
 ``unwrap()``
 ---------------------------
@@ -1924,6 +1926,8 @@ whatever's inside that tag. It's good for stripping out markup::
 Like ``replace_with()``, ``unwrap()`` returns the tag
 that was replaced.
 
+In earlier versions of Beautiful Soup, ``unwrap()`` was called
+``replace_with_children()`, and that name will still work.
 
 Output
 ======
