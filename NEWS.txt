@@ -3,6 +3,8 @@
 * Added experimental support for fixing Windows-1252 characters
   embedded in UTF-8 documents.
 
+* Fixed the handling of &quot; with the built-in parser. [bug=993871]
+
 = 4.0.5 (20120427) =
 
 * Added a new method, wrap(), which wraps an element in a tag.

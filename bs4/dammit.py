@@ -41,18 +41,18 @@ class EntitySubstitution(object):
     def _populate_class_variables():
         lookup = {}
         reverse_lookup = {}
-        characters = []
+        characters_for_re = []
         for codepoint, name in list(codepoint2name.items()):
-            if codepoint == 34:
+            character = unichr(codepoint)
+            if codepoint != 34:
                 # There's no point in turning the quotation mark into
                 # &quot;, unless it happens within an attribute value, which
                 # is handled elsewhere.
-                continue
-            character = unichr(codepoint)
-            characters.append(character)
-            lookup[character] = name
+                characters_for_re.append(character)
+                lookup[character] = name
+            # But we do want to turn &quot; into the quotation mark.
             reverse_lookup[name] = character
-        re_definition = "[%s]" % "".join(characters)
+        re_definition = "[%s]" % "".join(characters_for_re)
         return lookup, reverse_lookup, re.compile(re_definition)
     (CHARACTER_TO_HTML_ENTITY, HTML_ENTITY_TO_CHARACTER,
      CHARACTER_TO_HTML_ENTITY_RE) = _populate_class_variables()

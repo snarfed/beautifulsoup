@@ -217,6 +217,10 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertSoupEquals("<p>pi&#xf1;ata</p>", expect)
         self.assertSoupEquals("<p>pi&ntilde;ata</p>", expect)
 
+    def test_quot_entity_converted_to_quotation_mark(self):
+        self.assertSoupEquals("<p>I said &quot;good day!&quot;</p>",
+                              '<p>I said "good day!"</p>')
+
     def test_out_of_range_entity(self):
         expect = u"\N{REPLACEMENT CHARACTER}"
         self.assertSoupEquals("&#10000000000000;", expect)
