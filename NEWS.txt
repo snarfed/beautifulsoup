@@ -17,7 +17,11 @@
   into a tag it's already inside, and replacing one of a tag's
   children with another. [bug=997529]
 
-* Fixed the inability to search for non-ASCII attribute values. [bug=1003974]
+* Fixed the inability to search for non-ASCII attribute
+  values. [bug=1003974]
+
+  This caused a major refactoring of the search code. All the tests
+  pass, but it's possible that some searches will behave differently.
 
 = 4.0.5 (20120427) =
 

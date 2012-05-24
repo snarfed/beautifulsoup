@@ -1161,20 +1161,55 @@ class SoupStrainer(object):
     text)."""
 
     def __init__(self, name=None, attrs={}, text=None, **kwargs):
-        self.name = name
+        self.name = self._normalize_search_value(name)
         if not isinstance(attrs, dict):
             # Treat a non-dict value for attrs as a search for the 'class'
             # attribute.
             kwargs['class'] = attrs
             attrs = None
+
         if kwargs:
             if attrs:
                 attrs = attrs.copy()
                 attrs.update(kwargs)
             else:
                 attrs = kwargs
-        self.attrs = attrs
-        self.text = text
+        normalized_attrs = {}
+        for key, value in attrs.items():
+            normalized_attrs[key] = self._normalize_search_value(value)
+
+        self.attrs = normalized_attrs
+        self.text = self._normalize_search_value(text)
+
+    def _normalize_search_value(self, value):
+        # Leave it alone if it's a Unicode string, a callable, a
+        # regular expression, a boolean, or None.
+        if (isinstance(value, unicode) or callable(value) or hasattr(value, 'match')
+            or isinstance(value, bool) or value is None):
+            return value
+
+        # If it's a bytestring, convert it to Unicode, treating it as UTF-8.
+        if isinstance(value, bytes):
+            return value.decode("utf8")
+
+        # If it's listlike, convert it into a list of strings.
+        if hasattr(value, '__iter__'):
+            new_value = []
+            for v in value:
+                if (hasattr(v, '__iter__') and not isinstance(v, bytes)
+                    and not isinstance(v, unicode)):
+                    # This is almost certainly the user's mistake. In the
+                    # interests of avoiding infinite loops, we'll let
+                    # it through as-is rather than doing a recursive call.
+                    new_value.append(v)
+                else:
+                    new_value.append(self._normalize_search_value(v))
+            return new_value
+
+        # Otherwise, convert it into a Unicode string.
+        # The unicode(str()) thing is so this will do the same thing on Python 2
+        # and Python 3.
+        return unicode(str(value))
 
     def __str__(self):
         if self.text:
@@ -1250,13 +1285,12 @@ class SoupStrainer(object):
         return found
 
     def _matches(self, markup, match_against):
-        #print "Matching %s against %s" % (markup, match_against)
+        # print u"Matching %s against %s" % (markup, match_against)
         result = False
-
         if isinstance(markup, list) or isinstance(markup, tuple):
-            # This should only happen when searching, e.g. the 'class'
-            # attribute.
-            if (isinstance(match_against, basestring)
+            # This should only happen when searching a multi-valued attribute
+            # like 'class'.
+            if (isinstance(match_against, unicode)
                 and ' ' in match_against):
                 # A bit of a special case. If they try to match "foo
                 # bar" on a multivalue attribute's value, only accept
@@ -1265,50 +1299,44 @@ class SoupStrainer(object):
                 # XXX This is going to be pretty slow because we keep
                 # splitting match_against. But it shouldn't come up
                 # too often.
-                result = (whitespace_re.split(match_against) == markup)
+                return (whitespace_re.split(match_against) == markup)
             else:
                 for item in markup:
                     if self._matches(item, match_against):
-                        result = True
-        elif match_against is True:
-            result = markup is not None
-        elif isinstance(match_against, collections.Callable):
-            result = match_against(markup)
-        else:
-            #Custom match methods take the tag as an argument, but all
-            #other ways of matching match the tag name as a string.
-            if isinstance(markup, Tag):
-                markup = markup.name
-            if markup is not None and not isinstance(markup, basestring):
-                markup = unicode(markup)
-            #Now we know that chunk is either a string, or None.
-            if hasattr(match_against, 'match'):
-                # It's a regexp object.
-                result = markup and match_against.search(markup)
-            elif (hasattr(match_against, '__iter__')
-                    and markup is not None
-                    and not isinstance(match_against, bytes)
-                    and not isinstance(match_against, unicode)):
-                result = markup in match_against
-            elif hasattr(match_against, 'items'):
-                if markup is None:
-                    result = len(match_against.items()) == 0
-                else:
-                    result = match_against in markup
-            elif match_against is not None:
-                if isinstance(match_against, unicode):
-                    # Unicode is fine.
-                    pass
-                elif isinstance(match_against, bytes):
-                    # A bytestring should be converted into Unicode.
-                    match_against = match_against.decode("utf8")
-                else:
-                    # Anything else should be converted into a string, then to Unicode.
-                    match_against = str(match_against)
+                        return True
+                return False
 
-            if not result:
-                result = match_against == markup
-        return result
+        if match_against is True:
+            # True matches any non-None value.
+            return markup is not None
+
+        if isinstance(match_against, collections.Callable):
+            return match_against(markup)
+
+        # Custom callables take the tag as an argument, but all
+        # other ways of matching match the tag name as a string.
+        if isinstance(markup, Tag):
+            markup = markup.name
+
+        # Ensure that `markup` is either a Unicode string, or None.
+        markup = self._normalize_search_value(markup)
+
+        if markup is None:
+            # None matches None, False, an empty string, an empty list, and so on.
+            return not match_against
+
+        if isinstance(match_against, unicode):
+            # Exact string match
+            return markup == match_against
+
+        if hasattr(match_against, 'match'):
+            # Regexp match
+            return match_against.search(markup)
+
+        if hasattr(match_against, '__iter__'):
+            # The markup must be an exact match against something
+            # in the iterable.
+            return markup in match_against
 
 
 class ResultSet(list):

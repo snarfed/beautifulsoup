@@ -104,6 +104,16 @@ class TestFindAll(TreeTest):
         self.assertSelects(soup('a', limit=1), ["1"])
         self.assertSelects(soup.b(id="foo"), ["3"])
 
+    def test_find_all_with_self_referential_data_structure_does_not_cause_infinite_recursion(self):
+        soup = self.soup("<a></a>")
+        # Create a self-referential list.
+        l = []
+        l.append(l)
+
+        # Without special code in _normalize_search_value, this would cause infinite
+        # recursion.
+        self.assertEqual([], soup.find_all(l))
+
 class TestFindAllBasicNamespaces(TreeTest):
 
     def test_find_by_namespaced_name(self):
