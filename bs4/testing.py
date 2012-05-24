@@ -421,6 +421,11 @@ class HTMLTreeBuilderSmokeTest(object):
         # encoding.
         self.assertEqual('utf8', charset.encode("utf8"))
 
+    def test_tag_with_no_attributes_can_have_attributes_added(self):
+        data = self.soup("<a>text</a>")
+        data.a['foo'] = 'bar'
+        self.assertEqual('<a foo="bar">text</a>', data.a.decode())
+
 class XMLTreeBuilderSmokeTest(object):
 
     def test_docstring_generated(self):

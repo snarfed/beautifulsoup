@@ -286,7 +286,7 @@ class TestUnicodeDammit(unittest.TestCase):
         self.assertEqual(u"<a>áé</a>", dammit.unicode_markup)
         self.assertEqual("utf-16le", dammit.original_encoding)
 
-    def test_fix_embedded_windows_1252(self):
+    def test_detwingle(self):
         # Here's a UTF8 document.
         utf8 = (u"\N{SNOWMAN}" * 3).encode("utf8")
 
@@ -306,11 +306,11 @@ class TestUnicodeDammit(unittest.TestCase):
 
         # But if we run it through fix_embedded_windows_1252, it's fixed:
 
-        fixed = UnicodeDammit.fix_embedded_windows_1252(doc)
+        fixed = UnicodeDammit.detwingle(doc)
         self.assertEqual(
             u"☃☃☃“Hi, I like Windows!”☃☃☃", fixed.decode("utf8"))
 
-    def test_fix_embedded_windows_1252_ignores_multibyte_characters(self):
+    def test_detwingle_ignores_multibyte_characters(self):
         # Each of these characters has a UTF-8 representation ending
         # in \x93. \x93 is a smart quote if interpreted as
         # Windows-1252. But our code knows to skip over multibyte
@@ -322,7 +322,7 @@ class TestUnicodeDammit(unittest.TestCase):
             ):
             input = tricky_unicode_char.encode("utf8")
             self.assertTrue(input.endswith(b'\x93'))
-            output = UnicodeDammit.fix_embedded_windows_1252(input)
+            output = UnicodeDammit.detwingle(input)
             self.assertEqual(output, input)
 
 class TestNamedspacedAttribute(SoupTest):

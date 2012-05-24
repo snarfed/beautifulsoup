@@ -1,13 +1,17 @@
 = 4.1.0 (unreleased) =
 
 * Added experimental support for fixing Windows-1252 characters
-  embedded in UTF-8 documents.
+  embedded in UTF-8 documents. (UnicodeDammit.detwingle())
 
 * Fixed the handling of &quot; with the built-in parser. [bug=993871]
 
 * Comments, processing instructions, document type declarations, and
   markup declarations are now treated as preformatted strings, the way
   CData blocks are. [bug=1001025]
+
+* Fixed a bug with the lxml treebuilder that prevented the user from
+  adding attributes to a tag that didn't originally have
+  any. [bug=1002378] Thanks to Oliver Beattie for the patch.
 
 = 4.0.5 (20120427) =
 
