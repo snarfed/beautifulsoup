@@ -17,6 +17,8 @@
   into a tag it's already inside, and replacing one of a tag's
   children with another. [bug=997529]
 
+* Fixed the inability to search for non-ASCII attribute values. [bug=1003974]
+
 = 4.0.5 (20120427) =
 
 * Added a new method, wrap(), which wraps an element in a tag.

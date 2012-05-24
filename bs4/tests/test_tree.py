@@ -192,6 +192,14 @@ class TestFindAllByAttribute(TreeTest):
         self.assertSelects(tree.find_all(id='first'),
                            ["Matching a.", "Matching b."])
 
+    def test_find_all_by_utf8_attribute_value(self):
+        peace = u"םולש".encode("utf8")
+        data = u'<a title="םולש"></a>'.encode("utf8")
+        soup = self.soup(data)
+        self.assertEqual([soup.a], soup.find_all(title=peace))
+        self.assertEqual([soup.a], soup.find_all(title=peace.decode("utf8")))
+        self.assertEqual([soup.a], soup.find_all(title=[peace, "something else"]))
+
     def test_find_all_by_attribute_dict(self):
         # You can pass in a dictionary as the argument 'attrs'. This
         # lets you search for attributes like 'name' (a fixed argument
@@ -825,7 +833,7 @@ class TestTreeModification(SoupTest):
         data = "<a><b></b></a>"
         soup = self.soup(data)
         soup.a.append(soup.b)
-        self.assertEquals(data, soup.decode())
+        self.assertEqual(data, soup.decode())
 
     def test_move_tag_to_beginning_of_parent(self):
         data = "<a><b></b><c></c><d></d></a>"

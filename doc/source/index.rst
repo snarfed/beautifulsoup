@@ -1017,6 +1017,9 @@ code finds all the <b> tags in the document::
  soup.find_all('b')
  # [<b>The Dormouse's story</b>]
 
+If you pass in a byte string, Beautiful Soup will assume the string is
+encoded as UTF-8. You can avoid this by passing in a Unicode string instead.
+
 .. _a regular expression:
 
 A regular expression

@@ -1287,15 +1287,24 @@ class SoupStrainer(object):
                 result = markup and match_against.search(markup)
             elif (hasattr(match_against, '__iter__')
                     and markup is not None
-                    and not isinstance(match_against, basestring)):
+                    and not isinstance(match_against, bytes)
+                    and not isinstance(match_against, unicode)):
                 result = markup in match_against
             elif hasattr(match_against, 'items'):
                 if markup is None:
                     result = len(match_against.items()) == 0
                 else:
                     result = match_against in markup
-            elif match_against and isinstance(markup, basestring):
-                match_against = markup.__class__(match_against)
+            elif match_against is not None:
+                if isinstance(match_against, unicode):
+                    # Unicode is fine.
+                    pass
+                elif isinstance(match_against, bytes):
+                    # A bytestring should be converted into Unicode.
+                    match_against = match_against.decode("utf8")
+                else:
+                    # Anything else should be converted into a string, then to Unicode.
+                    match_against = str(match_against)
 
             if not result:
                 result = match_against == markup
