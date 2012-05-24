@@ -678,10 +678,12 @@ class NavigableString(unicode, PageElement):
         return self.PREFIX + output + self.SUFFIX
 
 
-class CData(NavigableString):
+class PreformattedString(NavigableString):
+    """A NavigableString not subject to the normal formatting rules.
 
-    PREFIX = u'<![CDATA['
-    SUFFIX = u']]>'
+    The string will be passed into the formatter (to trigger side effects),
+    but the return value will be ignored.
+    """
 
     def output_ready(self, formatter="minimal"):
         """CData strings are passed into the formatter.
@@ -689,25 +691,28 @@ class CData(NavigableString):
         self.format_string(self, formatter)
         return self.PREFIX + self + self.SUFFIX
 
+class CData(PreformattedString):
 
-class ProcessingInstruction(NavigableString):
+    PREFIX = u'<![CDATA['
+    SUFFIX = u']]>'
+
+class ProcessingInstruction(PreformattedString):
 
     PREFIX = u'<?'
     SUFFIX = u'?>'
 
-
-class Comment(NavigableString):
+class Comment(PreformattedString):
 
     PREFIX = u'<!--'
     SUFFIX = u'-->'
 
 
-class Declaration(NavigableString):
+class Declaration(PreformattedString):
     PREFIX = u'<!'
     SUFFIX = u'!>'
 
 
-class Doctype(NavigableString):
+class Doctype(PreformattedString):
 
     @classmethod
     def for_name_and_ids(cls, name, pub_id, system_id):

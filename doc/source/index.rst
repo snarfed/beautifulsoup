@@ -2419,8 +2419,13 @@ be, you can pass them in as a list::
  dammit.original_encoding
  # 'latin-1'
 
-Unicode, Dammit has one special feature that Beautiful Soup doesn't
-use. You can use it to convert Microsoft smart quotes to HTML or XML
+Unicode, Dammit has two special features that Beautiful Soup doesn't
+use.
+
+Smart quotes
+^^^^^^^^^^^^
+
+You can use Unicode, Dammit to convert Microsoft smart quotes to HTML or XML
 entities::
 
  markup = b"<p>I just \x93love\x94 Microsoft Word\x92s smart quotes</p>"
@@ -2443,6 +2448,51 @@ everything else::
 
  UnicodeDammit(markup, ["windows-1252"]).unicode_markup
  # u'<p>I just \u201clove\u201d Microsoft Word\u2019s smart quotes</p>'
+
+Inconsistent encodings
+^^^^^^^^^^^^^^^^^^^^^^
+
+Sometimes a document is mostly in UTF-8, but contains Windows-1252
+characters such as (again) Microsoft smart quotes. This can happen
+when a website includes data from multiple sources. You can use
+``UnicodeDammit.detwingle()`` to turn such a document into pure
+UTF-8. Here's a simple example::
+
+ snowmen = (u"\N{SNOWMAN}" * 3)
+ quote = (u"\N{LEFT DOUBLE QUOTATION MARK}I like snowmen!\N{RIGHT DOUBLE QUOTATION MARK}")
+ doc = snowmen.encode("utf8") + quote.encode("windows_1252")
+
+This document is a mess. You can display the snowmen or the smart
+quotes, but not both::
+
+ print(doc)
+ # ☃☃☃�I like snowmen!�
+
+ print(doc.decode("windows-1252"))
+ # â˜ƒâ˜ƒâ˜ƒ“I like snowmen!”
+
+Decoding the document as UTF-8 will raise a ``UnicodeDecodeError``,
+but ``UnicodeDammit.detwingle()`` will convert the document to pure
+UTF-8, allowing you to decode it and display the snowmen and
+quote marks simultaneously::
+
+ new_doc = UnicodeDammit.detwingle(doc)
+ print(new_doc.decode("utf8"))
+ # ☃☃☃“I like snowmen!”
+
+``UnicodeDammit.detwingle()`` only knows how to handle Windows-1252
+embedded in UTF-8 (or vice versa, I suppose), but this is the most
+common case.
+
+Note that you must know to call ``UnicodeDammit.detwingle()`` on your
+data before passing it into ``BeautifulSoup`` or the ``UnicodeDammit``
+constructor. Beautiful Soup assumes that a document has a single
+encoding, whatever it might be. If you pass it a document that
+contains both UTF-8 and Windows-1252, it's likely to think the whole
+document is Windows-1252, and the document will come out looking like
+`` â˜ƒâ˜ƒâ˜ƒ“I like snowmen!”``.
+
+``UnicodeDammit.detwingle()`` is new in Beautiful Soup 4.1.0.
 
 Parsing only part of a document
 ===============================
@@ -2565,7 +2615,7 @@ By default, Beautiful Soup parses documents as HTML. To parse a
 document as XML, pass in "xml" as the second argument to the
 ``BeautifulSoup`` constructor::
 
-soup = BeautifulSoup(markup, "xml")
+ soup = BeautifulSoup(markup, "xml")
 
 You'll need to :ref:`have lxml installed <parser-installation>`.
 

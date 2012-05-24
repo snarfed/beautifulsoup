@@ -5,6 +5,10 @@
 
 * Fixed the handling of &quot; with the built-in parser. [bug=993871]
 
+* Comments, processing instructions, document type declarations, and
+  markup declarations are now treated as preformatted strings, the way
+  CData blocks are. [bug=1001025]
+
 = 4.0.5 (20120427) =
 
 * Added a new method, wrap(), which wraps an element in a tag.

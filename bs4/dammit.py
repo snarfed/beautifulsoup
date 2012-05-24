@@ -728,23 +728,29 @@ class UnicodeDammit:
     LAST_MULTIBYTE_MARKER = MULTIBYTE_MARKERS_AND_SIZES[-1][1]
 
     @classmethod
-    def fix_embedded_windows_1252(cls, in_bytes, actual_encoding="utf8"):
-        """Fix Windows-1252 characters embedded in some other encoding.
+    def detwingle(cls, in_bytes, main_encoding="utf8",
+                  embedded_encoding="windows-1252"):
+        """Fix characters from one encoding embedded in some other encoding.
 
-        Also fixes embedded ISO-8859-1, which is a subset of Windows-1252.
-
-        Currently the only encoding supported is UTF-8.
+        Currently the only situation supported is Windows-1252 (or its
+        subset ISO-8859-1), embedded in UTF-8.
 
         The input must be a bytestring. If you've already converted
         the document to Unicode, you're too late.
 
-        The output is a bytestring in which Windows-1252 characters
-        have been converted to their UTF-8 equivalents.
+        The output is a bytestring in which `embedded_encoding`
+        characters have been converted to their `main_encoding`
+        equivalents.
         """
-        if actual_encoding.lower() not in ('utf8', 'utf-8'):
+        if embedded_encoding.replace('_', '-').lower() not in (
+            'windows-1252', 'windows_1252'):
             raise NotImplementedError(
-                "UTF-8 is the only currently supported encoding "
-                "for Windows-1252 removal.")
+                "Windows-1252 and ISO-8859-1 are the only currently supported "
+                "embedded encodings.")
+
+        if main_encoding.lower() not in ('utf8', 'utf-8'):
+            raise NotImplementedError(
+                "UTF-8 is the only currently supported main encoding.")
 
         byte_chunks = []
 
@@ -755,7 +761,8 @@ class UnicodeDammit:
             if not isinstance(byte, int):
                 # Python 2.x
                 byte = ord(byte)
-            if byte >= cls.FIRST_MULTIBYTE_MARKER and byte <= cls.LAST_MULTIBYTE_MARKER:
+            if (byte >= cls.FIRST_MULTIBYTE_MARKER
+                and byte <= cls.LAST_MULTIBYTE_MARKER):
                 # This is the start of a UTF-8 multibyte character. Skip
                 # to the end.
                 for start, end, size in cls.MULTIBYTE_MARKERS_AND_SIZES:
