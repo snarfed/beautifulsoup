@@ -137,14 +137,6 @@ class PageElement(object):
             raise ValueError("Cannot replace a Tag with its parent.")
         old_parent = self.parent
         my_index = self.parent.index(self)
-        if (hasattr(replace_with, 'parent')
-            and replace_with.parent is self.parent):
-            # We're replacing this element with one of its siblings.
-            if self.parent.index(replace_with) < my_index:
-                # Furthermore, it comes before this element. That
-                # means that when we extract it, the index of this
-                # element will change.
-                my_index -= 1
         self.extract()
         old_parent.insert(my_index, replace_with)
         return self
@@ -212,11 +204,12 @@ class PageElement(object):
             # We're 'inserting' an element that's already one
             # of this object's children.
             if new_child.parent is self:
-                if self.index(new_child) > position:
-                    # Furthermore we're moving it further down the
-                    # list of this object's children. That means that
-                    # when we extract this element, our target index
-                    # will jump down one.
+                current_index = self.index(new_child)
+                if current_index < position:
+                    # We're moving this element further down the list
+                    # of this object's children. That means that when
+                    # we extract this element, our target index will
+                    # jump down one.
                     position -= 1
             new_child.extract()
 

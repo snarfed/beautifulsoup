@@ -821,6 +821,18 @@ class TestTreeModification(SoupTest):
         self.assertEqual(the.next_element, c_tag)
         self.assertEqual(c_tag.previous_element, the)
 
+    def test_append_child_thats_already_at_the_end(self):
+        data = "<a><b></b></a>"
+        soup = self.soup(data)
+        soup.a.append(soup.b)
+        self.assertEquals(data, soup.decode())
+
+    def test_move_tag_to_beginning_of_parent(self):
+        data = "<a><b></b><c></c><d></d></a>"
+        soup = self.soup(data)
+        soup.a.insert(0, soup.d)
+        self.assertEqual("<a><d></d><b></b><c></c></a>", soup.decode())
+
     def test_insert_works_on_empty_element_tag(self):
         # This is a little strange, since most HTML parsers don't allow
         # markup like this to come through. But in general, we don't
@@ -881,6 +893,18 @@ class TestTreeModification(SoupTest):
         self.assertEqual(no.parent, soup.p)
         self.assertEqual(no.next_element, "no")
         self.assertEqual(no.next_sibling, " business")
+
+    def test_replace_first_child(self):
+        data = "<a><b></b><c></c></a>"
+        soup = self.soup(data)
+        soup.b.replace_with(soup.c)
+        self.assertEqual("<a><c></c></a>", soup.decode())
+
+    def test_replace_last_child(self):
+        data = "<a><b></b><c></c></a>"
+        soup = self.soup(data)
+        soup.c.replace_with(soup.b)
+        self.assertEqual("<a><b></b></a>", soup.decode())
 
     def test_nested_tag_replace_with(self):
         soup = self.soup(

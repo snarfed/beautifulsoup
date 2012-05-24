@@ -13,6 +13,10 @@
   adding attributes to a tag that didn't originally have
   any. [bug=1002378] Thanks to Oliver Beattie for the patch.
 
+* Fixed some edge-case bugs having to do with inserting an element
+  into a tag it's already inside, and replacing one of a tag's
+  children with another. [bug=997529]
+
 = 4.0.5 (20120427) =
 
 * Added a new method, wrap(), which wraps an element in a tag.
