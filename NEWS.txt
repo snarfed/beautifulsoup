@@ -1,4 +1,4 @@
-= 4.1.0 (unreleased) =
+= 4.1.0 (20120529) =
 
 * Added experimental support for fixing Windows-1252 characters
   embedded in UTF-8 documents. (UnicodeDammit.detwingle())
@@ -11,14 +11,13 @@
 
 * Fixed a bug with the lxml treebuilder that prevented the user from
   adding attributes to a tag that didn't originally have
-  any. [bug=1002378] Thanks to Oliver Beattie for the patch.
+  attributes. [bug=1002378] Thanks to Oliver Beattie for the patch.
 
 * Fixed some edge-case bugs having to do with inserting an element
   into a tag it's already inside, and replacing one of a tag's
   children with another. [bug=997529]
 
-* Fixed the inability to search for non-ASCII attribute
-  values. [bug=1003974]
+* Added the ability to search for attribute values specified in UTF-8. [bug=1003974]
 
   This caused a major refactoring of the search code. All the tests
   pass, but it's possible that some searches will behave differently.

@@ -82,9 +82,11 @@ class LXMLTreeBuilderForXML(TreeBuilder):
             data = markup.read(self.CHUNK_SIZE)
             if data != '':
                 self.parser.feed(data)
-        self.parser.close()
+        foo = self.parser.close()
+        import pdb; pdb.set_trace()
 
     def close(self):
+        import pdb; pdb.set_trace()
         self.nsmaps = None
 
     def start(self, name, attrs, nsmap={}):

@@ -2465,8 +2465,9 @@ UTF-8. Here's a simple example::
  quote = (u"\N{LEFT DOUBLE QUOTATION MARK}I like snowmen!\N{RIGHT DOUBLE QUOTATION MARK}")
  doc = snowmen.encode("utf8") + quote.encode("windows_1252")
 
-This document is a mess. You can display the snowmen or the smart
-quotes, but not both::
+This document is a mess. The snowmen are in UTF-8 and the quotes are
+in Windows-1252. You can display the snowmen or the quotes, but not
+both::
 
  print(doc)
  # ☃☃☃�I like snowmen!�
@@ -2474,10 +2475,11 @@ quotes, but not both::
  print(doc.decode("windows-1252"))
  # â˜ƒâ˜ƒâ˜ƒ“I like snowmen!”
 
-Decoding the document as UTF-8 will raise a ``UnicodeDecodeError``,
-but ``UnicodeDammit.detwingle()`` will convert the document to pure
-UTF-8, allowing you to decode it and display the snowmen and
-quote marks simultaneously::
+Decoding the document as UTF-8 raises a ``UnicodeDecodeError``, and
+decoding it as Windows-1252 gives you gibberish. Fortunately,
+``UnicodeDammit.detwingle()`` will convert the string to pure UTF-8,
+allowing you to decode it to Unicode and display the snowmen and quote
+marks simultaneously::
 
  new_doc = UnicodeDammit.detwingle(doc)
  print(new_doc.decode("utf8"))
@@ -2493,7 +2495,7 @@ constructor. Beautiful Soup assumes that a document has a single
 encoding, whatever it might be. If you pass it a document that
 contains both UTF-8 and Windows-1252, it's likely to think the whole
 document is Windows-1252, and the document will come out looking like
-`` â˜ƒâ˜ƒâ˜ƒ“I like snowmen!”``.
+` â˜ƒâ˜ƒâ˜ƒ“I like snowmen!”`.
 
 ``UnicodeDammit.detwingle()`` is new in Beautiful Soup 4.1.0.
 
