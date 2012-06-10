@@ -1026,15 +1026,22 @@ A regular expression
 ^^^^^^^^^^^^^^^^^^^^
 
 If you pass in a regular expression object, Beautiful Soup will filter
-against that regular expression. This code finds all the tags whose
-names start with the letter "b"; in this case, the <body> tag and the
-<b> tag::
+against that regular expression using its ``match()`` method. This code
+finds all the tags whose names start with the letter "b"; in this
+case, the <body> tag and the <b> tag::
 
  import re
- for tag in soup.find_all(re.compile("b.*")):
+ for tag in soup.find_all(re.compile("^b")):
      print(tag.name)
  # body
  # b
+
+This code finds all the tags whose names contain the letter 't'::
+
+ for tag in soup.find_all(re.compile("t")):
+     print(tag.name)
+ # html
+ # title
 
 .. _a list:
 
