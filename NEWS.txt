@@ -1,3 +1,9 @@
+= 4.1.1 (Unreleased) =
+
+Fixed an html5lib tree builder crash which happened when html5lib
+moved a tag with a multivalued attribute from one part of the tree to
+another. [bug=1019603]
+
 = 4.1.0 (20120529) =
 
 * Added experimental support for fixing Windows-1252 characters

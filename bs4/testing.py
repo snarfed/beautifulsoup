@@ -202,6 +202,14 @@ class HTMLTreeBuilderSmokeTest(object):
             "<tbody><tr><td>Bar</td></tr></tbody>"
             "<tfoot><tr><td>Baz</td></tr></tfoot></table>")
 
+    def test_deeply_nested_multivalued_attribute(self):
+        # html5lib can set the attributes of the same tag many times
+        # as it rearranges the tree. This has caused problems with
+        # multivalued attributes.
+        markup = '<table><div><div class="css"></div></div></table>'
+        soup = self.soup(markup)
+        self.assertEqual(["css"], soup.div.div['class'])
+
     def test_angle_brackets_in_attribute_values_are_escaped(self):
         self.assertSoupEquals('<a b="<a>"></a>', '<a b="&lt;a&gt;"></a>')
 
