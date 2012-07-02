@@ -1,8 +1,14 @@
 = 4.1.1 (Unreleased) =
 
-Fixed an html5lib tree builder crash which happened when html5lib
+* Fixed an html5lib tree builder crash which happened when html5lib
 moved a tag with a multivalued attribute from one part of the tree to
 another. [bug=1019603]
+
+* Correctly handle closing tags with an XML namespace declared. Patch
+  by Andreas Kostyrka. [bug=1019635]
+
+* Fixed a typo that made parsing significantly slower than it should
+  have been. [bug=1020268]
 
 = 4.1.0 (20120529) =
 

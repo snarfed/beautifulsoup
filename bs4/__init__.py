@@ -267,7 +267,7 @@ class BeautifulSoup(Tag):
 
         for i in range(len(self.tagStack) - 1, 0, -1):
             if (name == self.tagStack[i].name
-                and nsprefix == self.tagStack[i].nsprefix == nsprefix):
+                and nsprefix == self.tagStack[i].prefix):
                 numPops = len(self.tagStack) - i
                 break
         if not inclusivePop:
