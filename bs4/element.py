@@ -1000,14 +1000,15 @@ class Tag(PageElement):
                 attrs.append(decoded)
         close = ''
         closeTag = ''
-        if self.is_empty_element:
-            close = '/'
-        else:
-            closeTag = '</%s>' % self.name
 
         prefix = ''
         if self.prefix:
             prefix = self.prefix + ":"
+
+        if self.is_empty_element:
+            close = '/'
+        else:
+            closeTag = '</%s%s>' % (prefix, self.name)
 
         pretty_print = (indent_level is not None)
         if pretty_print:
@@ -1120,6 +1121,7 @@ class Tag(PageElement):
         callable that takes a string and returns whether or not the
         string matches for some custom definition of 'matches'. The
         same is true of the tag name."""
+
         generator = self.descendants
         if not recursive:
             generator = self.children

@@ -250,6 +250,11 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertEqual(
             'http://www.w3.org/2000/svg', soup.html['xmlns:svg'])
 
+    def test_closing_namespaced_tag(self):
+        markup = '<p xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:date>20010504</dc:date></p>'
+        soup = self.soup(markup)
+        self.assertEqual(unicode(soup.p), markup)
+
     def test_multivalued_attribute_value_becomes_list(self):
         markup = b'<a class="foo bar">'
         soup = self.soup(markup)
@@ -480,6 +485,10 @@ class XMLTreeBuilderSmokeTest(object):
         self.assertEqual("http://example.com/", root['xmlns:a'])
         self.assertEqual("http://example.net/", root['xmlns:b'])
 
+    def test_closing_namespaced_tag(self):
+        markup = '<p xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:date>20010504</dc:date></p>'
+        soup = self.soup(markup)
+        self.assertEqual(unicode(soup.p), markup)
 
 class HTML5TreeBuilderSmokeTest(HTMLTreeBuilderSmokeTest):
     """Smoke test for a tree builder that supports HTML5."""
