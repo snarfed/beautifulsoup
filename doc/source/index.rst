@@ -2685,14 +2685,18 @@ you're not using lxml as the underlying parser, my advice is to
 :ref:`start <parser-installation>`. Beautiful Soup parses documents
 significantly faster using lxml than using html.parser or html5lib.
 
+You can speed up encoding detection significantly by installing the
+`cchardet <http://pypi.python.org/pypi/cchardet/>`_ library.
+
 Sometimes `Unicode, Dammit`_ can only detect the encoding of a file by
 doing a byte-by-byte examination of the file. This slows Beautiful
 Soup to a crawl. My tests indicate that this only happened on 2.x
 versions of Python, and that it happened most often with documents
 using Russian or Chinese encodings. If this is happening to you, you
-can fix it by using Python 3 for your script. Or, if you happen to
-know a document's encoding, you can pass it into the
-``BeautifulSoup`` constructor as ``from_encoding``.
+can fix it by installing cchardet, or by using Python 3 for your
+script. If you happen to know a document's encoding, you can pass
+it into the ``BeautifulSoup`` constructor as ``from_encoding``, and
+bypass encoding detection altogether.
 
 `Parsing only part of a document`_ won't save you much time parsing
 the document, but it can save a lot of memory, and it'll make

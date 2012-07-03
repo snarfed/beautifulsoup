@@ -19,7 +19,7 @@ try:
     #  PyPI package: cchardet
     import cchardet
     def chardet_dammit(s):
-        return cchardet.detect(s).lower()
+        return cchardet.detect(s)
 except ImportError:
     try:
         # Fall back to the pure Python implementation
