@@ -138,12 +138,12 @@ class TestEncodingConversion(SoupTest):
 
     def setUp(self):
         super(TestEncodingConversion, self).setUp()
-        self.unicode_data = u"<html><head></head><body><foo>Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!</foo></body></html>"
+        self.unicode_data = u'<html><head><meta charset="utf-8"/></head><body><foo>Sacr\N{LATIN SMALL LETTER E WITH ACUTE} bleu!</foo></body></html>'
         self.utf8_data = self.unicode_data.encode("utf-8")
         # Just so you know what it looks like.
         self.assertEqual(
             self.utf8_data,
-            b"<html><head></head><body><foo>Sacr\xc3\xa9 bleu!</foo></body></html>")
+            b'<html><head><meta charset="utf-8"/></head><body><foo>Sacr\xc3\xa9 bleu!</foo></body></html>')
 
     def test_ascii_in_unicode_out(self):
         # ASCII input is converted to Unicode. The original_encoding
@@ -262,10 +262,12 @@ class TestUnicodeDammit(unittest.TestCase):
         doc = b"""\357\273\277<?xml version="1.0" encoding="UTF-8"?>
 <html><b>\330\250\330\252\330\261</b>
 <i>\310\322\321\220\312\321\355\344</i></html>"""
-        chardet = bs4.dammit.chardet
+        chardet = bs4.dammit.chardet_dammit
         logging.disable(logging.WARNING)
         try:
-            bs4.dammit.chardet = None
+            def noop(str):
+                return None
+            bs4.dammit.chardet_dammit = noop
             dammit = UnicodeDammit(doc)
             self.assertEqual(True, dammit.contains_replacement_characters)
             self.assertTrue(u"\ufffd" in dammit.unicode_markup)
@@ -274,7 +276,7 @@ class TestUnicodeDammit(unittest.TestCase):
             self.assertTrue(soup.contains_replacement_characters)
         finally:
             logging.disable(logging.NOTSET)
-            bs4.dammit.chardet = chardet
+            bs4.dammit.chardet_dammit = chardet
 
     def test_sniffed_xml_encoding(self):
         # A document written in UTF-16LE will be converted by a different
