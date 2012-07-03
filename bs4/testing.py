@@ -250,11 +250,6 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertEqual(
             'http://www.w3.org/2000/svg', soup.html['xmlns:svg'])
 
-    def test_closing_namespaced_tag(self):
-        markup = '<p xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:date>20010504</dc:date></p>'
-        soup = self.soup(markup)
-        self.assertEqual(unicode(soup.p), markup)
-
     def test_multivalued_attribute_value_becomes_list(self):
         markup = b'<a class="foo bar">'
         soup = self.soup(markup)
@@ -458,6 +453,11 @@ class XMLTreeBuilderSmokeTest(object):
         self.assertEqual(
             soup.encode("utf-8"), markup)
 
+    def test_popping_namespaced_tag(self):
+        markup = '<rss xmlns:dc="foo"><dc:creator>b</dc:creator><dc:date>2012-07-02T20:33:42Z</dc:date><dc:rights>c</dc:rights><image>d</image></rss>'
+        soup = self.soup(markup)
+        self.assertEqual(
+            unicode(soup.rss), markup)
 
     def test_docstring_includes_correct_encoding(self):
         soup = self.soup("<root/>")
