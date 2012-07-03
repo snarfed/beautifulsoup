@@ -820,7 +820,7 @@ class Tag(PageElement):
         for string in self._all_strings(True):
             yield string
 
-    def get_text(self, separator="", strip=False):
+    def get_text(self, separator=u"", strip=False):
         """
         Get all child strings, concatenated using the given separator.
         """
