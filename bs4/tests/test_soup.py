@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests of Beautiful Soup as a whole."""
 
+import logging
 import unittest
 from bs4 import (
     BeautifulSoup,
@@ -262,20 +263,17 @@ class TestUnicodeDammit(unittest.TestCase):
 <html><b>\330\250\330\252\330\261</b>
 <i>\310\322\321\220\312\321\355\344</i></html>"""
         chardet = bs4.dammit.chardet
+        logging.disable(logging.WARNING)
         try:
             bs4.dammit.chardet = None
-            with warnings.catch_warnings(record=True) as w:
-                dammit = UnicodeDammit(doc)
-                self.assertEqual(True, dammit.contains_replacement_characters)
-                self.assertTrue(u"\ufffd" in dammit.unicode_markup)
+            dammit = UnicodeDammit(doc)
+            self.assertEqual(True, dammit.contains_replacement_characters)
+            self.assertTrue(u"\ufffd" in dammit.unicode_markup)
 
-                soup = BeautifulSoup(doc, "html.parser")
-                self.assertTrue(soup.contains_replacement_characters)
-
-                msg = w[0].message
-                self.assertTrue(isinstance(msg, UnicodeWarning))
-                self.assertTrue("Some characters could not be decoded" in str(msg))
+            soup = BeautifulSoup(doc, "html.parser")
+            self.assertTrue(soup.contains_replacement_characters)
         finally:
+            logging.disable(logging.NOTSET)
             bs4.dammit.chardet = chardet
 
     def test_sniffed_xml_encoding(self):

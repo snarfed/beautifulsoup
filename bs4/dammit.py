@@ -10,7 +10,7 @@ encoding; that's the tree builder's job.
 import codecs
 from htmlentitydefs import codepoint2name
 import re
-import warnings
+import logging
 
 # Autodetects character encodings. Very useful.
 # Download from http://chardet.feedparser.org/
@@ -226,10 +226,9 @@ class UnicodeDammit:
                 if proposed_encoding != "ascii":
                     u = self._convert_from(proposed_encoding, "replace")
                 if u is not None:
-                    warnings.warn(
-                        UnicodeWarning(
+                    logging.warning(
                             "Some characters could not be decoded, and were "
-                            "replaced with REPLACEMENT CHARACTER."))
+                            "replaced with REPLACEMENT CHARACTER.")
                     self.contains_replacement_characters = True
                     break
 

@@ -1,3 +1,9 @@
+= 4.1.2 (Unreleased) =
+
+* Use logging.warning() instead of warning.warn() to notify the user
+  that characters were replaced with REPLACEMENT
+  CHARACTER. [bug=1013862]
+
 = 4.1.1 (20120703) =
 
 * Fixed an html5lib tree builder crash which happened when html5lib
