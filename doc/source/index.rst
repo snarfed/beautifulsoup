@@ -1304,7 +1304,7 @@ Here are some examples::
  # [u"The Dormouse's story", u"The Dormouse's story", u'Elsie', u'Lacie', u'Tillie', u'...']
 
 Although ``text`` is for finding strings, you can combine it with
-arguments for finding tags, Beautiful Soup will find all tags whose
+arguments that find tags: Beautiful Soup will find all tags whose
 ``.string`` matches your value for ``text``. This code finds the <a>
 tags whose ``.string`` is "Elsie"::
 
