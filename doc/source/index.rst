@@ -1942,11 +1942,12 @@ that was replaced.
 Output
 ======
 
+.. _.prettyprinting:
 Pretty-printing
 ---------------
 
 The ``prettify()`` method will turn a Beautiful Soup parse tree into a
-nicely formatted bytestring, with each HTML/XML tag on its own line::
+nicely formatted Unicode string, with each HTML/XML tag on its own line::
 
   markup = '<a href="http://example.com/">I linked to <i>example.com</i></a>'
   soup = BeautifulSoup(markup)
@@ -2620,6 +2621,8 @@ Version mismatch problems
 * ``ImportError: No module named bs4`` - Caused by running Beautiful
   Soup 4 code on a system that doesn't have BS4 installed.
 
+.. _parsing-xml:
+
 Parsing XML
 -----------
 
@@ -2654,6 +2657,14 @@ Other parser problems
   skips tags it doesn't understand. Solution: :ref:`Install lxml or
   html5lib. <parser-installation>`
 
+* Because `HTML tags and attributes are case-insensitive
+  <http://www.w3.org/TR/html5/syntax.html#syntax>`_, all three HTML
+  parsers convert tag and attribute names to lowercase. That is, the
+  markup <TAG></TAG> is converted to <tag></tag>. If you want to
+  preserve mixed-case or uppercase tags and attributes, you'll need to
+  :ref:`parse the document as XML. <parsing-xml>`
+
+
 Miscellaneous
 -------------
 
@@ -2665,11 +2676,15 @@ Miscellaneous
 
 * ``UnicodeEncodeError: 'charmap' codec can't encode character
   u'\xfoo' in position bar`` (or just about any other
-  ``UnicodeEncodeError``) - This is not a problem with Beautiful Soup:
-  you're trying to print a Unicode character that your console doesn't
-  know how to display. See `this page on the Python wiki
-  <http://wiki.python.org/moin/PrintFails>`_ for help. One easy
-  solution is to write the text to a file and then look at the file.
+  ``UnicodeEncodeError``) - This is not a problem with Beautiful Soup.
+  This problem show up in two main situations. First, when you try to
+  print a Unicode character that your console doesn't know how to
+  display. (See `this page on the Python wiki
+  <http://wiki.python.org/moin/PrintFails>`_ for help.) Second, when
+  you're writing to a file and you pass in a Unicode character that's
+  not supported by your default encoding.  In this case, the simplest
+  solution is to explicitly encode the Unicode string into UTF-8 with
+  ``u.encode("utf8")``.
 
 Improving Performance
 ---------------------
@@ -2878,10 +2893,13 @@ overlapping ways of dealing with entities, which have been
 removed. The ``BeautifulSoup`` constructor no longer recognizes the
 ``smartQuotesTo`` or ``convertEntities`` arguments. (`Unicode,
 Dammit`_ still has ``smart_quotes_to``, but its default is now to turn
-smart quotes into Unicode.)
+smart quotes into Unicode.) The constants ``HTML_ENTITIES``,
+``XML_ENTITIES``, and ``XHTML_ENTITIES`` have been removed, since they
+configure a feature (transforming some but not all entities into
+Unicode characters) that no longer exists.
 
-If you want to turn those Unicode characters back into HTML entities
-on output, rather than turning them into UTF-8 characters, you need to
+If you want to turn Unicode characters back into HTML entities on
+output, rather than turning them into UTF-8 characters, you need to
 use an :ref:`output formatter <output_formatters>`.
 
 Miscellaneous
@@ -2911,3 +2929,5 @@ The rarely-used alternate parser classes like
 ``ICantBelieveItsBeautifulSoup`` and ``BeautifulSOAP`` have been
 removed. It's now the parser's decision how to handle ambiguous
 markup.
+
+The ``prettify()`` method now returns a Unicode string, not a bytestring.
