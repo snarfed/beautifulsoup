@@ -1,5 +1,8 @@
 = 4.1.2 (Unreleased) =
 
+* Use namespace prefixes for namespaced attribute names, instead of
+  the fully-qualified names given by the lxml parser. [bug=1037597]
+
 * When sniffing encodings, if the cchardet library is installed, use
   it instead of chardet. It's much faster. [bug=1020748]
 

@@ -490,6 +490,11 @@ class XMLTreeBuilderSmokeTest(object):
         soup = self.soup(markup)
         self.assertEqual(unicode(soup.p), markup)
 
+    def test_namespaced_attributes(self):
+        markup = '<foo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><bar xsi:schemaLocation="http://www.example.com"/></foo>'
+        soup = self.soup(markup)
+        self.assertEqual(unicode(soup.foo), markup)
+
 class HTML5TreeBuilderSmokeTest(HTMLTreeBuilderSmokeTest):
     """Smoke test for a tree builder that supports HTML5."""
 
