@@ -20,9 +20,11 @@ The examples in this documentation should work the same way in Python
 2.7 and Python 3.2.
 
 You might be looking for the documentation for `Beautiful Soup 3
-<http://www.crummy.com/software/BeautifulSoup/bs3/documentation.html>`_. If
-you want to learn about the differences between Beautiful Soup 3 and
-Beautiful Soup 4, see `Porting code to BS4`_.
+<http://www.crummy.com/software/BeautifulSoup/bs3/documentation.html>`_.
+If so, you should know that Beautiful Soup 3 is no longer being
+developed, and that Beautiful Soup 4 is recommended for all new
+projects. If you want to learn about the differences between Beautiful
+Soup 3 and Beautiful Soup 4, see `Porting code to BS4`_.
 
 Getting help
 ------------
@@ -1217,45 +1219,27 @@ keyword argument::
 Searching by CSS class
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Instead of using keyword arguments, you can filter tags based on their
-attributes by passing a dictionary in for ``attrs``. These two lines of
-code are equivalent::
+It's very useful to search for a tag that has a certain CSS class, but
+the name of the CSS attribute, "class", is a reserved word in
+Python. Using ``class`` as a keyword argument will give you a syntax
+error. As of Beautiful Soup 4.1.2, you can search by CSS class using
+the keyword argument ``class_``::
 
- soup.find_all(href=re.compile("elsie"), id='link1')
- soup.find_all(attrs={'href' : re.compile("elsie"), 'id': 'link1'})
-
-The ``attrs`` argument would be a pretty obscure feature were it not for
-one thing: CSS. It's very useful to search for a tag that has a
-certain CSS class, but the name of the CSS attribute, "class", is also a
-Python reserved word.
-
-You can use ``attrs`` to search by CSS class::
-
- soup.find_all("a", { "class" : "sister" })
+ soup.find_all("a", class_="sister")
  # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
  #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
  #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
 
-But that's a lot of code for such a common operation. Instead, you can
-pass a string `attrs` instead of a dictionary. The string will be used
-to restrict the CSS class::
+As with any keyword argument, you can pass ``class_`` a string, a regular
+expression, a function, or ``True``::
 
- soup.find_all("a", "sister")
- # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
- #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
- #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
-
-You can also pass in a regular expression, a function or
-True. Anything you pass in for ``attrs`` that's not a dictionary will
-be used to search against the CSS class::
-
- soup.find_all(attrs=re.compile("itl"))
+ soup.find_all(class_=re.compile("itl"))
  # [<p class="title"><b>The Dormouse's story</b></p>]
 
  def has_six_characters(css_class):
      return css_class is not None and len(css_class) == 6
 
- soup.find_all(attrs=has_six_characters)
+ soup.find_all(class_=has_six_characters)
  # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
  #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
  #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
@@ -1266,16 +1250,46 @@ matches a certain CSS class, you're matching against `any` of its CSS
 classes::
 
  css_soup = BeautifulSoup('<p class="body strikeout"></p>')
- css_soup.find_all("p", "strikeout")
+ css_soup.find_all("p", class_="strikeout")
  # [<p class="body strikeout"></p>]
 
- css_soup.find_all("p", "body")
+ css_soup.find_all("p", class_="body")
  # [<p class="body strikeout"></p>]
 
-Searching for the string value of the ``class`` attribute won't work::
+You can also search for the exact string value of the ``class`` attribute:
 
- css_soup.find_all("p", "body strikeout")
+ css_soup.find_all("p", class_="body strikeout")
+ # [<p class="body strikeout"></p>]
+
+But searching for variants of the string value won't work::
+
+ css_soup.find_all("p", class_="strikeout body")
  # []
+
+There's a shortcut for ``class_`` present in all versions of Beautiful
+Soup.  The second argument to any ``find()``-type method is called
+``attrs``, and passing in a string for ``attrs`` will search for that
+string as a CSS class::
+
+ soup.find_all("a", "sister")
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+You can also pass in a regular expression, a function or
+True&mdash;anything except a dictionary. Whatever you pass in will be
+used to search against the CSS class, the same as if you'd passed it
+in for the ``class_`` keyword argument::
+
+By passing in a dictionary to ``attrs``, you can search many HTML
+attributes at once, not just the CSS class. These two lines of code
+are equivalent::
+
+ soup.find_all(href=re.compile("elsie"), id='link1')
+ soup.find_all(attrs={'href' : re.compile("elsie"), 'id': 'link1'})
+
+This isn't a very useful feature, since it's usually easier
+to use the keyword arguments.
 
 .. _text:
 

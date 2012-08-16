@@ -228,18 +228,24 @@ class TestFindAllByAttribute(TreeTest):
         self.assertSelects(tree.find_all(attrs={'name' : 'name1'}),
                            ["Name match."])
 
-        # Passing class='class2' would cause a syntax error.
         self.assertSelects(tree.find_all(attrs={'class' : 'class2'}),
                            ["Class match."])
 
     def test_find_all_by_class(self):
-        # Passing in a string to 'attrs' will search the CSS class.
         tree = self.soup("""
                          <a class="1">Class 1.</a>
                          <a class="2">Class 2.</a>
                          <b class="1">Class 1.</b>
                          <c class="3 4">Class 3 and 4.</c>
                          """)
+
+        # Passing in the class_ keyword argument will search against
+        # the 'class' attribute.
+        self.assertSelects(tree.find_all('a', class_='1'), ['Class 1.'])
+        self.assertSelects(tree.find_all('c', class_='3'), ['Class 3 and 4.'])
+        self.assertSelects(tree.find_all('c', class_='4'), ['Class 3 and 4.'])
+
+        # Passing in a string to 'attrs' will also search the CSS class.
         self.assertSelects(tree.find_all('a', '1'), ['Class 1.'])
         self.assertSelects(tree.find_all(attrs='1'), ['Class 1.', 'Class 1.'])
         self.assertSelects(tree.find_all('c', '3'), ['Class 3 and 4.'])
@@ -248,17 +254,15 @@ class TestFindAllByAttribute(TreeTest):
     def test_find_by_class_when_multiple_classes_present(self):
         tree = self.soup("<gar class='foo bar'>Found it</gar>")
 
-        attrs = { 'class' : re.compile("o") }
-        f = tree.find_all("gar", attrs=attrs)
+        f = tree.find_all("gar", class_=re.compile("o"))
         self.assertSelects(f, ["Found it"])
 
-        f = tree.find_all("gar", re.compile("a"))
+        f = tree.find_all("gar", class_=re.compile("a"))
         self.assertSelects(f, ["Found it"])
 
         # Since the class is not the string "foo bar", but the two
         # strings "foo" and "bar", this will not find anything.
-        attrs = { 'class' : re.compile("o b") }
-        f = tree.find_all("gar", attrs=attrs)
+        f = tree.find_all("gar", class_=re.compile("o b"))
         self.assertSelects(f, [])
 
     def test_find_all_with_non_dictionary_for_attrs_finds_by_class(self):
@@ -283,8 +287,9 @@ class TestFindAllByAttribute(TreeTest):
         self.assertEqual([a, a2], soup.find_all("a", "foo"))
         self.assertEqual([a], soup.find_all("a", "bar"))
 
-        # If you specify the attribute as a string that contains a
+        # If you specify the class as a string that contains a
         # space, only that specific value will be found.
+        self.assertEqual([a], soup.find_all("a", class_="foo bar"))
         self.assertEqual([a], soup.find_all("a", "foo bar"))
         self.assertEqual([], soup.find_all("a", "bar foo"))
 

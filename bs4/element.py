@@ -1170,6 +1170,12 @@ class SoupStrainer(object):
             kwargs['class'] = attrs
             attrs = None
 
+        if 'class_' in kwargs:
+            # Treat class_="foo" as a search for the 'class'
+            # attribute, overriding any non-dict value for attrs.
+            kwargs['class'] = kwargs['class_']
+            del kwargs['class_']
+
         if kwargs:
             if attrs:
                 attrs = attrs.copy()

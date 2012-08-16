@@ -1,10 +1,14 @@
 = 4.1.2 (Unreleased) =
 
+* As per PEP-8, allow searching by CSS class using the 'class_'
+  keyword argument. [bug=1037624]
+
 * Use namespace prefixes for namespaced attribute names, instead of
   the fully-qualified names given by the lxml parser. [bug=1037597]
 
-* When sniffing encodings, if the cchardet library is installed, use
-  it instead of chardet. It's much faster. [bug=1020748]
+* When sniffing encodings, if the cchardet library is installed,
+  Beautiful Soup uses ccharder instead of chardet. cchardet is much
+  faster. [bug=1020748]
 
 * Use logging.warning() instead of warning.warn() to notify the user
   that characters were replaced with REPLACEMENT
