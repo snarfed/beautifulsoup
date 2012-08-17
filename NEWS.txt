@@ -3,8 +3,11 @@
 * As per PEP-8, allow searching by CSS class using the 'class_'
   keyword argument. [bug=1037624]
 
-* Use namespace prefixes for namespaced attribute names, instead of
+* Display namespace prefixes for namespaced attribute names, instead of
   the fully-qualified names given by the lxml parser. [bug=1037597]
+
+* Fixed a crash on encoding when an attribute name contained
+  non-ASCII characters.
 
 * When sniffing encodings, if the cchardet library is installed,
   Beautiful Soup uses cchardet instead of chardet. cchardet is much
