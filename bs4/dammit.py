@@ -19,17 +19,17 @@ try:
     #  PyPI package: cchardet
     import cchardet
     def chardet_dammit(s):
-        return cchardet.detect(s)
+        return cchardet.detect(s)['encoding']
 except ImportError:
     try:
         # Fall back to the pure Python implementation
         #  Debian package: python-chardet
         #  PyPI package: chardet
         import chardet
-        #import chardet.constants
-        #chardet.constants._debug = 1
         def chardet_dammit(s):
             return chardet.detect(s)['encoding']
+        #import chardet.constants
+        #chardet.constants._debug = 1
     except ImportError:
         # No chardet available.
         def chardet_dammit(s):
