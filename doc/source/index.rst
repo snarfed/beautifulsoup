@@ -1281,6 +1281,9 @@ True&mdash;anything except a dictionary. Whatever you pass in will be
 used to search against the CSS class, the same as if you'd passed it
 in for the ``class_`` keyword argument::
 
+ soup.find_all("p", re.compile("itl"))
+ # [<p class="title"><b>The Dormouse's story</b></p>]
+
 By passing in a dictionary to ``attrs``, you can search many HTML
 attributes at once, not just the CSS class. These two lines of code
 are equivalent::
@@ -1957,6 +1960,7 @@ Output
 ======
 
 .. _.prettyprinting:
+
 Pretty-printing
 ---------------
 
