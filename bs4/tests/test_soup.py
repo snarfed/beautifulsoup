@@ -177,7 +177,7 @@ class TestEncodingConversion(SoupTest):
 
     def test_attribute_name_containing_unicode_characters(self):
         markup = u'<div><a \N{SNOWMAN}="snowman"></a></div>'
-        self.assertEquals(self.soup(markup).div.encode("utf8"), markup.encode("utf8"))
+        self.assertEqual(self.soup(markup).div.encode("utf8"), markup.encode("utf8"))
 
 class TestUnicodeDammit(unittest.TestCase):
     """Standalone tests of Unicode, Dammit."""
