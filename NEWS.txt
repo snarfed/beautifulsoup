@@ -1,4 +1,4 @@
-= 4.1.2 (Unreleased) =
+= 4.1.2 (20120817) =
 
 * As per PEP-8, allow searching by CSS class using the 'class_'
   keyword argument. [bug=1037624]
@@ -7,7 +7,7 @@
   the fully-qualified names given by the lxml parser. [bug=1037597]
 
 * When sniffing encodings, if the cchardet library is installed,
-  Beautiful Soup uses ccharder instead of chardet. cchardet is much
+  Beautiful Soup uses cchardet instead of chardet. cchardet is much
   faster. [bug=1020748]
 
 * Use logging.warning() instead of warning.warn() to notify the user

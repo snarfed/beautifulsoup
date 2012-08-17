@@ -2691,7 +2691,7 @@ Miscellaneous
 * ``UnicodeEncodeError: 'charmap' codec can't encode character
   u'\xfoo' in position bar`` (or just about any other
   ``UnicodeEncodeError``) - This is not a problem with Beautiful Soup.
-  This problem show up in two main situations. First, when you try to
+  This problem shows up in two main situations. First, when you try to
   print a Unicode character that your console doesn't know how to
   display. (See `this page on the Python wiki
   <http://wiki.python.org/moin/PrintFails>`_ for help.) Second, when
