@@ -28,7 +28,8 @@ try:
 except ImportError, e:
     LXML_PRESENT = False
 
-PRE_2_7 = (sys.version_info < (2,7))
+PYTHON_2_PRE_2_7 = (sys.version_info < (2,7))
+PYTHON_3_PRE_3_2 = (sys.version_info[0] == 3 and sys.version_info < (3,2))
 
 class TestDeprecatedConstructorArguments(SoupTest):
 
@@ -179,8 +180,8 @@ class TestEncodingConversion(SoupTest):
         self.assertEqual(soup_from_unicode.encode('utf-8'), self.utf8_data)
 
     @skipIf(
-        PRE_2_7,
-        "HTMLParser is pre-2.7; skipping test of non-ASCII characters in attribute name.")
+        PYTHON_2_PRE_2_7 or PYTHON_3_PRE_3_2,
+        "Bad HTMLParser detected; skipping test of non-ASCII characters in attribute name.")
     def test_attribute_name_containing_unicode_characters(self):
         markup = u'<div><a \N{SNOWMAN}="snowman"></a></div>'
         self.assertEqual(self.soup(markup).div.encode("utf8"), markup.encode("utf8"))

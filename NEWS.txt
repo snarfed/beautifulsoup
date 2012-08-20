@@ -1,6 +1,8 @@
 = 4.1.3 (20120820) =
 
-* Skipped a test under Python 2.6 to avoid a spurious test failure. [bug=1038503]
+* Skipped a test under Python 2.6 and Python 3.1 to avoid a spurious
+  test failure caused by the lousy HTMLParser in those
+  versions. [bug=1038503]
 
 * Raise a more specific error (FeatureNotFound) when a requested
   parser or parser feature is not installed. Raise NotImplementedError
