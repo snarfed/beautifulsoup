@@ -1,3 +1,9 @@
+= 4.1.3 (20120820) =
+
+* Skipped a test under Python 2.6 to avoid a spurious test failure. [bug=1038503]
+
+* 
+
 = 4.1.2 (20120817) =
 
 * As per PEP-8, allow searching by CSS class using the 'class_'
@@ -10,7 +16,7 @@
   non-ASCII characters.
 
 * When sniffing encodings, if the cchardet library is installed,
-  Beautiful Soup uses cchardet instead of chardet. cchardet is much
+  Beautiful Soup uses it instead of chardet. cchardet is much
   faster. [bug=1020748]
 
 * Use logging.warning() instead of warning.warn() to notify the user

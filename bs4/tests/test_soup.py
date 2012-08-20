@@ -3,6 +3,7 @@
 
 import logging
 import unittest
+import sys
 from bs4 import (
     BeautifulSoup,
     BeautifulStoneSoup,
@@ -26,6 +27,8 @@ try:
     LXML_PRESENT = True
 except ImportError, e:
     LXML_PRESENT = False
+
+PRE_2_7 = (sys.version_info < (2,7))
 
 class TestDeprecatedConstructorArguments(SoupTest):
 
@@ -175,6 +178,9 @@ class TestEncodingConversion(SoupTest):
         soup_from_unicode = self.soup(self.unicode_data)
         self.assertEqual(soup_from_unicode.encode('utf-8'), self.utf8_data)
 
+    @skipIf(
+        PRE_2_7,
+        "HTMLParser is pre-2.7; skipping test of non-ASCII characters in attribute name.")
     def test_attribute_name_containing_unicode_characters(self):
         markup = u'<div><a \N{SNOWMAN}="snowman"></a></div>'
         self.assertEqual(self.soup(markup).div.encode("utf8"), markup.encode("utf8"))
