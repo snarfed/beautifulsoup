@@ -2,7 +2,11 @@
 
 * Skipped a test under Python 2.6 to avoid a spurious test failure. [bug=1038503]
 
-* 
+* Raise a more specific error (FeatureNotFound) when a requested
+  parser or parser feature is not installed. Raise NotImplementedError
+  instead of ValueError when the user calls insert_before() or
+  insert_after() on the BeautifulSoup object itself. Patch by Aaron
+  Devore. [bug=1038301]
 
 = 4.1.2 (20120817) =
 
