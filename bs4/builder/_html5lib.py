@@ -72,22 +72,6 @@ class TreeBuilderForHtml5lib(html5lib.treebuilders._base.TreeBuilder):
         doctype = Doctype.for_name_and_ids(name, publicId, systemId)
         self.soup.object_was_parsed(doctype)
 
-    def insertComment(self, token, parent=None):
-        comment = Comment(token['data'])
-        parent = parent or self.soup
-        # We can't rely on self.soup.previousElement, because this
-        # comment may have been parsed a long time ago and inserted.
-        if parent is None:
-            parent = self.soup.currentTag
-        else:
-            parent = parent.element
-        if len(parent.contents) > 0:
-            previous_element = parent.contents[-1]
-        else:
-            previous_element = parent
-
-        self.soup.object_was_parsed(comment, parent, previous_element)
-
     def elementClass(self, name, namespace):
         tag = self.soup.new_tag(name, namespace)
         return Element(tag, self.soup, namespace)
@@ -148,8 +132,7 @@ class Element(html5lib.treebuilders._base.Node):
             new_element = self.soup.new_string(old_element + node.element)
             old_element.replace_with(new_element)
         else:
-            self.element.append(node.element)
-            node.parent = self
+            self.soup.object_was_parsed(node.element, parent=self.element)
 
     def getAttributes(self):
         return AttrList(self.element)
