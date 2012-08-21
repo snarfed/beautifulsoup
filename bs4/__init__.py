@@ -245,13 +245,15 @@ class BeautifulSoup(Tag):
             o = containerClass(currentData)
             self.object_was_parsed(o)
 
-    def object_was_parsed(self, o):
+    def object_was_parsed(self, o, parent=None, previous_element=None):
         """Add an object to the parse tree."""
-        o.setup(self.currentTag, self.previous_element)
+        parent = parent or self.currentTag
+        previous_element = previous_element or self.previous_element
+        o.setup(parent, previous_element)
         if self.previous_element:
             self.previous_element.next_element = o
         self.previous_element = o
-        self.currentTag.contents.append(o)
+        parent.contents.append(o)
 
     def _popToTag(self, name, nsprefix=None, inclusivePop=True):
         """Pops the tag stack up to and including the most recent

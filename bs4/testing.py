@@ -159,6 +159,12 @@ class HTMLTreeBuilderSmokeTest(object):
         comment = soup.find(text="foobar")
         self.assertEqual(comment.__class__, Comment)
 
+        # The comment is properly integrated into the tree.
+        foo = soup.find(text="foo")
+        self.assertEqual(comment, foo.next_element)
+        baz = soup.find(text="baz")
+        self.assertEquals(comment, baz.previous_element)
+
     def test_preserved_whitespace_in_pre_and_textarea(self):
         """Whitespace must be preserved in <pre> and <textarea> tags."""
         self.assertSoupEquals("<pre>   </pre>")
@@ -523,6 +529,12 @@ class HTML5TreeBuilderSmokeTest(HTMLTreeBuilderSmokeTest):
         self.assertEqual(namespace, soup.math.namespace)
         self.assertEqual(namespace, soup.msqrt.namespace)
 
+    def test_xml_declaration_becomes_comment(self):
+        markup = '<?xml version="1.0" encoding="utf-8"?><html></html>'
+        soup = self.soup(markup)
+        self.assertTrue(isinstance(soup.contents[0], Comment))
+        self.assertEqual(soup.contents[0], '?xml version="1.0" encoding="utf-8"?')
+        self.assertEqual("html", soup.contents[0].next_element.name)
 
 def skipIf(condition, reason):
    def nothing(test, *args, **kwargs):
