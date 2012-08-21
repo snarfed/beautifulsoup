@@ -1,3 +1,8 @@
+= 4.1.4 (Unreleased) =
+
+* Fix a bug in the html5lib treebuilder which sometimes created
+  disconnected trees. [bug=1039527]
+
 = 4.1.3 (20120820) =
 
 * Skipped a test under Python 2.6 and Python 3.1 to avoid a spurious
