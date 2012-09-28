@@ -90,7 +90,6 @@ class LXMLTreeBuilderForXML(TreeBuilder):
     def start(self, name, attrs, nsmap={}):
         # Make sure attrs is a mutable dict--lxml may send an immutable dictproxy.
         attrs = dict(attrs)
-
         nsprefix = None
         # Invert each namespace map as it comes in.
         if len(nsmap) == 0 and self.nsmaps != None:

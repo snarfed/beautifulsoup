@@ -156,7 +156,7 @@ Installing Beautiful Soup
 If you're using a recent version of Debian or Ubuntu Linux, you can
 install Beautiful Soup with the system package manager:
 
-:kbd:`$ apt-get install python-beautifulsoup4`
+:kbd:`$ apt-get install python-bs4`
 
 Beautiful Soup 4 is published through PyPi, so if you can't install it
 with the system packager, you can install it with ``easy_install`` or
@@ -1256,7 +1256,7 @@ classes::
  css_soup.find_all("p", class_="body")
  # [<p class="body strikeout"></p>]
 
-You can also search for the exact string value of the ``class`` attribute:
+You can also search for the exact string value of the ``class`` attribute::
 
  css_soup.find_all("p", class_="body strikeout")
  # [<p class="body strikeout"></p>]
@@ -1277,7 +1277,7 @@ string as a CSS class::
  #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
 
 You can also pass in a regular expression, a function or
-True&mdash;anything except a dictionary. Whatever you pass in will be
+True--anything except a dictionary. Whatever you pass in will be
 used to search against the CSS class, the same as if you'd passed it
 in for the ``class_`` keyword argument::
 
