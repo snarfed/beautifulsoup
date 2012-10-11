@@ -26,6 +26,9 @@ class NamespacedAttribute(unicode):
     def __new__(cls, prefix, name, namespace=None):
         if name is None:
             obj = unicode.__new__(cls, prefix)
+        elif prefix is None:
+            # Not really namespaced.
+            obj = unicode.__new__(cls, name)
         else:
             obj = unicode.__new__(cls, prefix + ":" + name)
         obj.prefix = prefix
