@@ -264,7 +264,7 @@ This table summarizes the advantages and disadvantages of each parser library:
 |                      | ``BeautifulSoup(markup, "xml")``           | * The only currently supported |                          |
 |                      |                                            |   XML parser                   |                          |
 +----------------------+--------------------------------------------+--------------------------------+--------------------------+
-| html5lib             | ``BeautifulSoup(markup, html5lib)``        | * Extremely lenient            | * Very slow              |
+| html5lib             | ``BeautifulSoup(markup, "html5lib")``        | * Extremely lenient            | * Very slow              |
 |                      |                                            | * Parses pages the same way a  | * External Python        |
 |                      |                                            |   web browser does             |   dependency             |
 |                      |                                            | * Creates valid HTML5          | * Python 2 only          |
@@ -2146,7 +2146,7 @@ One last caveat: if you create a ``CData`` object, the text inside
 that object is always presented `exactly as it appears, with no
 formatting`. Beautiful Soup will call the formatter method, just in
 case you've written a custom method that counts all the strings in the
-document or something, but it will ignore the return value.
+document or something, but it will ignore the return value::
 
  from bs4.element import CData
  soup = BeautifulSoup("<a></a>")

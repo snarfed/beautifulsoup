@@ -273,7 +273,6 @@ class UnicodeDammit:
             return None
         self.tried_encodings.append((proposed, errors))
         markup = self.markup
-
         # Convert smart quotes to HTML if coming from an encoding
         # that might have them.
         if (self.smart_quotes_to is not None
