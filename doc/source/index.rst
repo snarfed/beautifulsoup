@@ -264,7 +264,7 @@ This table summarizes the advantages and disadvantages of each parser library:
 |                      | ``BeautifulSoup(markup, "xml")``           | * The only currently supported |                          |
 |                      |                                            |   XML parser                   |                          |
 +----------------------+--------------------------------------------+--------------------------------+--------------------------+
-| html5lib             | ``BeautifulSoup(markup, "html5lib")``        | * Extremely lenient            | * Very slow              |
+| html5lib             | ``BeautifulSoup(markup, "html5lib")``      | * Extremely lenient            | * Very slow              |
 |                      |                                            | * Parses pages the same way a  | * External Python        |
 |                      |                                            |   web browser does             |   dependency             |
 |                      |                                            | * Creates valid HTML5          | * Python 2 only          |
