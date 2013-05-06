@@ -24,13 +24,17 @@ def diagnose(data):
 
     for parser in basic_parsers:
         print "Trying to parse your data with %s" % parser
+        success = False
         try:
             soup = BeautifulSoup(data, parser)
-            print "Here's what %s did with the document:" % parser
-            print soup.prettify()
+            success = True
         except Exception, e:
             print "%s could not parse the document." % parser
             traceback.print_exc()
+        if success:
+            print "Here's what %s did with the document:" % parser
+            print soup.prettify()
+
         print "-" * 80
 
 def lxml_trace(data, html=True):

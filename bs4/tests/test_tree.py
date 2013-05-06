@@ -1310,6 +1310,24 @@ class TestSubstitutions(SoupTest):
         expect_upper = u'<a href="HTTP://A.COM?A=B&C=É">E</a>'
         self.assertEqual(expect_upper, a.decode(formatter=lambda x: x.upper()))
 
+    def test_formatter_skips_script_tag_for_html_documents(self):
+        doc = """
+  <script type="text/javascript">
+   console.log("< < hey > > ");
+  </script>
+"""
+        encoded = BeautifulSoup(doc).encode()
+        self.assertTrue("< < hey > >" in encoded)
+
+    def test_formatter_processes_script_tag_for_xml_documents(self):
+        doc = """
+  <script type="text/javascript">
+   console.log("< < hey > > ");
+  </script>
+"""
+        encoded = BeautifulSoup(doc).encode()
+        self.assertTrue("&lt; &lt; hey &gt; &gt;" in encoded)
+
     def test_prettify_accepts_formatter(self):
         soup = BeautifulSoup("<html><body>foo</body></html>")
         pretty = soup.prettify(formatter = lambda x: x.upper())

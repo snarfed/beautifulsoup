@@ -163,7 +163,7 @@ class HTMLTreeBuilderSmokeTest(object):
         foo = soup.find(text="foo")
         self.assertEqual(comment, foo.next_element)
         baz = soup.find(text="baz")
-        self.assertEquals(comment, baz.previous_element)
+        self.assertEqual(comment, baz.previous_element)
 
     def test_preserved_whitespace_in_pre_and_textarea(self):
         """Whitespace must be preserved in <pre> and <textarea> tags."""
