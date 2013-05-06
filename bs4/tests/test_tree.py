@@ -1317,16 +1317,28 @@ class TestSubstitutions(SoupTest):
   </script>
 """
         encoded = BeautifulSoup(doc).encode()
-        self.assertTrue("< < hey > >" in encoded)
+        self.assertTrue(b"< < hey > >" in encoded)
+
+    def test_formatter_skips_style_tag_for_html_documents(self):
+        doc = """
+  <style type="text/css">
+   console.log("< < hey > > ");
+  </style>
+"""
+        encoded = BeautifulSoup(doc).encode()
+        self.assertTrue(b"< < hey > >" in encoded)
 
     def test_formatter_processes_script_tag_for_xml_documents(self):
         doc = """
   <script type="text/javascript">
-   console.log("< < hey > > ");
   </script>
 """
-        encoded = BeautifulSoup(doc).encode()
-        self.assertTrue("&lt; &lt; hey &gt; &gt;" in encoded)
+        soup = BeautifulSoup(doc, "xml")
+        # lxml would have stripped this while parsing, but we can add
+        # it later.
+        soup.script.string = 'console.log("< < hey > > ");'
+        encoded = soup.encode()
+        self.assertTrue(b"&lt; &lt; hey &gt; &gt;" in encoded)
 
     def test_prettify_accepts_formatter(self):
         soup = BeautifulSoup("<html><body>foo</body></html>")

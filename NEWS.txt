@@ -1,4 +1,8 @@
-= 4.1.4 (Unreleased) =
+= 4.2.0 (Unreleased) =
+
+* In an HTML document, the contents of a <script> or <style> tag will
+  no longer undergo entity substitution by default. XML documents work
+  the same way they did before. [bug=1085953]
 
 * Fix a bug in the html5lib treebuilder which sometimes created
   disconnected trees. [bug=1039527]

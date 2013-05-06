@@ -81,6 +81,38 @@ class ContentMetaAttributeValue(AttributeValueWithCharsetSubstitution):
             return match.group(1) + encoding
         return self.CHARSET_RE.sub(rewrite, self.original_value)
 
+class HTMLAwareEntitySubstitution(EntitySubstitution):
+
+    """Entity substitution rules that are aware of some HTML quirks.
+
+    Specifically, the contents of <script> and <style> tags should not
+    undergo entity substitution.
+
+    Incoming NavigableString objects are checked to see if they're the
+    direct children of a <script> or <style> tag.
+    """
+
+    cdata_containing_tags = set(["script", "style"])
+
+    @classmethod
+    def _substitute_if_appropriate(cls, ns, f):
+        if (isinstance(ns, NavigableString)
+            and ns.parent is not None
+            and ns.parent.name in cls.cdata_containing_tags):
+            # Do nothing.
+            return ns
+        # Substitute.
+        return f(ns)
+
+    @classmethod
+    def substitute_html(cls, ns):
+        return cls._substitute_if_appropriate(
+            ns, EntitySubstitution.substitute_html)
+
+    @classmethod
+    def substitute_xml(cls, ns):
+        return cls._substitute_if_appropriate(
+            ns, EntitySubstitution.substitute_xml)
 
 class PageElement(object):
     """Contains the navigational information for some part of the page
@@ -97,24 +129,59 @@ class PageElement(object):
     #   converted to entities.  This is not recommended, but it's
     #   faster than "minimal".
     # A function - This function will be called on every string that
-    #  needs to undergo entity substition
-    FORMATTERS = {
+    #  needs to undergo entity substitution.
+    #
+
+    # In an HTML document, the default "html" and "minimal" functions
+    # will leave the contents of <script> and <style> tags alone. For
+    # an XML document, all tags will be given the same treatment.
+
+    HTML_FORMATTERS = {
+        "html" : HTMLAwareEntitySubstitution.substitute_html,
+        "minimal" : HTMLAwareEntitySubstitution.substitute_xml,
+        None : None
+        }
+
+    XML_FORMATTERS = {
         "html" : EntitySubstitution.substitute_html,
         "minimal" : EntitySubstitution.substitute_xml,
         None : None
         }
 
-    @classmethod
     def format_string(self, s, formatter='minimal'):
         """Format the given string using the given formatter."""
         if not callable(formatter):
-            formatter = self.FORMATTERS.get(
-                formatter, EntitySubstitution.substitute_xml)
+            formatter = self._formatter_for_name(formatter)
         if formatter is None:
             output = s
         else:
             output = formatter(s)
         return output
+
+    @property
+    def _is_xml(self):
+        """Is this element part of an XML tree or an HTML tree?
+
+        This is used when mapping a formatter name ("minimal") to an
+        appropriate function (one that performs entity-substitution on
+        the contents of <script> and <style> tags, or not). It's
+        inefficient, but it should be called very rarely.
+        """
+        if self.parent is None:
+            # This is the top-level object. It should have .is_xml set
+            # from tree creation. If not, take a guess--BS is usually
+            # used on HTML markup.
+            return getattr(self, 'is_xml', False)
+        return self.parent._is_xml
+
+    def _formatter_for_name(self, name):
+        "Look up a formatter function based on its name and the tree."
+        if self._is_xml:
+            return self.XML_FORMATTERS.get(
+                name, EntitySubstitution.substitute_xml)
+        else:
+            return self.HTML_FORMATTERS.get(
+                name, HTMLAwareEntitySubstitution.substitute_xml)
 
     def setup(self, parent=None, previous_element=None):
         """Sets up the initial relations between this element and
@@ -981,6 +1048,12 @@ class Tag(PageElement):
            document contains a <META> tag that mentions the document's
            encoding.
         """
+
+        # First off, turn a string formatter into a function. This
+        # will stop the lookup from happening over and over again.
+        if not callable(formatter):
+            formatter = self._formatter_for_name(formatter)
+
         attrs = []
         if self.attrs:
             for key, val in sorted(self.attrs.items()):
@@ -1066,6 +1139,11 @@ class Tag(PageElement):
            document contains a <META> tag that mentions the document's
            encoding.
         """
+        # First off, turn a string formatter into a function. This
+        # will stop the lookup from happening over and over again.
+        if not callable(formatter):
+            formatter = self._formatter_for_name(formatter)
+
         pretty_print = (indent_level is not None)
         s = []
         for c in self:
