@@ -436,7 +436,7 @@ class PageElement(object):
         # NOTE: We can't use _find_one because findParents takes a different
         # set of arguments.
         r = None
-        l = self.find_parents(name, attrs, 1)
+        l = self.find_parents(name, attrs, 1, **kwargs)
         if l:
             r = l[0]
         return r

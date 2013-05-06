@@ -425,6 +425,7 @@ class TestParentOperations(TreeTest):
 
     def test_find_parent(self):
         self.assertEqual(self.start.find_parent('ul')['id'], 'bottom')
+        self.assertEqual(self.start.find_parent('ul', id='top')['id'], 'top')
 
     def test_parent_of_text_element(self):
         text = self.tree.find(text="Start here")
