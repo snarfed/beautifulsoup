@@ -31,7 +31,7 @@ Getting help
 
 If you have questions about Beautiful Soup, or run into problems,
 `send mail to the discussion group
-<http://groups.google.com/group/beautifulsoup/>`_.
+<https://groups.google.com/forum/?fromgroups#!forum/beautifulsoup>`_.
 
 Quick Start
 ===========
