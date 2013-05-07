@@ -1266,6 +1266,12 @@ But searching for variants of the string value won't work::
  css_soup.find_all("p", class_="strikeout body")
  # []
 
+If you want to search for tags that match two or more CSS classes, you
+should use a CSS selector::
+
+ css_soup.select("p.strikeout.body")
+ # [<p class="body strikeout"></p>]
+
 There's a shortcut for ``class_`` present in all versions of Beautiful
 Soup.  The second argument to any ``find()``-type method is called
 ``attrs``, and passing in a string for ``attrs`` will search for that
