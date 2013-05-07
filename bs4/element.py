@@ -915,6 +915,7 @@ class Tag(PageElement):
         while i is not None:
             next = i.next_element
             i.__dict__.clear()
+            i.contents = []
             i = next
 
     def clear(self, decompose=False):
