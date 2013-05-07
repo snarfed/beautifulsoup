@@ -94,6 +94,8 @@ class HTMLAwareEntitySubstitution(EntitySubstitution):
 
     cdata_containing_tags = set(["script", "style"])
 
+    preformatted_tags = set(["pre"])
+
     @classmethod
     def _substitute_if_appropriate(cls, ns, f):
         if (isinstance(ns, NavigableString)
@@ -1047,6 +1049,13 @@ class Tag(PageElement):
         u = self.decode(indent_level, encoding, formatter)
         return u.encode(encoding, errors)
 
+    def _should_pretty_print(self, indent_level):
+        """Should this tag be pretty-printed?"""
+        return (
+            indent_level is not None and
+            (self.name not in HTMLAwareEntitySubstitution.preformatted_tags
+             or self._is_xml))
+
     def decode(self, indent_level=None,
                eventual_encoding=DEFAULT_OUTPUT_ENCODING,
                formatter="minimal"):
@@ -1097,12 +1106,15 @@ class Tag(PageElement):
         else:
             closeTag = '</%s%s>' % (prefix, self.name)
 
-        pretty_print = (indent_level is not None)
+        pretty_print = self._should_pretty_print(indent_level)
+        space = ''
+        indent_space = ''
+        if indent_level is not None:
+            indent_space = (' ' * (indent_level - 1))
         if pretty_print:
-            space = (' ' * (indent_level - 1))
+            space = indent_space
             indent_contents = indent_level + 1
         else:
-            space = ''
             indent_contents = None
         contents = self.decode_contents(
             indent_contents, eventual_encoding, formatter)
@@ -1115,8 +1127,10 @@ class Tag(PageElement):
             attribute_string = ''
             if attrs:
                 attribute_string = ' ' + ' '.join(attrs)
-            if pretty_print:
-                s.append(space)
+            if indent_level is not None:
+                # Even if this particular tag is not pretty-printed,
+                # we should indent up to the start of the tag.
+                s.append(indent_space)
             s.append('<%s%s%s%s>' % (
                     prefix, self.name, attribute_string, close))
             if pretty_print:
@@ -1127,7 +1141,10 @@ class Tag(PageElement):
             if pretty_print and closeTag:
                 s.append(space)
             s.append(closeTag)
-            if pretty_print and closeTag and self.next_sibling:
+            if indent_level is not None and closeTag and self.next_sibling:
+                # Even if this particular tag is not pretty-printed,
+                # we're now done with the tag, and we should add a
+                # newline if appropriate.
                 s.append("\n")
             s = ''.join(s)
         return s
@@ -1164,13 +1181,13 @@ class Tag(PageElement):
             elif isinstance(c, Tag):
                 s.append(c.decode(indent_level, eventual_encoding,
                                   formatter))
-            if text and indent_level:
+            if text and indent_level and not self.name == 'pre':
                 text = text.strip()
             if text:
-                if pretty_print:
+                if pretty_print and not self.name == 'pre':
                     s.append(" " * (indent_level - 1))
                 s.append(text)
-                if pretty_print:
+                if pretty_print and not self.name == 'pre':
                     s.append("\n")
         return ''.join(s)
 

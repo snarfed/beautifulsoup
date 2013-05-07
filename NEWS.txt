@@ -15,6 +15,9 @@
    or
   from bs4 import _soup
 
+* The prettify() method now leaves the contents of <pre> tags
+  alone. [bug=1095654]
+
 * Fix a bug in the html5lib treebuilder which sometimes created
   disconnected trees. [bug=1039527]
 

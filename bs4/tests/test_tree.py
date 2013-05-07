@@ -1050,7 +1050,7 @@ class TestTreeModification(SoupTest):
         # clear using decompose()
         em = a.em
         a.clear(decompose=True)
-        self.assertFalse(hasattr(em, "contents"))
+        self.assertEqual(0, len(em.contents))
 
     def test_string_set(self):
         """Tag.string = 'string'"""
@@ -1355,6 +1355,14 @@ class TestSubstitutions(SoupTest):
         soup.script.string = 'console.log("< < hey > > ");'
         encoded = soup.encode()
         self.assertTrue(b"&lt; &lt; hey &gt; &gt;" in encoded)
+
+    def test_prettify_leaves_preformatted_text_alone(self):
+        soup = self.soup("<div>  foo  <pre>  \tbar\n  \n  </pre>  baz  ")
+        # Everything outside the <pre> tag is reformatted, but everything
+        # inside is left alone.
+        self.assertEqual(
+            u'<div>\n foo\n <pre>  \tbar\n  \n  </pre>\n baz\n</div>',
+            soup.div.prettify())
 
     def test_prettify_accepts_formatter(self):
         soup = BeautifulSoup("<html><body>foo</body></html>")
