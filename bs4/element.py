@@ -759,6 +759,9 @@ class NavigableString(unicode, PageElement):
             return unicode.__new__(cls, value)
         return unicode.__new__(cls, value, DEFAULT_OUTPUT_ENCODING)
 
+    def __copy__(self):
+        return self
+
     def __getnewargs__(self):
         return (unicode(self),)
 
