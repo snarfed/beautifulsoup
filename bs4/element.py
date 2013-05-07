@@ -608,7 +608,7 @@ class PageElement(object):
         else:
             return lambda el: el.has_attr(attribute)
 
-    def select(self, selector):
+    def select(self, selector, recursive=True):
         """Perform a CSS selection operation on the current element."""
         tokens = selector.split()
         current_context = [self]
@@ -627,7 +627,9 @@ class PageElement(object):
                 found = []
                 for context in current_context:
                     found.extend(
-                        [el for el in context.find_all(tag) if checker(el)])
+                        [el for el in
+                         context.find_all(tag, recursive=recursive)
+                         if checker(el)])
                 current_context = found
                 continue
 
@@ -656,15 +658,45 @@ class PageElement(object):
                         return False
                     return classes.issubset(tag['class'])
                 for context in current_context:
-                    found.extend(context.find_all(classes_match))
+                    found.extend(context.find_all(classes_match, recursive=recursive))
                 current_context = found
                 continue
+
+            if ':' in token:
+                # Pseudoselector
+                tag_name, pseudo = token.split(':', 1)
+                if not tag_name:
+                    raise ValueError(
+                        "A pseudoselector must be prefixed with a tag name.")
+                pseudo_attributes = re.match('([a-zA-Z\d-]+)\(([a-zA-Z\d]+)\)', pseudo)
+                found = []
+                if pseudo_attributes is not None:
+                    pseudo_type, pseudo_value = pseudo_attributes.groups()
+                    if pseudo_type == 'nth-of-type':
+                        try:
+                            pseudo_value = int(pseudo_value)
+                        except:
+                            raise NotImplementedError(
+                                'Only numeric values are supported for the nth-of-type pseudoselector for now.')
+                        if pseudo_value < 1:
+                            raise ValueError(
+                                'nth-of-type pseudoselector value must be at least 1.')
+                        pseudo_value = pseudo_value - 1
+                        for context in current_context:
+                            all_nodes = context.find_all(tag_name, recursive=recursive)
+                            if pseudo_value < len(all_nodes):
+                                found.extend([all_nodes[pseudo_value]])
+                        current_context = found
+                        continue
+                    else:
+                        raise NotImplementedError(
+                            'Only the nth-of-type pseudoselector is supported for now.')
 
             if token == '*':
                 # Star selector
                 found = []
                 for context in current_context:
-                    found.extend(context.findAll(True))
+                    found.extend(context.find_all(True, recursive=recursive))
                 current_context = found
                 continue
 
@@ -676,16 +708,16 @@ class PageElement(object):
 
                 found = []
                 for context in current_context:
-                    found.extend(context.find_all(tag, recursive=False))
+                    found.extend(context.select(tag, recursive=False))
                 current_context = found
                 continue
-
+            
             # Here we should just have a regular tag
             if not self.tag_name_re.match(token):
                 return []
             found = []
             for context in current_context:
-                found.extend(context.findAll(token))
+                found.extend(context.find_all(token, recursive=recursive))
             current_context = found
         return current_context
 

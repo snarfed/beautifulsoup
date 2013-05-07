@@ -9,14 +9,23 @@
   processing commands. [bug=1050164]
 
 * The BeautifulSoup class is now aliased to "_s" and "_soup", making
-  it quicker to type an import statement in an interactive session:
+  it quicker to type the import statement in an interactive session:
 
   from bs4 import _s
    or
   from bs4 import _soup
 
+  This may change in the future, so don't use this in code that goes
+  into a file.
+
 * The prettify() method now leaves the contents of <pre> tags
   alone. [bug=1095654]
+
+* Added support for the "nth-of-type" CSS selector. Code by Sven
+  Slootweg. [bug=1109952]
+
+* The CSS selector ">" can now find a tag by means other than the
+  tag name. Code by Sven Slootweg. [bug=1109952]
 
 * Fix a bug in the html5lib treebuilder which sometimes created
   disconnected trees. [bug=1039527]

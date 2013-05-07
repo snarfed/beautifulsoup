@@ -1613,6 +1613,9 @@ You can find tags::
  soup.select("title")
  # [<title>The Dormouse's story</title>]
 
+ soup.select("p nth-of-type(3)")
+ # [<p class="story">...</p>]
+
 Find tags beneath other tags::
 
  soup.select("body a")
@@ -1632,6 +1635,12 @@ Find tags `directly` beneath other tags::
  # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
  #  <a class="sister" href="http://example.com/lacie"  id="link2">Lacie</a>,
  #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+ soup.select("p > a:nth-of-type(2)")
+ # [<a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>]
+
+ soup.select("p > #link1")
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>]
 
  soup.select("body > a")
  # []
