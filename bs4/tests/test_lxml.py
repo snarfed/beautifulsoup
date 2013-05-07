@@ -7,13 +7,7 @@ try:
     from bs4.builder import LXMLTreeBuilder, LXMLTreeBuilderForXML
     LXML_PRESENT = True
     import lxml.etree
-    LXML_VERSION = []
-    for i in lxml.etree.__version__.split('.'):
-        try:
-            part = int(i)
-        except TypeError:
-            part = 0
-        LXML_VERSION.append(part)
+    LXML_VERSION = lxml.etree.LXML_VERSION
 except ImportError, e:
     LXML_PRESENT = False
 
@@ -53,7 +47,7 @@ class LXMLTreeBuilderSmokeTest(SoupTest, HTMLTreeBuilderSmokeTest):
     # test if an old version of lxml is installed.
 
     @skipIf(
-        LXML_VERSION < [2,3,5],
+        LXML_VERSION < (2,3,5,0),
         "Skipping doctype test for old version of lxml to avoid segfault.")
     def test_empty_doctype(self):
         soup = self.soup("<!DOCTYPE>")
