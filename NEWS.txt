@@ -4,6 +4,10 @@
   no longer undergo entity substitution by default. XML documents work
   the same way they did before. [bug=1085953]
 
+* Methods like get_text() and properties like .strings now only give
+  you strings that are visible in the document--no comments or
+  processing commands. [bug=1050164]
+
 * Fix a bug in the html5lib treebuilder which sometimes created
   disconnected trees. [bug=1039527]
 

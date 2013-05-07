@@ -873,16 +873,24 @@ class Tag(PageElement):
         self.clear()
         self.append(string.__class__(string))
 
-    def _all_strings(self, strip=False):
-        """Yield all child strings, possibly stripping them."""
+    def _all_strings(self, strip=False, types=(NavigableString, CData)):
+        """Yield all strings of certain classes, possibly stripping them.
+
+        By default, yields only NavigableString and CData objects. So
+        no comments, processing instructions, etc.
+        """
         for descendant in self.descendants:
-            if not isinstance(descendant, NavigableString):
+            if (
+                (types is None and not isinstance(descendant, NavigableString))
+                or
+                (types is not None and type(descendant) not in types)):
                 continue
             if strip:
                 descendant = descendant.strip()
                 if len(descendant) == 0:
                     continue
             yield descendant
+
     strings = property(_all_strings)
 
     @property
@@ -890,11 +898,13 @@ class Tag(PageElement):
         for string in self._all_strings(True):
             yield string
 
-    def get_text(self, separator=u"", strip=False):
+    def get_text(self, separator=u"", strip=False,
+                 types=(NavigableString, CData)):
         """
         Get all child strings, concatenated using the given separator.
         """
-        return separator.join([s for s in self._all_strings(strip)])
+        return separator.join([s for s in self._all_strings(
+                    strip, types=types)])
     getText = get_text
     text = property(get_text)
 

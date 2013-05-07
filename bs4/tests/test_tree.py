@@ -20,6 +20,7 @@ from bs4.builder import (
 )
 from bs4.element import (
     CData,
+    Comment,
     Doctype,
     NavigableString,
     SoupStrainer,
@@ -1166,6 +1167,20 @@ class TestElementObjects(SoupTest):
         self.assertEqual(soup.a.get_text(strip=True), "art")
         self.assertEqual(soup.a.get_text(","), "a,r, , t ")
         self.assertEqual(soup.a.get_text(",", strip=True), "a,r,t")
+
+    def test_get_text_ignores_comments(self):
+        soup = self.soup("foo<!--IGNORE-->bar")
+        self.assertEqual(soup.get_text(), "foobar")
+
+        self.assertEqual(
+            soup.get_text(types=(NavigableString, Comment)), "fooIGNOREbar")
+        self.assertEqual(
+            soup.get_text(types=None), "fooIGNOREbar")
+
+    def test_all_strings_ignores_comments(self):
+        soup = self.soup("foo<!--IGNORE-->bar")
+        self.assertEqual(['foo', 'bar'], list(soup.strings))
+
 
 class TestCDAtaListAttributes(SoupTest):
 
