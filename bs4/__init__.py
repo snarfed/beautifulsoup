@@ -335,6 +335,10 @@ class BeautifulSoup(Tag):
         return prefix + super(BeautifulSoup, self).decode(
             indent_level, eventual_encoding, formatter)
 
+# Alias to make it easier to type import: 'from bs4 import _soup'
+_s = BeautifulSoup
+_soup = BeautifulSoup
+
 class BeautifulStoneSoup(BeautifulSoup):
     """Deprecated interface to an XML parser."""
 

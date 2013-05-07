@@ -8,6 +8,13 @@
   you strings that are visible in the document--no comments or
   processing commands. [bug=1050164]
 
+* The BeautifulSoup class is now aliased to "_s" and "_soup", making
+  it quicker to type an import statement in an interactive session:
+
+  from bs4 import _s
+   or
+  from bs4 import _soup
+
 * Fix a bug in the html5lib treebuilder which sometimes created
   disconnected trees. [bug=1039527]
 
