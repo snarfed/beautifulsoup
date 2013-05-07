@@ -779,7 +779,7 @@ class Doctype(PreformattedString):
 
     @classmethod
     def for_name_and_ids(cls, name, pub_id, system_id):
-        value = name
+        value = name or ''
         if pub_id is not None:
             value += ' PUBLIC "%s"' % pub_id
             if system_id is not None:

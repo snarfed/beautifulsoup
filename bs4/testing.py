@@ -81,6 +81,11 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertDoctypeHandled(
             'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"')
 
+    def test_empty_doctype(self):
+        soup = self.soup("<!DOCTYPE>")
+        doctype = soup.contents[0]
+        self.assertEqual("", doctype.strip())
+
     def test_public_doctype_with_url(self):
         doctype = 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"'
         self.assertDoctypeHandled(doctype)
