@@ -638,6 +638,9 @@ class PageElement(object):
                 tag, id = token.split('#', 1)
                 if tag == "":
                     tag = True
+                if len(current_context) == 0:
+                    # No match.
+                    return []
                 el = current_context[0].find(tag, {'id': id})
                 if el is None:
                     return [] # No match

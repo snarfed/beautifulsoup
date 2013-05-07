@@ -43,6 +43,9 @@
   corresponding problem on the Beautiful Soup end that was previously
   invisible. [bug=984936]
 
+* Fixed an exception when an overspecified CSS selector didn't match
+  anything. Code by Stefaan Lippens. [bug=1168167]
+
 = 4.1.3 (20120820) =
 
 * Skipped a test under Python 2.6 and Python 3.1 to avoid a spurious

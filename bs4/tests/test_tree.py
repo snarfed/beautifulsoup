@@ -1513,7 +1513,7 @@ class TestSoupSelector(TreeTest):
 </head>
 <body>
 
-<div id="main">
+<div id="main" class="fancy">
 <div id="inner">
 <h1 id="header1">An H1</h1>
 <p>Some text</p>
@@ -1782,3 +1782,7 @@ class TestSoupSelector(TreeTest):
         # The <div id="inner"> tag was selected. The <div id="footer">
         # tag was not.
         self.assertSelectsIDs(selected, ['inner'])
+
+    def test_overspecified_child_id(self):
+        self.assertSelects(".fancy #inner", ['inner'])
+        self.assertSelects(".normal #inner", [])
