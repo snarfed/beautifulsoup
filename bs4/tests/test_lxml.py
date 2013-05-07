@@ -6,6 +6,14 @@ import warnings
 try:
     from bs4.builder import LXMLTreeBuilder, LXMLTreeBuilderForXML
     LXML_PRESENT = True
+    import lxml.etree
+    LXML_VERSION = []
+    for i in lxml.etree.__version__.split('.'):
+        try:
+            part = int(i)
+        except TypeError:
+            part = 0
+        LXML_VERSION.append(part)
 except ImportError, e:
     LXML_PRESENT = False
 
@@ -40,6 +48,17 @@ class LXMLTreeBuilderSmokeTest(SoupTest, HTMLTreeBuilderSmokeTest):
             "<p>foo&#x10000000000000;bar</p>", "<p>foobar</p>")
         self.assertSoupEquals(
             "<p>foo&#1000000000;bar</p>", "<p>foobar</p>")
+
+    # In lxml < 2.3.5, an empty doctype causes a segfault. Skip this
+    # test if an old version of lxml is installed.
+
+    @skipIf(
+        LXML_VERSION < [2,3,5],
+        "Skipping doctype test for old version of lxml to avoid segfault.")
+    def test_empty_doctype(self):
+        soup = self.soup("<!DOCTYPE>")
+        doctype = soup.contents[0]
+        self.assertEqual("", doctype.strip())
 
     def test_beautifulstonesoup_is_xml_parser(self):
         # Make sure that the deprecated BSS class uses an xml builder
