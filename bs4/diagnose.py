@@ -1,13 +1,22 @@
 """Diagnostic functions, mainly for use when doing tech support."""
 from StringIO import StringIO
 from HTMLParser import HTMLParser
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, __version__
 from bs4.builder import builder_registry
+import os
 import traceback
 import sys
 
 def diagnose(data):
     """Diagnostic suite for isolating common problems."""
+    print "Diagnostic running on Beautiful Soup %s" % __version__
+    print "Python version %s" % sys.version
+
+    if hasattr(data, 'read'):
+        data = data.read()
+    elif os.path.exists(data):
+        print '"%s" looks like a filename. Reading data from the file.' % data
+        data = open(data).read()
     basic_parsers = ["html.parser", "html5lib", "lxml"]
     for name in basic_parsers:
         for builder in builder_registry.builders:
@@ -21,18 +30,25 @@ def diagnose(data):
 
     if 'lxml' in basic_parsers:
         basic_parsers.append(["lxml", "xml"])
+        from lxml import etree
+        print "Found lxml version %s" % ".".join(map(str,etree.LXML_VERSION))
+
+    if 'html5lib' in basic_parsers:
+        import html5lib
+        print "Found html5lib version %s" % html5lib.__version__
+    print
 
     for parser in basic_parsers:
-        print "Trying to parse your data with %s" % parser
+        print "Trying to parse your markup with %s" % parser
         success = False
         try:
             soup = BeautifulSoup(data, parser)
             success = True
         except Exception, e:
-            print "%s could not parse the document." % parser
+            print "%s could not parse the markup." % parser
             traceback.print_exc()
         if success:
-            print "Here's what %s did with the document:" % parser
+            print "Here's what %s did with the markup:" % parser
             print soup.prettify()
 
         print "-" * 80

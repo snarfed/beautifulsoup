@@ -15,8 +15,23 @@
    or
   from bs4 import _soup
 
-  This may change in the future, so don't use this in code that goes
-  into a file.
+  The alias may change in the future, so don't use this in code you're
+  going to run more than once.
+
+* Added the 'diagnose' submodule, which includes several useful
+  functions for reporting problems and doing tech support.
+
+  * diagnose(data) tries the given markup on every installed parser,
+    reporting exceptions and displaying successes. If a parser is not
+    installed, diagnose() mentions this fact.
+
+  * lxml_trace(data, html=True) runs the given markup through lxml's
+    XML parser or HTML parser, and prints out the parser events as
+    they happen. This helps you quickly determine whether a given
+    problem occurs in lxml code or Beautiful Soup code.
+
+  * htmlparser_trace(data) is the same thing, but for Python's
+    built-in HTMLParser class.
 
 * The prettify() method now leaves the contents of <pre> tags
   alone. [bug=1095654]
