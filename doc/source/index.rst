@@ -1651,6 +1651,15 @@ Find tags `directly` beneath other tags::
  soup.select("body > a")
  # []
 
+Find the siblings of tags::
+
+ soup.select("#link1 ~ .sister")
+ # [<a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
+ #  <a class="sister" href="http://example.com/tillie"  id="link3">Tillie</a>]
+
+ soup.select("#link1 + .sister")
+ # [<a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>]
+
 Find tags by CSS class::
 
  soup.select(".sister")
