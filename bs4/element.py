@@ -638,8 +638,8 @@ class PageElement(object):
                 tag_name, id = token.split('#', 1)
                 if tag_name == "":
                     tag_name = True
-                production_rule = lambda tag: tag.find(tag_name, id=id)
-                checker = None
+                production_rule = lambda tag: [tag.find(tag_name, id=id)]
+                checker = lambda x: True
 
             elif '.' in token:
                 # Class selector
@@ -655,7 +655,7 @@ class PageElement(object):
             elif ':' in token:
                 # Pseudoselector
                 tag_name, pseudo = token.split(':', 1)
-                if not tag_name:
+                if tag_name == '':
                     raise ValueError(
                         "A pseudoselector must be prefixed with a tag name.")
                 pseudo_attributes = re.match('([a-zA-Z\d-]+)\(([a-zA-Z\d]+)\)', pseudo)
@@ -671,22 +671,21 @@ class PageElement(object):
                         if pseudo_value < 1:
                             raise ValueError(
                                 'nth-of-type pseudoselector value must be at least 1.')
-                        count = 0
-                        def checker(tag):
-                            if tag.name == tag_name:
-                                count += 1
-                            if pseudo_value == count:
-                                return True
-                            return False
-                        production_rule = lambda tag: tag.find_all(tag_name, limit=pseudo_value)
-                        checker = checker
+                        def nth_child_of_type(tag):
+                            children = tag.find_all(
+                                tag_name, limit=pseudo_value)
+                            if len(children) < pseudo_value:
+                                return []
+                            return [children[pseudo_value-1]]
+                        production_rule = nth_child_of_type
+                        checker = lambda x: True
                     else:
                         raise NotImplementedError(
                             'The following pseudoselectors are implemented: nth-of-type.')
 
             elif token == '*':
                 # Star selector
-                production_rule = lambda tag: tag.find_all()
+                production_rule = lambda tag: tag.find_all(True)
                 checker = lambda x: True
 
             elif token == '>':
