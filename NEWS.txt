@@ -1,24 +1,16 @@
 = 4.2.0 (Unreleased) =
 
-* The Tag.select() method now supports most features of
-  CSS selectors.
+* The Tag.select() method now supports a much wider variety of CSS
+  selectors.
 
  - Added support for the adjacent sibling combinator (+) and the
    general sibling combinator (~). Tests by "liquider". [bug=1082144]
 
+ - The combinators (*, >, +, and ~) can now combine with any supported
+   selector, not just one that selects based on tag name.
+
  - Added limited support for the "nth-of-type" pseudo-class. Code
    by Sven Slootweg. [bug=1109952]
-
- - Refactored the code so that the combinators (+, ~, and >) can
-   select child or sibling tags by attributes other than name.
-
-* In an HTML document, the contents of a <script> or <style> tag will
-  no longer undergo entity substitution by default. XML documents work
-  the same way they did before. [bug=1085953]
-
-* Methods like get_text() and properties like .strings now only give
-  you strings that are visible in the document--no comments or
-  processing commands. [bug=1050164]
 
 * The BeautifulSoup class is now aliased to "_s" and "_soup", making
   it quicker to type the import statement in an interactive session:
@@ -44,6 +36,14 @@
 
   - htmlparser_trace(data) is the same thing, but for Python's
     built-in HTMLParser class.
+
+* In an HTML document, the contents of a <script> or <style> tag will
+  no longer undergo entity substitution by default. XML documents work
+  the same way they did before. [bug=1085953]
+
+* Methods like get_text() and properties like .strings now only give
+  you strings that are visible in the document--no comments or
+  processing commands. [bug=1050164]
 
 * The prettify() method now leaves the contents of <pre> tags
   alone. [bug=1095654]
