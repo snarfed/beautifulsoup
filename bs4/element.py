@@ -1222,9 +1222,9 @@ class Tag(PageElement):
 
             elif '#' in token:
                 # ID selector
-                tag_name, id = token.split('#', 1)
+                tag_name, tag_id = token.split('#', 1)
                 def id_matches(tag):
-                    return tag.get('id', None) == id
+                    return tag.get('id', None) == tag_id
                 checker = id_matches
 
             elif '.' in token:
@@ -1349,6 +1349,7 @@ class Tag(PageElement):
                 _use_candidate_generator = _candidate_generator
 
             new_context = []
+            new_context_ids = set([])
             for tag in current_context:
                 if self._select_debug:
                     print "    Running candidate generator on %s %s" % (
@@ -1368,7 +1369,11 @@ class Tag(PageElement):
                     if checker is None or result:
                         if self._select_debug:
                             print "     SUCCESS %s %s" % (candidate.name, repr(candidate.attrs))
-                        new_context.append(candidate)
+                        if id(candidate) not in new_context_ids:
+                            # If a tag matches a selector more than once,
+                            # don't include it in the context more than once.
+                            new_context.append(candidate)
+                            new_context_ids.add(id(candidate))
                     elif self._select_debug:
                         print "     FAILURE %s %s" % (candidate.name, repr(candidate.attrs))
 

@@ -1802,3 +1802,6 @@ class TestSoupSelector(TreeTest):
 
     def test_dangling_combinator(self):
         self.assertRaises(ValueError, self.soup.select, 'h1 >')
+
+    def test_sibling_combinator_wont_select_same_tag_twice(self):
+        self.assertSelects('p[lang] ~ p', ['lang-en-gb', 'lang-en-us', 'lang-fr'])
