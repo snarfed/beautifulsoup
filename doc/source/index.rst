@@ -1609,10 +1609,10 @@ tag it contains.
 CSS selectors
 -------------
 
-Beautiful Soup supports a subset of the `CSS selector standard
-<http://www.w3.org/TR/CSS2/selector.html>`_. Just construct the
-selector as a string and pass it into the ``.select()`` method of a
-``Tag`` or the ``BeautifulSoup`` object itself.
+Beautiful Soup supports the most commonly-used `CSS selectors
+<http://www.w3.org/TR/CSS2/selector.html>`_. Just pass a string into
+the ``.select()`` method of a ``Tag`` object or the ``BeautifulSoup``
+object itself.
 
 You can find tags::
 
