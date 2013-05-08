@@ -695,6 +695,8 @@ class PageElement(object):
                                 self.count += 1
                                 if self.count == self.destination:
                                     return True
+                                if self.count > self.destination:
+                                    raise StopIteration()
                                 return False
                         checker = Counter(pseudo_value).nth_child_of_type
                     else:
@@ -786,7 +788,12 @@ class PageElement(object):
                         continue
                     if tag_name and candidate.name != tag_name:
                         continue
-                    if checker is None or checker(candidate):
+                    if checker is not None:
+                        try:
+                            result = checker(candidate)
+                        except StopIteration:
+                            break
+                    if checker is None or result:
                         if self._select_debug:
                             print "     SUCCESS %s %s" % (candidate.name, repr(candidate.attrs))
                         new_context.append(candidate)
