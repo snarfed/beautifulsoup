@@ -1799,3 +1799,6 @@ class TestSoupSelector(TreeTest):
         self.assertSelects('#p1 ~ h2 + a', ['me'])
         self.assertSelects('#p1 ~ h2 + [rel="me"]', ['me'])
         self.assertEqual([], self.soup.select('#inner ~ h2'))
+
+    def test_dangling_combinator(self):
+        self.assertRaises(ValueError, self.soup.select, 'h1 >')
