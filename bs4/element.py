@@ -617,55 +617,42 @@ class PageElement(object):
                 # already found direct descendants in last step. skip this
                 # step.
                 continue
+
+            # Each operation corresponds to a candidate generator (a
+            # rule for finding tags that might match) and a checker function (a
+            # rule for determining whether a tag does match.
+            production_rule = None
+            checker = None
+
             m = self.attribselect_re.match(token)
             if m is not None:
                 # Attribute selector
-                tag, attribute, operator, value = m.groups()
-                if not tag:
-                    tag = True
-                checker = self._attribute_checker(operator, attribute, value)
-                found = []
-                for context in current_context:
-                    found.extend(
-                        [el for el in
-                         context.find_all(tag, recursive=recursive)
-                         if checker(el)])
-                current_context = found
-                continue
-
-            if '#' in token:
-                # ID selector
-                tag, id = token.split('#', 1)
-                if tag == "":
-                    tag = True
-                if len(current_context) == 0:
-                    # No match.
-                    return []
-                el = current_context[0].find(tag, {'id': id})
-                if el is None:
-                    return [] # No match
-                current_context = [el]
-                continue
-
-            if '.' in token:
-                # Class selector
-                tag_name, klass = token.split('.', 1)
+                tag_name, attribute, operator, value = m.groups()
                 if not tag_name:
                     tag_name = True
-                classes = set(klass.split('.'))
-                found = []
-                def classes_match(tag):
-                    if tag_name is not True and tag.name != tag_name:
-                        return False
-                    if not tag.has_attr('class'):
-                        return False
-                    return classes.issubset(tag['class'])
-                for context in current_context:
-                    found.extend(context.find_all(classes_match, recursive=recursive))
-                current_context = found
-                continue
+                production_rule = lambda tag: tag.find_all(tag_name)
+                checker = self._attribute_checker(operator, attribute, value)
 
-            if ':' in token:
+            elif '#' in token:
+                # ID selector
+                tag_name, id = token.split('#', 1)
+                if tag_name == "":
+                    tag_name = True
+                production_rule = lambda tag: tag.find(tag_name, id=id)
+                checker = None
+
+            elif '.' in token:
+                # Class selector
+                tag_name, klass = token.split('.', 1)
+                if tag_name == '':
+                    tag_name = True
+                classes = set(klass.split('.'))
+                production_rule = lambda tag: tag.find_all(tag_name)
+                def classes_match(candidate):
+                    return classes.issubset(tag.getattr('class', []))
+                checker = classes_match
+
+            elif ':' in token:
                 # Pseudoselector
                 tag_name, pseudo = token.split(':', 1)
                 if not tag_name:
@@ -684,44 +671,51 @@ class PageElement(object):
                         if pseudo_value < 1:
                             raise ValueError(
                                 'nth-of-type pseudoselector value must be at least 1.')
-                        pseudo_value = pseudo_value - 1
-                        for context in current_context:
-                            all_nodes = context.find_all(tag_name, recursive=recursive)
-                            if pseudo_value < len(all_nodes):
-                                found.extend([all_nodes[pseudo_value]])
-                        current_context = found
-                        continue
+                        count = 0
+                        def checker(tag):
+                            if tag.name == tag_name:
+                                count += 1
+                            if pseudo_value == count:
+                                return True
+                            return False
+                        production_rule = lambda tag: tag.find_all(tag_name, limit=pseudo_value)
+                        checker = checker
                     else:
                         raise NotImplementedError(
-                            'Only the nth-of-type pseudoselector is supported for now.')
+                            'The following pseudoselectors are implemented: nth-of-type.')
 
-            if token == '*':
+            elif token == '*':
                 # Star selector
-                found = []
-                for context in current_context:
-                    found.extend(context.find_all(True, recursive=recursive))
-                current_context = found
-                continue
+                production_rule = lambda tag: tag.find_all()
+                checker = lambda x: True
 
-            if token == '>':
+            elif token == '>':
                 # Child selector
-                tag = tokens[index + 1]
-                if not tag:
-                    tag = True
+                # TODO If this is the last token, there's a problem.
+                next_selector = tokens[index + 1]
+                production_rule = lambda tag: tag.select(next_selector)
+                checker = lambda candidate: True
 
-                found = []
-                for context in current_context:
-                    found.extend(context.select(tag, recursive=False))
-                current_context = found
-                continue
-            
-            # Here we should just have a regular tag
-            if not self.tag_name_re.match(token):
-                return []
-            found = []
-            for context in current_context:
-                found.extend(context.find_all(token, recursive=recursive))
-            current_context = found
+            elif self.tag_name_re.match(token):
+                tag_name = token
+                production_rule = lambda tag: tag.find_all(tag_name)
+                checker = lambda candidate: True
+            else:
+                raise ValueError(
+                    'Unsupported or invalid CSS selector: "%s"' % token)
+
+            # We now have a production rule and a checker. Apply the
+            # production rule to every member of the new context to
+            # find candidates. Check each candidate against the
+            # checker. The new context is the set of candidates that
+            # pass the checker.
+            new_context = []
+            for tag in current_context:
+                for candidate in production_rule(tag):
+                    if checker(candidate):
+                        new_context.append(candidate)
+            current_context = new_context
+
         return current_context
 
     # Old non-property versions of the generators, for backwards
