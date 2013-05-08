@@ -700,17 +700,15 @@ class PageElement(object):
 
             elif token == '*':
                 # Star selector -- matches everything
-                checker = True
-
+                pass
             elif token == '>':
                 # Run the next token as a CSS selector against the
                 # direct children of each tag in the current context.
-                recursive_candidate_generator = tag.children
+                recursive_candidate_generator = lambda tag: tag.children
 
             elif self.tag_name_re.match(token):
                 # Just a tag name.
                 tag_name = token
-                checker = True
             else:
                 raise ValueError(
                     'Unsupported or invalid CSS selector: "%s"' % token)
@@ -727,9 +725,15 @@ class PageElement(object):
                 # the selector is "foo".
                 next_token = tokens[index+1]
                 def recursive_select(tag):
-                    tag.select(next_token, recursive_candidate_generator)
-                _candidate_generator = recursive_select
-                checker = True
+                    if self.debug:
+                        print '    Calling select("%s") recursively on %s %s' % (next_token, tag.name, tag.attrs)
+                        print '-' * 40
+                    for i in tag.select(next_token, recursive_candidate_generator):
+                        print '(Recursive select picked up candidate %s %s)' % (i.name, i.attrs)
+                        yield i
+                    if self.debug:
+                        print '-' * 40
+                _use_candidate_generator = recursive_select
             elif _candidate_generator is None:
                 # By default, a tag's candidates are all of its
                 # children. If tag_name is defined, only yield tags
@@ -747,17 +751,23 @@ class PageElement(object):
                         if tag_name and not child.name == tag_name:
                             continue
                         yield child
-                _candidate_generator = default_candidate_generator
+                _use_candidate_generator = default_candidate_generator
+            else:
+                _use_candidate_generator = _candidate_generator
+
+            if checker is None:
+                if tag_name:
+                    checker = lambda tag: tag.name == tag_name
 
             new_context = []
             for tag in current_context:
                 if self.debug:
                     print "    Running candidate generator on %s %s" % (
                         tag.name, repr(tag.attrs))
-                for candidate in _candidate_generator(tag):
+                for candidate in _use_candidate_generator(tag):
                     if not isinstance(candidate, Tag):
                         continue
-                    if checker is True or checker(candidate):
+                    if checker is None or checker(candidate):
                         if self.debug:
                             print "     SUCCESS %s %s" % (candidate.name, repr(candidate.attrs))
                         new_context.append(candidate)
