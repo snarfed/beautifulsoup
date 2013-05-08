@@ -1786,3 +1786,16 @@ class TestSoupSelector(TreeTest):
     def test_overspecified_child_id(self):
         self.assertSelects(".fancy #inner", ['inner'])
         self.assertSelects(".normal #inner", [])
+
+    def test_adjacent_sibling_selector(self):
+        self.assertSelects('#p1 + h2', ['header2'])
+        self.assertSelects('#p1 + h2 + p', ['pmulti'])
+        self.assertSelects('#p1 + #header2 + .class1', ['pmulti'])
+        self.assertEqual([], self.soup.select('#p1 + p'))
+
+    def test_general_sibling_selector(self):
+        self.assertSelects('#p1 ~ h2', ['header2', 'header3'])
+        self.assertSelects('#p1 ~ #header2', ['header2'])
+        self.assertSelects('#p1 ~ h2 + a', ['me'])
+        self.assertSelects('#p1 ~ h2 + [rel="me"]', ['me'])
+        self.assertEqual([], self.soup.select('#inner ~ h2'))

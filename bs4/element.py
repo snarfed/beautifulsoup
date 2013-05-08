@@ -708,6 +708,17 @@ class PageElement(object):
                 # Run the next token as a CSS selector against the
                 # direct children of each tag in the current context.
                 recursive_candidate_generator = lambda tag: tag.children
+            elif token == '~':
+                # Run the next token as a CSS selector against the
+                # siblings of each tag in the current context.
+                recursive_candidate_generator = lambda tag: tag.next_siblings
+            elif token == '+':
+                # For each tag in the current context, run the next
+                # token as a CSS selector against the tag's next
+                # sibling that's a tag.
+                def next_tag_sibling(tag):
+                    yield tag.find_next_sibling(True)
+                recursive_candidate_generator = next_tag_sibling
 
             elif self.tag_name_re.match(token):
                 # Just a tag name.
@@ -761,7 +772,7 @@ class PageElement(object):
                             yield child
                     _use_candidate_generator = default_candidate_generator
                 else:
-                    _use_candidate_generator = lambda x: x.descendants
+                    _use_candidate_generator = lambda tag: tag.descendants
             else:
                 _use_candidate_generator = _candidate_generator
 
