@@ -618,27 +618,26 @@ class PageElement(object):
 
     _selectors_that_consume_an_extra_token = ['>', '+', '~']
 
-    debug = True
+    _select_debug = False
 
     def select(self, selector, _candidate_generator=None):
         """Perform a CSS selection operation on the current element."""
-        debug = True
         tokens = selector.split()
         current_context = [self]
 
         if tokens[-1] in self._selectors_that_consume_an_extra_token:
             raise ValueError(
                 'Final selector "%s" is missing an argument.' % tokens[-1])
-        if self.debug:
+        if self._select_debug:
             print 'Running CSS selector "%s"' % selector
         for index, token in enumerate(tokens):
-            if self.debug:
+            if self._select_debug:
                 print ' Considering token "%s"' % token
             recursive_candidate_generator = None
             tag_name = None
             if tokens[index-1] in self._selectors_that_consume_an_extra_token:
                 # This token was consumed by the previous selector. Skip it.
-                if self.debug:
+                if self._select_debug:
                     print '  Token was consumed by the previous selector.'
                 continue
             # Each operation corresponds to a checker function, a rule
@@ -687,13 +686,17 @@ class PageElement(object):
                         if pseudo_value < 1:
                             raise ValueError(
                                 'nth-of-type pseudoselector value must be at least 1.')
-                        count = 0
-                        def nth_child_of_type(tag):
-                            count += 1
-                            if count == pseudo_value:
-                                return True
-                            return False
-                        checker = nth_child_of_type
+                        class Counter(object):
+                            def __init__(self, destination):
+                                self.count = 0
+                                self.destination = destination
+
+                            def nth_child_of_type(self, tag):
+                                self.count += 1
+                                if self.count == self.destination:
+                                    return True
+                                return False
+                        checker = Counter(pseudo_value).nth_child_of_type
                     else:
                         raise NotImplementedError(
                             'The following pseudoselectors are implemented: nth-of-type.')
@@ -725,57 +728,66 @@ class PageElement(object):
                 # the selector is "foo".
                 next_token = tokens[index+1]
                 def recursive_select(tag):
-                    if self.debug:
+                    if self._select_debug:
                         print '    Calling select("%s") recursively on %s %s' % (next_token, tag.name, tag.attrs)
                         print '-' * 40
                     for i in tag.select(next_token, recursive_candidate_generator):
-                        print '(Recursive select picked up candidate %s %s)' % (i.name, i.attrs)
+                        if self._select_debug:
+                            print '(Recursive select picked up candidate %s %s)' % (i.name, i.attrs)
                         yield i
-                    if self.debug:
+                    if self._select_debug:
                         print '-' * 40
                 _use_candidate_generator = recursive_select
             elif _candidate_generator is None:
                 # By default, a tag's candidates are all of its
                 # children. If tag_name is defined, only yield tags
                 # with that name.
-                if self.debug:
+                if self._select_debug:
                     if tag_name:
                         check = "[any]"
                     else:
                         check = tag_name
                     print '   Default candidate generator, tag name="%s"' % check
-                def default_candidate_generator(tag):
-                    for child in tag.descendants:
-                        if not isinstance(child, Tag):
-                            continue
-                        if tag_name and not child.name == tag_name:
-                            continue
-                        yield child
-                _use_candidate_generator = default_candidate_generator
+                if self._select_debug:
+                    # This is redundant with later code, but it stops
+                    # a bunch of bogus tags from cluttering up the
+                    # debug log.
+                    def default_candidate_generator(tag):
+                        for child in tag.descendants:
+                            if not isinstance(child, Tag):
+                                continue
+                            if tag_name and not child.name == tag_name:
+                                continue
+                            yield child
+                    _use_candidate_generator = default_candidate_generator
+                else:
+                    _use_candidate_generator = lambda x: x.descendants
             else:
                 _use_candidate_generator = _candidate_generator
 
-            if checker is None:
-                if tag_name:
-                    checker = lambda tag: tag.name == tag_name
-
             new_context = []
             for tag in current_context:
-                if self.debug:
+                if self._select_debug:
                     print "    Running candidate generator on %s %s" % (
                         tag.name, repr(tag.attrs))
                 for candidate in _use_candidate_generator(tag):
                     if not isinstance(candidate, Tag):
                         continue
+                    if tag_name and candidate.name != tag_name:
+                        continue
                     if checker is None or checker(candidate):
-                        if self.debug:
+                        if self._select_debug:
                             print "     SUCCESS %s %s" % (candidate.name, repr(candidate.attrs))
                         new_context.append(candidate)
-                    elif self.debug:
+                    elif self._select_debug:
                         print "     FAILURE %s %s" % (candidate.name, repr(candidate.attrs))
 
             current_context = new_context
 
+        if self._select_debug:
+            print "Final verdict:"
+            for i in current_context:
+                print " %s %s" % (i.name, i.attrs)
         return current_context
 
     # Old non-property versions of the generators, for backwards
