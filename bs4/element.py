@@ -608,7 +608,7 @@ class PageElement(object):
         else:
             return lambda el: el.has_attr(attribute)
 
-    def select(self, selector):
+    def select(self, selector, recursive=True):
         """Perform a CSS selection operation on the current element."""
         tokens = selector.split()
         current_context = [self]
@@ -630,7 +630,8 @@ class PageElement(object):
                 tag_name, attribute, operator, value = m.groups()
                 if not tag_name:
                     tag_name = True
-                production_rule = lambda tag: tag.find_all(tag_name)
+                production_rule = lambda tag: tag.find_all(
+                    tag_name, recursive=recursive)
                 checker = self._attribute_checker(operator, attribute, value)
 
             elif '#' in token:
@@ -639,7 +640,7 @@ class PageElement(object):
                 if tag_name == "":
                     tag_name = True
                 def find_by_id(tag):
-                    found = tag.find(tag_name, id=id)
+                    found = tag.find(tag_name, id=id, recursive=recursive)
                     if found is None:
                         return []
                     return [found]
@@ -652,7 +653,8 @@ class PageElement(object):
                 if tag_name == '':
                     tag_name = True
                 classes = set(klass.split('.'))
-                production_rule = lambda tag: tag.find_all(tag_name)
+                production_rule = lambda tag: tag.find_all(
+                    tag_name, recursive=recursive)
                 def classes_match(candidate):
                     return classes.issubset(candidate.get('class', []))
                 checker = classes_match
@@ -678,7 +680,7 @@ class PageElement(object):
                                 'nth-of-type pseudoselector value must be at least 1.')
                         def nth_child_of_type(tag):
                             children = tag.find_all(
-                                tag_name, limit=pseudo_value)
+                                tag_name, limit=pseudo_value, recursive=recursive)
                             if len(children) < pseudo_value:
                                 return []
                             return [children[pseudo_value-1]]
@@ -690,29 +692,30 @@ class PageElement(object):
 
             elif token == '*':
                 # Star selector
-                production_rule = lambda tag: tag.find_all(True)
+                production_rule = lambda tag: tag.find_all(True, recursive=recursive)
                 checker = lambda x: True
 
             elif token == '>':
                 # Child selector
                 # TODO If this is the last token, there's a problem.
                 next_selector = tokens[index + 1]
-                production_rule = lambda tag: tag.select(next_selector)
+                production_rule = lambda tag: tag.select(
+                    next_selector, recursive=False)
                 checker = lambda candidate: True
 
             elif self.tag_name_re.match(token):
                 tag_name = token
-                production_rule = lambda tag: tag.find_all(tag_name)
+                production_rule = lambda tag: tag.find_all(tag_name, recursive=recursive)
                 checker = lambda candidate: True
             else:
                 raise ValueError(
                     'Unsupported or invalid CSS selector: "%s"' % token)
 
-            # We now have a production rule and a checker. Apply the
-            # production rule to every member of the new context to
-            # find candidates. Check each candidate against the
-            # checker. The new context is the set of candidates that
-            # pass the checker.
+            # We now have a production rule and a checker. Find
+            # candidates by applying the production rule to every
+            # member of the current context. Check each candidate
+            # against the checker. The new context is the set of
+            # candidates that pass the checker.
             new_context = []
             for tag in current_context:
                 for candidate in production_rule(tag):

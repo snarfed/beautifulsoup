@@ -1637,7 +1637,7 @@ class TestSoupSelector(TreeTest):
     def test_child_selector(self):
         self.assertSelects('.s1 > a', ['s1a1', 's1a2'])
         self.assertSelects('.s1 > a span', ['s1a2s1'])
-        
+
     def test_child_selector_id(self):
         self.assertSelects('.s1 > a#s1a2 span', ['s1a2s1'])
 
