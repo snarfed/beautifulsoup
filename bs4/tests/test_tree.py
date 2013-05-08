@@ -1585,7 +1585,7 @@ class TestSoupSelector(TreeTest):
         self.assertEqual(len(self.soup.select('del')), 0)
 
     def test_invalid_tag(self):
-        self.assertEqual(len(self.soup.select('tag%t')), 0)
+        self.assertRaises(ValueError, self.soup.select, 'tag%t')
 
     def test_header_tags(self):
         self.assertSelectMultiple(

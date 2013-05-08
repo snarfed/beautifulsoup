@@ -649,7 +649,7 @@ class PageElement(object):
                 classes = set(klass.split('.'))
                 production_rule = lambda tag: tag.find_all(tag_name)
                 def classes_match(candidate):
-                    return classes.issubset(tag.getattr('class', []))
+                    return classes.issubset(candidate.get('class', []))
                 checker = classes_match
 
             elif ':' in token:
