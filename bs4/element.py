@@ -1184,16 +1184,18 @@ class Tag(PageElement):
             yield current
             current = current.next_element
 
-    _selectors_that_consume_an_extra_token = ['>', '+', '~']
+    # CSS selector code
+
+    _selector_combinators = ['>', '+', '~']
     _select_debug = False
     def select(self, selector, _candidate_generator=None):
         """Perform a CSS selection operation on the current element."""
         tokens = selector.split()
         current_context = [self]
 
-        if tokens[-1] in self._selectors_that_consume_an_extra_token:
+        if tokens[-1] in self._selector_combinators:
             raise ValueError(
-                'Final selector "%s" is missing an argument.' % tokens[-1])
+                'Final combinator "%s" is missing an argument.' % tokens[-1])
         if self._select_debug:
             print 'Running CSS selector "%s"' % selector
         for index, token in enumerate(tokens):
@@ -1201,10 +1203,10 @@ class Tag(PageElement):
                 print ' Considering token "%s"' % token
             recursive_candidate_generator = None
             tag_name = None
-            if tokens[index-1] in self._selectors_that_consume_an_extra_token:
-                # This token was consumed by the previous selector. Skip it.
+            if tokens[index-1] in self._selector_combinators:
+                # This token was consumed by the previous combinator. Skip it.
                 if self._select_debug:
-                    print '  Token was consumed by the previous selector.'
+                    print '  Token was consumed by the previous combinator.'
                 continue
             # Each operation corresponds to a checker function, a rule
             # for determining whether a candidate matches the

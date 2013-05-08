@@ -6,7 +6,7 @@
  - Added support for the adjacent sibling combinator (+) and the
    general sibling combinator (~). Tests by "liquider". [bug=1082144]
 
- - The combinators (*, >, +, and ~) can now combine with any supported
+ - The combinators (>, +, and ~) can now combine with any supported
    selector, not just one that selects based on tag name.
 
  - Added limited support for the "nth-of-type" pseudo-class. Code
