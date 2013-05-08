@@ -1264,6 +1264,8 @@ class Tag(PageElement):
                                 if self.count == self.destination:
                                     return True
                                 if self.count > self.destination:
+                                    # Stop the generator that's sending us
+                                    # these things.
                                     raise StopIteration()
                                 return False
                         checker = Counter(pseudo_value).nth_child_of_type
@@ -1360,6 +1362,8 @@ class Tag(PageElement):
                         try:
                             result = checker(candidate)
                         except StopIteration:
+                            # The checker has decided we should no longer
+                            # run the generator.
                             break
                     if checker is None or result:
                         if self._select_debug:
