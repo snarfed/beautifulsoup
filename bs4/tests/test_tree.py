@@ -1585,7 +1585,7 @@ class TestSoupSelector(TreeTest):
         self.assertEqual(len(self.soup.select('del')), 0)
 
     def test_invalid_tag(self):
-        self.assertEqual(len(self.soup.select('tag%t')), 0)
+        self.assertRaises(ValueError, self.soup.select, 'tag%t')
 
     def test_header_tags(self):
         self.assertSelectMultiple(
@@ -1637,7 +1637,7 @@ class TestSoupSelector(TreeTest):
     def test_child_selector(self):
         self.assertSelects('.s1 > a', ['s1a1', 's1a2'])
         self.assertSelects('.s1 > a span', ['s1a2s1'])
-        
+
     def test_child_selector_id(self):
         self.assertSelects('.s1 > a#s1a2 span', ['s1a2s1'])
 
@@ -1786,3 +1786,19 @@ class TestSoupSelector(TreeTest):
     def test_overspecified_child_id(self):
         self.assertSelects(".fancy #inner", ['inner'])
         self.assertSelects(".normal #inner", [])
+
+    def test_adjacent_sibling_selector(self):
+        self.assertSelects('#p1 + h2', ['header2'])
+        self.assertSelects('#p1 + h2 + p', ['pmulti'])
+        self.assertSelects('#p1 + #header2 + .class1', ['pmulti'])
+        self.assertEqual([], self.soup.select('#p1 + p'))
+
+    def test_general_sibling_selector(self):
+        self.assertSelects('#p1 ~ h2', ['header2', 'header3'])
+        self.assertSelects('#p1 ~ #header2', ['header2'])
+        self.assertSelects('#p1 ~ h2 + a', ['me'])
+        self.assertSelects('#p1 ~ h2 + [rel="me"]', ['me'])
+        self.assertEqual([], self.soup.select('#inner ~ h2'))
+
+    def test_dangling_combinator(self):
+        self.assertRaises(ValueError, self.soup.select, 'h1 >')

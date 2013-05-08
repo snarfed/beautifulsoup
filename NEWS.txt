@@ -1,12 +1,16 @@
 = 4.2.0 (Unreleased) =
 
-* In an HTML document, the contents of a <script> or <style> tag will
-  no longer undergo entity substitution by default. XML documents work
-  the same way they did before. [bug=1085953]
+* The Tag.select() method now supports a much wider variety of CSS
+  selectors.
 
-* Methods like get_text() and properties like .strings now only give
-  you strings that are visible in the document--no comments or
-  processing commands. [bug=1050164]
+ - Added support for the adjacent sibling combinator (+) and the
+   general sibling combinator (~). Tests by "liquider". [bug=1082144]
+
+ - The combinators (>, +, and ~) can now combine with any supported
+   selector, not just one that selects based on tag name.
+
+ - Added limited support for the "nth-of-type" pseudo-class. Code
+   by Sven Slootweg. [bug=1109952]
 
 * The BeautifulSoup class is now aliased to "_s" and "_soup", making
   it quicker to type the import statement in an interactive session:
@@ -21,26 +25,28 @@
 * Added the 'diagnose' submodule, which includes several useful
   functions for reporting problems and doing tech support.
 
-  * diagnose(data) tries the given markup on every installed parser,
+  - diagnose(data) tries the given markup on every installed parser,
     reporting exceptions and displaying successes. If a parser is not
     installed, diagnose() mentions this fact.
 
-  * lxml_trace(data, html=True) runs the given markup through lxml's
+  - lxml_trace(data, html=True) runs the given markup through lxml's
     XML parser or HTML parser, and prints out the parser events as
     they happen. This helps you quickly determine whether a given
     problem occurs in lxml code or Beautiful Soup code.
 
-  * htmlparser_trace(data) is the same thing, but for Python's
+  - htmlparser_trace(data) is the same thing, but for Python's
     built-in HTMLParser class.
+
+* In an HTML document, the contents of a <script> or <style> tag will
+  no longer undergo entity substitution by default. XML documents work
+  the same way they did before. [bug=1085953]
+
+* Methods like get_text() and properties like .strings now only give
+  you strings that are visible in the document--no comments or
+  processing commands. [bug=1050164]
 
 * The prettify() method now leaves the contents of <pre> tags
   alone. [bug=1095654]
-
-* Added support for the "nth-of-type" CSS selector. Code by Sven
-  Slootweg. [bug=1109952]
-
-* The CSS selector ">" can now find a tag by means other than the
-  tag name. Code by Sven Slootweg. [bug=1109952]
 
 * Fix a bug in the html5lib treebuilder which sometimes created
   disconnected trees. [bug=1039527]

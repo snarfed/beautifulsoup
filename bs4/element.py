@@ -567,6 +567,14 @@ class PageElement(object):
             value =" ".join(value)
         return value
 
+    def _tag_name_matches_and(self, function, tag_name):
+        if not tag_name:
+            return function
+        else:
+            def _match(tag):
+                return tag.name == tag_name and function(tag)
+            return _match
+
     def _attribute_checker(self, operator, attribute, value=''):
         """Create a function that performs a CSS selector operation.
 
@@ -607,122 +615,6 @@ class PageElement(object):
             return _is_or_starts_with_dash
         else:
             return lambda el: el.has_attr(attribute)
-
-    def select(self, selector, recursive=True):
-        """Perform a CSS selection operation on the current element."""
-        tokens = selector.split()
-        current_context = [self]
-        for index, token in enumerate(tokens):
-            if tokens[index - 1] == '>':
-                # already found direct descendants in last step. skip this
-                # step.
-                continue
-            m = self.attribselect_re.match(token)
-            if m is not None:
-                # Attribute selector
-                tag, attribute, operator, value = m.groups()
-                if not tag:
-                    tag = True
-                checker = self._attribute_checker(operator, attribute, value)
-                found = []
-                for context in current_context:
-                    found.extend(
-                        [el for el in
-                         context.find_all(tag, recursive=recursive)
-                         if checker(el)])
-                current_context = found
-                continue
-
-            if '#' in token:
-                # ID selector
-                tag, id = token.split('#', 1)
-                if tag == "":
-                    tag = True
-                if len(current_context) == 0:
-                    # No match.
-                    return []
-                el = current_context[0].find(tag, {'id': id})
-                if el is None:
-                    return [] # No match
-                current_context = [el]
-                continue
-
-            if '.' in token:
-                # Class selector
-                tag_name, klass = token.split('.', 1)
-                if not tag_name:
-                    tag_name = True
-                classes = set(klass.split('.'))
-                found = []
-                def classes_match(tag):
-                    if tag_name is not True and tag.name != tag_name:
-                        return False
-                    if not tag.has_attr('class'):
-                        return False
-                    return classes.issubset(tag['class'])
-                for context in current_context:
-                    found.extend(context.find_all(classes_match, recursive=recursive))
-                current_context = found
-                continue
-
-            if ':' in token:
-                # Pseudoselector
-                tag_name, pseudo = token.split(':', 1)
-                if not tag_name:
-                    raise ValueError(
-                        "A pseudoselector must be prefixed with a tag name.")
-                pseudo_attributes = re.match('([a-zA-Z\d-]+)\(([a-zA-Z\d]+)\)', pseudo)
-                found = []
-                if pseudo_attributes is not None:
-                    pseudo_type, pseudo_value = pseudo_attributes.groups()
-                    if pseudo_type == 'nth-of-type':
-                        try:
-                            pseudo_value = int(pseudo_value)
-                        except:
-                            raise NotImplementedError(
-                                'Only numeric values are supported for the nth-of-type pseudoselector for now.')
-                        if pseudo_value < 1:
-                            raise ValueError(
-                                'nth-of-type pseudoselector value must be at least 1.')
-                        pseudo_value = pseudo_value - 1
-                        for context in current_context:
-                            all_nodes = context.find_all(tag_name, recursive=recursive)
-                            if pseudo_value < len(all_nodes):
-                                found.extend([all_nodes[pseudo_value]])
-                        current_context = found
-                        continue
-                    else:
-                        raise NotImplementedError(
-                            'Only the nth-of-type pseudoselector is supported for now.')
-
-            if token == '*':
-                # Star selector
-                found = []
-                for context in current_context:
-                    found.extend(context.find_all(True, recursive=recursive))
-                current_context = found
-                continue
-
-            if token == '>':
-                # Child selector
-                tag = tokens[index + 1]
-                if not tag:
-                    tag = True
-
-                found = []
-                for context in current_context:
-                    found.extend(context.select(tag, recursive=False))
-                current_context = found
-                continue
-            
-            # Here we should just have a regular tag
-            if not self.tag_name_re.match(token):
-                return []
-            found = []
-            for context in current_context:
-                found.extend(context.find_all(token, recursive=recursive))
-            current_context = found
-        return current_context
 
     # Old non-property versions of the generators, for backwards
     # compatibility with BS3.
@@ -1291,6 +1183,202 @@ class Tag(PageElement):
         while current is not stopNode:
             yield current
             current = current.next_element
+
+    # CSS selector code
+
+    _selector_combinators = ['>', '+', '~']
+    _select_debug = False
+    def select(self, selector, _candidate_generator=None):
+        """Perform a CSS selection operation on the current element."""
+        tokens = selector.split()
+        current_context = [self]
+
+        if tokens[-1] in self._selector_combinators:
+            raise ValueError(
+                'Final combinator "%s" is missing an argument.' % tokens[-1])
+        if self._select_debug:
+            print 'Running CSS selector "%s"' % selector
+        for index, token in enumerate(tokens):
+            if self._select_debug:
+                print ' Considering token "%s"' % token
+            recursive_candidate_generator = None
+            tag_name = None
+            if tokens[index-1] in self._selector_combinators:
+                # This token was consumed by the previous combinator. Skip it.
+                if self._select_debug:
+                    print '  Token was consumed by the previous combinator.'
+                continue
+            # Each operation corresponds to a checker function, a rule
+            # for determining whether a candidate matches the
+            # selector. Candidates are generated by the active
+            # iterator.
+            checker = None
+
+            m = self.attribselect_re.match(token)
+            if m is not None:
+                # Attribute selector
+                tag_name, attribute, operator, value = m.groups()
+                checker = self._attribute_checker(operator, attribute, value)
+
+            elif '#' in token:
+                # ID selector
+                tag_name, id = token.split('#', 1)
+                def id_matches(tag):
+                    return tag.get('id', None) == id
+                checker = id_matches
+
+            elif '.' in token:
+                # Class selector
+                tag_name, klass = token.split('.', 1)
+                classes = set(klass.split('.'))
+                def classes_match(candidate):
+                    return classes.issubset(candidate.get('class', []))
+                checker = classes_match
+
+            elif ':' in token:
+                # Pseudo-class
+                tag_name, pseudo = token.split(':', 1)
+                if tag_name == '':
+                    raise ValueError(
+                        "A pseudo-class must be prefixed with a tag name.")
+                pseudo_attributes = re.match('([a-zA-Z\d-]+)\(([a-zA-Z\d]+)\)', pseudo)
+                found = []
+                if pseudo_attributes is not None:
+                    pseudo_type, pseudo_value = pseudo_attributes.groups()
+                    if pseudo_type == 'nth-of-type':
+                        try:
+                            pseudo_value = int(pseudo_value)
+                        except:
+                            raise NotImplementedError(
+                                'Only numeric values are currently supported for the nth-of-type pseudo-class.')
+                        if pseudo_value < 1:
+                            raise ValueError(
+                                'nth-of-type pseudo-class value must be at least 1.')
+                        class Counter(object):
+                            def __init__(self, destination):
+                                self.count = 0
+                                self.destination = destination
+
+                            def nth_child_of_type(self, tag):
+                                self.count += 1
+                                if self.count == self.destination:
+                                    return True
+                                if self.count > self.destination:
+                                    # Stop the generator that's sending us
+                                    # these things.
+                                    raise StopIteration()
+                                return False
+                        checker = Counter(pseudo_value).nth_child_of_type
+                    else:
+                        raise NotImplementedError(
+                            'Only the following pseudo-classes are implemented: nth-of-type.')
+
+            elif token == '*':
+                # Star selector -- matches everything
+                pass
+            elif token == '>':
+                # Run the next token as a CSS selector against the
+                # direct children of each tag in the current context.
+                recursive_candidate_generator = lambda tag: tag.children
+            elif token == '~':
+                # Run the next token as a CSS selector against the
+                # siblings of each tag in the current context.
+                recursive_candidate_generator = lambda tag: tag.next_siblings
+            elif token == '+':
+                # For each tag in the current context, run the next
+                # token as a CSS selector against the tag's next
+                # sibling that's a tag.
+                def next_tag_sibling(tag):
+                    yield tag.find_next_sibling(True)
+                recursive_candidate_generator = next_tag_sibling
+
+            elif self.tag_name_re.match(token):
+                # Just a tag name.
+                tag_name = token
+            else:
+                raise ValueError(
+                    'Unsupported or invalid CSS selector: "%s"' % token)
+
+            if recursive_candidate_generator:
+                # This happens when the selector looks like  "> foo".
+                #
+                # The generator calls select() recursively on every
+                # member of the current context, passing in a different
+                # candidate generator and a different selector.
+                #
+                # In the case of "> foo", the candidate generator is
+                # one that yields a tag's direct children (">"), and
+                # the selector is "foo".
+                next_token = tokens[index+1]
+                def recursive_select(tag):
+                    if self._select_debug:
+                        print '    Calling select("%s") recursively on %s %s' % (next_token, tag.name, tag.attrs)
+                        print '-' * 40
+                    for i in tag.select(next_token, recursive_candidate_generator):
+                        if self._select_debug:
+                            print '(Recursive select picked up candidate %s %s)' % (i.name, i.attrs)
+                        yield i
+                    if self._select_debug:
+                        print '-' * 40
+                _use_candidate_generator = recursive_select
+            elif _candidate_generator is None:
+                # By default, a tag's candidates are all of its
+                # children. If tag_name is defined, only yield tags
+                # with that name.
+                if self._select_debug:
+                    if tag_name:
+                        check = "[any]"
+                    else:
+                        check = tag_name
+                    print '   Default candidate generator, tag name="%s"' % check
+                if self._select_debug:
+                    # This is redundant with later code, but it stops
+                    # a bunch of bogus tags from cluttering up the
+                    # debug log.
+                    def default_candidate_generator(tag):
+                        for child in tag.descendants:
+                            if not isinstance(child, Tag):
+                                continue
+                            if tag_name and not child.name == tag_name:
+                                continue
+                            yield child
+                    _use_candidate_generator = default_candidate_generator
+                else:
+                    _use_candidate_generator = lambda tag: tag.descendants
+            else:
+                _use_candidate_generator = _candidate_generator
+
+            new_context = []
+            for tag in current_context:
+                if self._select_debug:
+                    print "    Running candidate generator on %s %s" % (
+                        tag.name, repr(tag.attrs))
+                for candidate in _use_candidate_generator(tag):
+                    if not isinstance(candidate, Tag):
+                        continue
+                    if tag_name and candidate.name != tag_name:
+                        continue
+                    if checker is not None:
+                        try:
+                            result = checker(candidate)
+                        except StopIteration:
+                            # The checker has decided we should no longer
+                            # run the generator.
+                            break
+                    if checker is None or result:
+                        if self._select_debug:
+                            print "     SUCCESS %s %s" % (candidate.name, repr(candidate.attrs))
+                        new_context.append(candidate)
+                    elif self._select_debug:
+                        print "     FAILURE %s %s" % (candidate.name, repr(candidate.attrs))
+
+            current_context = new_context
+
+        if self._select_debug:
+            print "Final verdict:"
+            for i in current_context:
+                print " %s %s" % (i.name, i.attrs)
+        return current_context
 
     # Old names for backwards compatibility
     def childGenerator(self):
