@@ -608,7 +608,7 @@ class PageElement(object):
         else:
             return lambda el: el.has_attr(attribute)
 
-    def select(self, selector, recursive=True):
+    def select(self, selector):
         """Perform a CSS selection operation on the current element."""
         tokens = selector.split()
         current_context = [self]
@@ -638,7 +638,12 @@ class PageElement(object):
                 tag_name, id = token.split('#', 1)
                 if tag_name == "":
                     tag_name = True
-                production_rule = lambda tag: [tag.find(tag_name, id=id)]
+                def find_by_id(tag):
+                    found = tag.find(tag_name, id=id)
+                    if found is None:
+                        return []
+                    return [found]
+                production_rule = find_by_id
                 checker = lambda x: True
 
             elif '.' in token:
