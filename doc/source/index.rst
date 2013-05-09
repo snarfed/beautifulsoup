@@ -41,7 +41,7 @@ document. It's part of a story from `Alice in Wonderland`::
 
  html_doc = """
  <html><head><title>The Dormouse's story</title></head>
-
+ <body>
  <p class="title"><b>The Dormouse's story</b></p>
 
  <p class="story">Once upon a time there were three little sisters; and their names were
