@@ -1214,6 +1214,20 @@ keyword argument::
  soup.find_all(href=re.compile("elsie"), id='link1')
  # [<a class="sister" href="http://example.com/elsie" id="link1">three</a>]
 
+Some attributes, like the data-* attributes in HTML 5, have names that
+can't be used as the names of keyword arguments::
+
+ data_soup = BeautifulSoup('<div data-foo="value">foo!</div>')
+ data_soup.find_all(data-foo="value")
+ # SyntaxError: keyword can't be an expression
+
+You can use these attributes in searches by putting them into a
+dictionary and passing the dictionary into ``find_all()`` as the
+``attrs`` argument::
+
+ data_soup.find_all(attrs={"data-foo": "value"})
+ # [<div data-foo="value">foo!</div>]
+
 .. _attrs:
 
 Searching by CSS class
@@ -1272,33 +1286,15 @@ should use a CSS selector::
  css_soup.select("p.strikeout.body")
  # [<p class="body strikeout"></p>]
 
-There's a shortcut for ``class_`` present in all versions of Beautiful
-Soup.  The second argument to any ``find()``-type method is called
-``attrs``, and passing in a string for ``attrs`` will search for that
-string as a CSS class::
+In older versions of Beautiful Soup, which don't have the ``class_``
+shortcut, you can use the ``attrs`` trick mentioned above. Create a
+dictionary whose value for "class" is the string (or regular
+expression, or whatever) you want to search for::
 
- soup.find_all("a", "sister")
+ soup.find_all("a", attrs={"class": "sister"})
  # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
  #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
  #  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
-
-You can also pass in a regular expression, a function or
-True--anything except a dictionary. Whatever you pass in will be
-used to search against the CSS class, the same as if you'd passed it
-in for the ``class_`` keyword argument::
-
- soup.find_all("p", re.compile("itl"))
- # [<p class="title"><b>The Dormouse's story</b></p>]
-
-By passing in a dictionary to ``attrs``, you can search many HTML
-attributes at once, not just the CSS class. These two lines of code
-are equivalent::
-
- soup.find_all(href=re.compile("elsie"), id='link1')
- soup.find_all(attrs={'href' : re.compile("elsie"), 'id': 'link1'})
-
-This isn't a very useful feature, since it's usually easier
-to use the keyword arguments.
 
 .. _text:
 
