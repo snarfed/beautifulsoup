@@ -4,6 +4,7 @@ from HTMLParser import HTMLParser
 from bs4 import BeautifulSoup, __version__
 from bs4.builder import builder_registry
 import os
+import random
 import traceback
 import sys
 
@@ -100,6 +101,43 @@ def htmlparser_trace(data):
     """
     parser = AnnouncingParser()
     parser.feed(data)
+
+_vowels = "aeiou"
+_consonants = "bcdfghjklmnpqrstvwxyz"
+
+def rword(length=5):
+    "Generate a random word-like string."
+    s = ''
+    for i in range(length):
+        if i % 2 == 0:
+            t = _consonants
+        else:
+            t = _vowels
+        s += random.choice(t)
+    return s
+
+def rsentence(length=4):
+    "Generate a random sentence-like string."
+    return " ".join(rword(random.randint(4,9)) for i in range(length))
+        
+def rdoc(num_elements=1000):
+    """Randomly generate an invalid HTML document."""
+    tag_names = ['p', 'div', 'span', 'i', 'b', 'script', 'table']
+    elements = []
+    for i in range(num_elements):
+        choice = random.randint(0,3)
+        if choice == 0:
+            # New tag.
+            tag_name = random.choice(tag_names)
+            elements.append("<%s>" % tag_name)
+        elif choice == 1:
+            elements.append(rsentence(random.randint(1,4)))
+        elif choice == 2:
+            # Close a tag.
+            tag_name = random.choice(tag_names)
+            elements.append("</%s>" % tag_name)
+    return "\n".join(elements)
+
 
 if __name__ == '__main__':
     diagnose(sys.stdin.read())

@@ -65,7 +65,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         :return: A 3-tuple (markup, original encoding, encoding
         declared within markup).
         """
-        if isinstance(markup, unicode):
+        if isinstance(markup, unicode) or True:
             return markup, None, None, False
 
         try_encodings = [user_specified_encoding, document_declared_encoding]
