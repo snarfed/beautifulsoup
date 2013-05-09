@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup, __version__
 from bs4.builder import builder_registry
 import os
 import random
+import time
 import traceback
 import sys
 
@@ -66,32 +67,36 @@ def lxml_trace(data, html=True):
 
 class AnnouncingParser(HTMLParser):
     """Announces HTMLParser parse events, without doing anything else."""
+
+    def _p(self, s):
+        print(s)
+
     def handle_starttag(self, name, attrs):
-        print "%s START" % name
+        self._p("%s START" % name)
 
     def handle_endtag(self, name):
-        print "%s END" % name
+        self._p("%s END" % name)
 
     def handle_data(self, data):
-        print "%s DATA" % data
+        self._p("%s DATA" % data)
 
     def handle_charref(self, name):
-        print "%s CHARREF" % name
+        self._p("%s CHARREF" % name)
 
     def handle_entityref(self, name):
-        print "%s ENTITYREF" % name
+        self._p("%s ENTITYREF" % name)
 
     def handle_comment(self, data):
-        print "%s COMMENT" % data
+        self._p("%s COMMENT" % data)
 
     def handle_decl(self, data):
-        print "%s DECL" % data
+        self._p("%s DECL" % data)
 
     def unknown_decl(self, data):
-        print "%s UNKNOWN-DECL" % data
+        self._p("%s UNKNOWN-DECL" % data)
 
     def handle_pi(self, data):
-        print "%s PI" % data
+        self._p("%s PI" % data)
 
 def htmlparser_trace(data):
     """Print out the HTMLParser events that occur during parsing.
@@ -136,8 +141,31 @@ def rdoc(num_elements=1000):
             # Close a tag.
             tag_name = random.choice(tag_names)
             elements.append("</%s>" % tag_name)
-    return "\n".join(elements)
+    return "<html>" + "\n".join(elements) + "</html>"
 
+def benchmark_parsers(num_elements=100000):
+    """Very basic head-to-head performance benchmark."""
+    print "Comparative parser benchmark on Beautiful Soup %s" % __version__
+    data = rdoc(num_elements)
+    print "Generated a large invalid HTML document (%d bytes)." % len(data)
+    for parser in ["lxml", ["lxml", "html"], "html5lib", "html.parser"]:
+        success = False
+        try:
+            a = time.time()
+            soup = BeautifulSoup(data, )
+            b = time.time()
+            success = True
+        except Exception, e:
+            print "%s could not parse the markup." % parser
+            traceback.print_exc()
+        if success:
+            print "BS4+%s parsed the markup in %.2fs." % (parser, b-a)
+
+    from lxml import etree
+    a = time.time()
+    etree.HTML(data)
+    b = time.time()
+    print "Raw lxml parsed the markup in %.2fs." % (b-a)
 
 if __name__ == '__main__':
     diagnose(sys.stdin.read())
