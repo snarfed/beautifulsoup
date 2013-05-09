@@ -3,6 +3,7 @@ __all__ = [
     'LXMLTreeBuilder',
     ]
 
+from io import BytesIO
 from StringIO import StringIO
 import collections
 from lxml import etree
@@ -65,7 +66,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         :return: A 3-tuple (markup, original encoding, encoding
         declared within markup).
         """
-        if isinstance(markup, unicode) or True:
+        if isinstance(markup, unicode):
             return markup, None, None, False
 
         try_encodings = [user_specified_encoding, document_declared_encoding]
@@ -75,7 +76,9 @@ class LXMLTreeBuilderForXML(TreeBuilder):
                 dammit.contains_replacement_characters)
 
     def feed(self, markup):
-        if isinstance(markup, basestring):
+        if isinstance(markup, bytes):
+            markup = BytesIO(markup)
+        elif isinstance(markup, unicode):
             markup = StringIO(markup)
         # Call feed() at least once, even if the markup is empty,
         # or the parser won't be initialized.

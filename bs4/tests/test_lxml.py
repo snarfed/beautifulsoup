@@ -85,4 +85,3 @@ class LXMLXMLTreeBuilderSmokeTest(SoupTest, XMLTreeBuilderSmokeTest):
     @property
     def default_builder(self):
         return LXMLTreeBuilderForXML()
-
