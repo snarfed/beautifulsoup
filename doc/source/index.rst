@@ -1095,7 +1095,7 @@ Here's a function that returns ``True`` if a tag defines the "class"
 attribute but doesn't define the "id" attribute::
 
  def has_class_but_no_id(tag):
-     return tag.has_key('class') and not tag.has_key('id')
+     return tag.has_attr('class') and not tag.has_attr('id')
 
 Pass this function into ``find_all()`` and you'll pick up all the <p>
 tags::
@@ -2746,15 +2746,10 @@ Other parser problems
   preserve mixed-case or uppercase tags and attributes, you'll need to
   :ref:`parse the document as XML. <parsing-xml>`
 
+.. _misc:
 
 Miscellaneous
 -------------
-
-* ``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
-  tag in question doesn't define the ``attr`` attribute. The most
-  common errors are ``KeyError: 'href'`` and ``KeyError:
-  'class'``. Use ``tag.get('attr')`` if you're not sure ``attr`` is
-  defined, just as you would with a Python dictionary.
 
 * ``UnicodeEncodeError: 'charmap' codec can't encode character
   u'\xfoo' in position bar`` (or just about any other
@@ -2767,6 +2762,27 @@ Miscellaneous
   not supported by your default encoding.  In this case, the simplest
   solution is to explicitly encode the Unicode string into UTF-8 with
   ``u.encode("utf8")``.
+
+* ``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
+  tag in question doesn't define the ``attr`` attribute. The most
+  common errors are ``KeyError: 'href'`` and ``KeyError:
+  'class'``. Use ``tag.get('attr')`` if you're not sure ``attr`` is
+  defined, just as you would with a Python dictionary.
+
+* ``AttributeError: 'ResultSet' object has no attribute 'foo'`` - This
+  usually happens because you expected ``find_all()`` to return a
+  single tag or string. But ``find_all()`` returns a _list_ of tags
+  and strings--a ``ResultSet`` object. You need to iterate over the
+  list and look at the ``.foo`` of each one. Or, if you really only
+  want one result, you need to use ``find()`` instead of
+  ``find_all()``.
+
+* ``AttributeError: 'NoneType' object has no attribute 'foo'`` - This
+  usually happens because you called ``find()`` and then tried to
+  access the `.foo`` attribute of the result. But in your case,
+  ``find()`` didn't find anything, so it returned ``None``, instead of
+  returning a tag or a string. You need to figure out why your
+  ``find()`` call isn't returning anything.
 
 Improving Performance
 ---------------------
