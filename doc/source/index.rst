@@ -455,6 +455,12 @@ them. In particular, since a string can't contain anything (the way a
 tag may contain a string or another tag), strings don't support the
 ``.contents`` or ``.string`` attributes, or the ``find()`` method.
 
+If you want to use a ``NavigableString`` outside of Beautiful Soup,
+you should call ``unicode()`` on it to turn it into a normal Python
+Unicode string. If you don't, your string will carry around a
+reference to the entire Beautiful Soup parse tree, even when you're
+done using Beautiful Soup. This is a big waste of memory.
+
 ``BeautifulSoup``
 -----------------
 
