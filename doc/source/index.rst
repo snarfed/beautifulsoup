@@ -31,7 +31,10 @@ Getting help
 
 If you have questions about Beautiful Soup, or run into problems,
 `send mail to the discussion group
-<https://groups.google.com/forum/?fromgroups#!forum/beautifulsoup>`_.
+<https://groups.google.com/forum/?fromgroups#!forum/beautifulsoup>`_. If
+your problem involves parsing an HTML document, be sure to mention
+:ref:`what the diagnose() function says <diagnose>` about
+that document.
 
 Quick Start
 ===========
@@ -976,7 +979,7 @@ Searching the tree
 ==================
 
 Beautiful Soup defines a lot of methods for searching the parse tree,
-but they're all very similar. I'm going to spend a lot of time explain
+but they're all very similar. I'm going to spend a lot of time explaining
 the two most popular methods: ``find()`` and ``find_all()``. The other
 methods take almost exactly the same arguments, so I'll just cover
 them briefly.
@@ -1001,7 +1004,7 @@ Once again, I'll be using the "three sisters" document as an example::
  soup = BeautifulSoup(html_doc)
 
 By passing in a filter to an argument like ``find_all()``, you can
-isolate whatever parts of the document you're interested.
+zoom in on the parts of the document you're interested in.
 
 Kinds of filters
 ----------------
@@ -1979,9 +1982,6 @@ whatever's inside that tag. It's good for stripping out markup::
 Like ``replace_with()``, ``unwrap()`` returns the tag
 that was replaced.
 
-(In earlier versions of Beautiful Soup, ``unwrap()`` was called
-``replace_with_children()``, and that name will still work.)
-
 Output
 ======
 
@@ -2271,7 +2271,7 @@ into an <html> tag.::
 
  BeautifulSoup("<a><b /></a>", "xml")
  # <?xml version="1.0" encoding="utf-8"?>
- # <a><b /></a>
+ # <a><b/></a>
 
 There are also differences between HTML parsers. If you give Beautiful
 Soup a perfectly-formed HTML document, these differences won't
@@ -2562,8 +2562,8 @@ ignore everything that wasn't an <a> tag in the first place. The
 document are parsed. You just create a ``SoupStrainer`` and pass it in
 to the ``BeautifulSoup`` constructor as the ``parse_only`` argument.
 
-(Note that *this feature won't work if you're using the html5lib
-parser*. If you use html5lib, the whole document will be parsed, no
+(Note that *this feature won't work if you're using the html5lib parser*.
+If you use html5lib, the whole document will be parsed, no
 matter what. This is because html5lib constantly rearranges the parse
 tree as it works, and if some part of the document didn't actually
 make it into the parse tree, it'll crash. To avoid confusion, in the
@@ -2644,14 +2644,16 @@ thought I'd mention it::
 Troubleshooting
 ===============
 
+.. _diagnose:
+
 ``diagnose()``
 --------------
 
 If you're having trouble understanding what Beautiful Soup does to a
-document, pass it into the ``diagnose()`` function. (New in 4.2.0.)
-Beautiful Soup will print out a report showing you how different
-parsers handle the document, and tell you if you're missing a parser
-that Beautiful Soup could be using::
+document, pass the document into the ``diagnose()`` function. (New in
+Beautiful Soup 4.2.0.)  Beautiful Soup will print out a report showing
+you how different parsers handle the document, and tell you if you're
+missing a parser that Beautiful Soup could be using::
 
  from bs4.diagnose import diagnose
  data = open("bad.html").read()
