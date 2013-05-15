@@ -1392,10 +1392,13 @@ class Tag(PageElement):
     def recursiveChildGenerator(self):
         return self.descendants
 
-    # This was kind of misleading because has_key() (attributes) was
-    # different from __in__ (contents). has_key() is gone in Python 3,
-    # anyway.
-    has_key = has_attr
+    def has_key(self, key):
+        """This was kind of misleading because has_key() (attributes)
+        was different from __in__ (contents). has_key() is gone in
+        Python 3, anyway."""
+        warnings.warn('has_key is deprecated. Use has_attr("%s") instead.' % (
+                key))
+        return self.has_attr(key)
 
 # Next, a couple classes to represent queries and their results.
 class SoupStrainer(object):

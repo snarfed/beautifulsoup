@@ -31,7 +31,10 @@ Getting help
 
 If you have questions about Beautiful Soup, or run into problems,
 `send mail to the discussion group
-<https://groups.google.com/forum/?fromgroups#!forum/beautifulsoup>`_.
+<https://groups.google.com/forum/?fromgroups#!forum/beautifulsoup>`_. If
+your problem involves parsing an HTML document, be sure to mention
+:ref:`what the diagnose() function says <diagnose>` about
+that document.
 
 Quick Start
 ===========
@@ -454,6 +457,12 @@ another, using :ref:`replace_with`::
 them. In particular, since a string can't contain anything (the way a
 tag may contain a string or another tag), strings don't support the
 ``.contents`` or ``.string`` attributes, or the ``find()`` method.
+
+If you want to use a ``NavigableString`` outside of Beautiful Soup,
+you should call ``unicode()`` on it to turn it into a normal Python
+Unicode string. If you don't, your string will carry around a
+reference to the entire Beautiful Soup parse tree, even when you're
+done using Beautiful Soup. This is a big waste of memory.
 
 ``BeautifulSoup``
 -----------------
@@ -970,7 +979,7 @@ Searching the tree
 ==================
 
 Beautiful Soup defines a lot of methods for searching the parse tree,
-but they're all very similar. I'm going to spend a lot of time explain
+but they're all very similar. I'm going to spend a lot of time explaining
 the two most popular methods: ``find()`` and ``find_all()``. The other
 methods take almost exactly the same arguments, so I'll just cover
 them briefly.
@@ -995,7 +1004,7 @@ Once again, I'll be using the "three sisters" document as an example::
  soup = BeautifulSoup(html_doc)
 
 By passing in a filter to an argument like ``find_all()``, you can
-isolate whatever parts of the document you're interested.
+zoom in on the parts of the document you're interested in.
 
 Kinds of filters
 ----------------
@@ -1095,7 +1104,7 @@ Here's a function that returns ``True`` if a tag defines the "class"
 attribute but doesn't define the "id" attribute::
 
  def has_class_but_no_id(tag):
-     return tag.has_key('class') and not tag.has_key('id')
+     return tag.has_attr('class') and not tag.has_attr('id')
 
 Pass this function into ``find_all()`` and you'll pick up all the <p>
 tags::
@@ -1973,9 +1982,6 @@ whatever's inside that tag. It's good for stripping out markup::
 Like ``replace_with()``, ``unwrap()`` returns the tag
 that was replaced.
 
-(In earlier versions of Beautiful Soup, ``unwrap()`` was called
-``replace_with_children()``, and that name will still work.)
-
 Output
 ======
 
@@ -2265,7 +2271,7 @@ into an <html> tag.::
 
  BeautifulSoup("<a><b /></a>", "xml")
  # <?xml version="1.0" encoding="utf-8"?>
- # <a><b /></a>
+ # <a><b/></a>
 
 There are also differences between HTML parsers. If you give Beautiful
 Soup a perfectly-formed HTML document, these differences won't
@@ -2556,8 +2562,8 @@ ignore everything that wasn't an <a> tag in the first place. The
 document are parsed. You just create a ``SoupStrainer`` and pass it in
 to the ``BeautifulSoup`` constructor as the ``parse_only`` argument.
 
-(Note that *this feature won't work if you're using the html5lib
-parser*. If you use html5lib, the whole document will be parsed, no
+(Note that *this feature won't work if you're using the html5lib parser*.
+If you use html5lib, the whole document will be parsed, no
 matter what. This is because html5lib constantly rearranges the parse
 tree as it works, and if some part of the document didn't actually
 make it into the parse tree, it'll crash. To avoid confusion, in the
@@ -2638,14 +2644,16 @@ thought I'd mention it::
 Troubleshooting
 ===============
 
+.. _diagnose:
+
 ``diagnose()``
 --------------
 
 If you're having trouble understanding what Beautiful Soup does to a
-document, pass it into the ``diagnose()`` function. (New in 4.2.0.)
-Beautiful Soup will print out a report showing you how different
-parsers handle the document, and tell you if you're missing a parser
-that Beautiful Soup could be using::
+document, pass the document into the ``diagnose()`` function. (New in
+Beautiful Soup 4.2.0.)  Beautiful Soup will print out a report showing
+you how different parsers handle the document, and tell you if you're
+missing a parser that Beautiful Soup could be using::
 
  from bs4.diagnose import diagnose
  data = open("bad.html").read()
@@ -2746,15 +2754,10 @@ Other parser problems
   preserve mixed-case or uppercase tags and attributes, you'll need to
   :ref:`parse the document as XML. <parsing-xml>`
 
+.. _misc:
 
 Miscellaneous
 -------------
-
-* ``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
-  tag in question doesn't define the ``attr`` attribute. The most
-  common errors are ``KeyError: 'href'`` and ``KeyError:
-  'class'``. Use ``tag.get('attr')`` if you're not sure ``attr`` is
-  defined, just as you would with a Python dictionary.
 
 * ``UnicodeEncodeError: 'charmap' codec can't encode character
   u'\xfoo' in position bar`` (or just about any other
@@ -2767,6 +2770,27 @@ Miscellaneous
   not supported by your default encoding.  In this case, the simplest
   solution is to explicitly encode the Unicode string into UTF-8 with
   ``u.encode("utf8")``.
+
+* ``KeyError: [attr]`` - Caused by accessing ``tag['attr']`` when the
+  tag in question doesn't define the ``attr`` attribute. The most
+  common errors are ``KeyError: 'href'`` and ``KeyError:
+  'class'``. Use ``tag.get('attr')`` if you're not sure ``attr`` is
+  defined, just as you would with a Python dictionary.
+
+* ``AttributeError: 'ResultSet' object has no attribute 'foo'`` - This
+  usually happens because you expected ``find_all()`` to return a
+  single tag or string. But ``find_all()`` returns a _list_ of tags
+  and strings--a ``ResultSet`` object. You need to iterate over the
+  list and look at the ``.foo`` of each one. Or, if you really only
+  want one result, you need to use ``find()`` instead of
+  ``find_all()``.
+
+* ``AttributeError: 'NoneType' object has no attribute 'foo'`` - This
+  usually happens because you called ``find()`` and then tried to
+  access the `.foo`` attribute of the result. But in your case,
+  ``find()`` didn't find anything, so it returned ``None``, instead of
+  returning a tag or a string. You need to figure out why your
+  ``find()`` call isn't returning anything.
 
 Improving Performance
 ---------------------

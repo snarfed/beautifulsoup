@@ -1,4 +1,4 @@
-= 4.2.0 (Unreleased) =
+= 4.2.0 (20130514) =
 
 * The Tag.select() method now supports a much wider variety of CSS
   selectors.
@@ -60,7 +60,7 @@
 * Stop a crash when unwisely messing with a tag that's been
   decomposed. [bug=1097699]
 
-* Now that lxml's segfault on invalid doctype has been fixed, fix a
+* Now that lxml's segfault on invalid doctype has been fixed, fixed a
   corresponding problem on the Beautiful Soup end that was previously
   invisible. [bug=984936]
 

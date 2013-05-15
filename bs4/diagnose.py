@@ -14,11 +14,6 @@ def diagnose(data):
     print "Diagnostic running on Beautiful Soup %s" % __version__
     print "Python version %s" % sys.version
 
-    if hasattr(data, 'read'):
-        data = data.read()
-    elif os.path.exists(data):
-        print '"%s" looks like a filename. Reading data from the file.' % data
-        data = open(data).read()
     basic_parsers = ["html.parser", "html5lib", "lxml"]
     for name in basic_parsers:
         for builder in builder_registry.builders:
@@ -38,6 +33,16 @@ def diagnose(data):
     if 'html5lib' in basic_parsers:
         import html5lib
         print "Found html5lib version %s" % html5lib.__version__
+
+    if hasattr(data, 'read'):
+        data = data.read()
+    elif os.path.exists(data):
+        print '"%s" looks like a filename. Reading data from the file.' % data
+        data = open(data).read()
+    elif data.startswith("http:") or data.startswith("https:"):
+        print '"%s" looks like a URL. Beautiful Soup is not an HTTP client.' % data
+        print "You need to use some other library to get the document behind the URL, and feed that document to Beautiful Soup."
+        return
     print
 
     for parser in basic_parsers:
