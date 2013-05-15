@@ -8,6 +8,7 @@ import random
 import time
 import traceback
 import sys
+import cProfile
 
 def diagnose(data):
     """Diagnostic suite for isolating common problems."""
@@ -153,11 +154,12 @@ def benchmark_parsers(num_elements=100000):
     print "Comparative parser benchmark on Beautiful Soup %s" % __version__
     data = rdoc(num_elements)
     print "Generated a large invalid HTML document (%d bytes)." % len(data)
+    
     for parser in ["lxml", ["lxml", "html"], "html5lib", "html.parser"]:
         success = False
         try:
             a = time.time()
-            soup = BeautifulSoup(data, )
+            soup = BeautifulSoup(data, parser)
             b = time.time()
             success = True
         except Exception, e:
