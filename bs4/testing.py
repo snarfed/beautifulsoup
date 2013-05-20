@@ -464,6 +464,18 @@ class XMLTreeBuilderSmokeTest(object):
         self.assertEqual(
             soup.encode("utf-8"), markup)
 
+    def test_formatter_processes_script_tag_for_xml_documents(self):
+        doc = """
+  <script type="text/javascript">
+  </script>
+"""
+        soup = BeautifulSoup(doc, "xml")
+        # lxml would have stripped this while parsing, but we can add
+        # it later.
+        soup.script.string = 'console.log("< < hey > > ");'
+        encoded = soup.encode()
+        self.assertTrue(b"&lt; &lt; hey &gt; &gt;" in encoded)
+
     def test_popping_namespaced_tag(self):
         markup = '<rss xmlns:dc="foo"><dc:creator>b</dc:creator><dc:date>2012-07-02T20:33:42Z</dc:date><dc:rights>c</dc:rights><image>d</image></rss>'
         soup = self.soup(markup)

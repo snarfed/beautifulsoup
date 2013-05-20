@@ -1344,18 +1344,6 @@ class TestSubstitutions(SoupTest):
         encoded = BeautifulSoup(doc).encode()
         self.assertTrue(b"< < hey > >" in encoded)
 
-    def test_formatter_processes_script_tag_for_xml_documents(self):
-        doc = """
-  <script type="text/javascript">
-  </script>
-"""
-        soup = BeautifulSoup(doc, "xml")
-        # lxml would have stripped this while parsing, but we can add
-        # it later.
-        soup.script.string = 'console.log("< < hey > > ");'
-        encoded = soup.encode()
-        self.assertTrue(b"&lt; &lt; hey &gt; &gt;" in encoded)
-
     def test_prettify_leaves_preformatted_text_alone(self):
         soup = self.soup("<div>  foo  <pre>  \tbar\n  \n  </pre>  baz  ")
         # Everything outside the <pre> tag is reformatted, but everything
