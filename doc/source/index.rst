@@ -239,10 +239,10 @@ you might install lxml with one of these commands:
 
 :kbd:`$ pip install lxml`
 
-If you're using Python 2, another alternative is the pure-Python
-`html5lib parser <http://code.google.com/p/html5lib/>`_, which parses
-HTML the way a web browser does. Depending on your setup, you might
-install html5lib with one of these commands:
+Another alternative is the pure-Python `html5lib parser
+<http://code.google.com/p/html5lib/>`_, which parses HTML the way a
+web browser does. Depending on your setup, you might install html5lib
+with one of these commands:
 
 :kbd:`$ apt-get install python-html5lib`
 
@@ -270,7 +270,7 @@ This table summarizes the advantages and disadvantages of each parser library:
 | html5lib             | ``BeautifulSoup(markup, "html5lib")``      | * Extremely lenient            | * Very slow              |
 |                      |                                            | * Parses pages the same way a  | * External Python        |
 |                      |                                            |   web browser does             |   dependency             |
-|                      |                                            | * Creates valid HTML5          | * Python 2 only          |
+|                      |                                            | * Creates valid HTML5          |                          |
 +----------------------+--------------------------------------------+--------------------------------+--------------------------+
 
 If you can, I recommend you install and use lxml for speed. If you're

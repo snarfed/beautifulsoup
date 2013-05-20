@@ -69,4 +69,4 @@ class HTML5LibBuilderSmokeTest(SoupTest, HTML5TreeBuilderSmokeTest):
 </html>'''
         soup = self.soup(markup)
         # Verify that we can reach the <p> tag; this means the tree is connected.
-        self.assertEquals("<p>foo</p>", soup.p.encode())
+        self.assertEqual(b"<p>foo</p>", soup.p.encode())

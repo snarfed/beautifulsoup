@@ -1,3 +1,10 @@
+= 4.2.1 (Unreleased) =
+
+* Fixed test failures when lxml is not installed. [bug=1181589]
+
+* html5lib now supports Python 3. Fixed some Python 2-specific
+  code in the html5lib test suite. [bug=1181624]
+
 = 4.2.0 (20130514) =
 
 * The Tag.select() method now supports a much wider variety of CSS
