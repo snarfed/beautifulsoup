@@ -245,14 +245,14 @@ class BeautifulSoup(Tag):
             o = containerClass(currentData)
             self.object_was_parsed(o)
 
-    def object_was_parsed(self, o, parent=None, previous_element=None):
+    def object_was_parsed(self, o, parent=None, most_recent_element=None):
         """Add an object to the parse tree."""
         parent = parent or self.currentTag
-        previous_element = previous_element or self.previous_element
-        o.setup(parent, previous_element)
-        if self.previous_element:
-            self.previous_element.next_element = o
-        self.previous_element = o
+        most_recent_element = most_recent_element or self._most_recent_element
+        o.setup(parent, most_recent_element)
+        if most_recent_element is not None:
+            most_recent_element.next_element = o
+        self._most_recent_element = o
         parent.contents.append(o)
 
     def _popToTag(self, name, nsprefix=None, inclusivePop=True):
@@ -297,12 +297,12 @@ class BeautifulSoup(Tag):
             return None
 
         tag = Tag(self, self.builder, name, namespace, nsprefix, attrs,
-                  self.currentTag, self.previous_element)
+                  self.currentTag, self._most_recent_element)
         if tag is None:
             return tag
-        if self.previous_element:
-            self.previous_element.next_element = tag
-        self.previous_element = tag
+        if self._most_recent_element:
+            self._most_recent_element.next_element = tag
+        self._most_recent_element = tag
         self.pushTag(tag)
         return tag
 
