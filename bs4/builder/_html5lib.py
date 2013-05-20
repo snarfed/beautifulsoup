@@ -131,6 +131,7 @@ class Element(html5lib.treebuilders._base.Node):
             old_element = self.element.contents[-1]
             new_element = self.soup.new_string(old_element + node.element)
             old_element.replace_with(new_element)
+            self.soup.previous_element = new_element
         else:
             self.soup.object_was_parsed(node.element, parent=self.element)
 

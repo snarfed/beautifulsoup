@@ -3,6 +3,9 @@
 * Gave new_string() the ability to create subclasses of
   NavigableString. [bug=1181986]
 
+* Fixed another bug by which the html5lib tree builder could create a
+  disconnected tree. [bug=1182089]
+
 * Fixed test failures when lxml is not installed. [bug=1181589]
 
 * html5lib now supports Python 3. Fixed some Python 2-specific

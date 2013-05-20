@@ -246,6 +246,12 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertSoupEquals("&#x10000000000000;", expect)
         self.assertSoupEquals("&#1000000000;", expect)
 
+    def test_multipart_strings(self):
+        "Mostly to prevent a recurrence of a bug in the html5lib treebuilder."
+        soup = self.soup("<html><h2>\nfoo</h2><p></p></html>")
+        self.assertEqual("p", soup.h2.string.next_element.name)
+        self.assertEqual("p", soup.p.name)
+
     def test_basic_namespaces(self):
         """Parsers don't need to *understand* namespaces, but at the
         very least they should not choke on namespaces or lose
