@@ -1806,6 +1806,20 @@ Python string in to ``append()``, or you can call the factory method
    tag.contents
    # [u'Hello', u' there']
 
+If you want to create a comment or some other subclass of
+``NavigableString``, pass that class as the second argument to
+``new_string()``::
+
+   from bs4 import Comment
+   new_comment = soup.new_string("Nice to see you.", Comment)
+   tag.append(new_comment)
+   tag
+   # <b>Hello there<!--Nice to see you.--></b>
+   tag.contents
+   # [u'Hello', u' there', u'Nice to see you.']
+
+(This is a new feature in Beautiful Soup 4.2.1.)
+
 What if you need to create a whole new tag?  The best solution is to
 call the factory method ``BeautifulSoup.new_tag()``::
 

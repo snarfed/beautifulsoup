@@ -17,7 +17,7 @@ http://www.crummy.com/software/BeautifulSoup/bs4/doc/
 """
 
 __author__ = "Leonard Richardson (leonardr@segfault.org)"
-__version__ = "4.2.0"
+__version__ = "4.2.1"
 __copyright__ = "Copyright (c) 2004-2013 Leonard Richardson"
 __license__ = "MIT"
 
@@ -201,9 +201,9 @@ class BeautifulSoup(Tag):
         """Create a new tag associated with this soup."""
         return Tag(None, self.builder, name, namespace, nsprefix, attrs)
 
-    def new_string(self, s):
+    def new_string(self, s, subclass=NavigableString):
         """Create a new NavigableString associated with this soup."""
-        navigable = NavigableString(s)
+        navigable = subclass(s)
         navigable.setup()
         return navigable
 

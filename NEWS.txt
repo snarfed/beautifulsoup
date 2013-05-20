@@ -1,5 +1,8 @@
 = 4.2.1 (Unreleased) =
 
+* Gave new_string() the ability to create subclasses of
+  NavigableString. [bug=1181986]
+
 * Fixed test failures when lxml is not installed. [bug=1181589]
 
 * html5lib now supports Python 3. Fixed some Python 2-specific

@@ -689,6 +689,12 @@ class TestTagCreation(SoupTest):
         self.assertEqual("foo", s)
         self.assertTrue(isinstance(s, NavigableString))
 
+    def test_new_string_can_create_navigablestring_subclass(self):
+        soup = self.soup("")
+        s = soup.new_string("foo", Comment)
+        self.assertEqual("foo", s)
+        self.assertTrue(isinstance(s, Comment))
+
 class TestTreeModification(SoupTest):
 
     def test_attribute_modification(self):
