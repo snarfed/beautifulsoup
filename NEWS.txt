@@ -6,6 +6,9 @@
 * Fixed another bug by which the html5lib tree builder could create a
   disconnected tree. [bug=1182089]
 
+* The .previous_element of a BeautifulSoup object is now always None,
+  not the last element to be parsed. [bug=1182089]
+
 * Fixed test failures when lxml is not installed. [bug=1181589]
 
 * html5lib now supports Python 3. Fixed some Python 2-specific
