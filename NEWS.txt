@@ -5,6 +5,16 @@
   list of tags and strings without having to check whether each
   element is a tag or a string.
 
+* The default XML formatter will now replace ampersands even if they
+  appear to be part of entities. That is, "&lt;" will become
+  "&amp;lt;". The old code was left over from Beautiful Soup 3, which
+  didn't always turn entities into Unicode characters.
+
+  If you really want the old behavior (maybe because you add new
+  strings to the tree, those strings include entities, and you want
+  the formatter to leave them alone on output), it can be found in
+  EntitySubstitution.substitute_xml_containing_entities(). [bug=1182183]
+
 * Gave new_string() the ability to create subclasses of
   NavigableString. [bug=1181986]
 
