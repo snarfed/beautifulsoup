@@ -223,24 +223,25 @@ class EncodingDetector:
         self.declared_encoding = None
         self.sniffed_encoding = None
 
-    def _yield(self, encoding, tried):
+    def _usable(self, encoding, tried):
         if encoding not in tried and encoding is not None:
-            yield encoding
             tried.add(encoding)
+            return True
+        return False
 
     @property
     def encodings(self):
         """Yield a number of encodings that might work for this markup."""
         tried = set()
         for e in self.override_encodings:
-            for x in self._yield(e, tried):
-                yield x
+            if self._usable(e, tried):
+                yield e
 
         if self.sniffed_encoding is None:
             (self.markup,
              self.sniffed_encoding) = self.strip_byte_order_mark(self.markup)
-        for x in self._yield(self.sniffed_encoding, tried):
-            yield x
+        if self._usable(self.sniffed_encoding, tried):
+            yield self.sniffed_encoding
 
         if self.declared_encoding is None:
             self.declared_encoding = self.find_declared_encoding(
@@ -261,20 +262,18 @@ class EncodingDetector:
                 # only called if the sniffed encoding didn't work.
                 self.declared_encoding = self.sniffed_encoding
 
-        if self.declared_encoding is not None:
-            for x in self._yield(self.declared_encoding, tried):
-                yield x
+        if self._usable(self.declared_encoding, tried):
+            yield self.declared_encoding
 
         if self.chardet_encoding is None:
             self.chardet_encoding = chardet_dammit(self.markup)
-        if self.chardet_encoding is not None:
-            for x in self._yield(self.chardet_encoding, tried):
-                yield x
+        if self._usable(self.chardet_encoding, tried):
+            yield self.chardet_encoding
 
         # As a last-ditch effort, try utf-8 and windows-1252.
         for e in ('utf-8', 'windows-1252'):
-            for x in self._yield(e, tried):
-                yield x
+            if self._usable(e, tried):
+                yield e
 
     @classmethod
     def strip_byte_order_mark(cls, markup):
