@@ -61,14 +61,14 @@ def diagnose(data):
 
         print "-" * 80
 
-def lxml_trace(data, html=True):
+def lxml_trace(data, html=True, **kwargs):
     """Print out the lxml events that occur during parsing.
 
     This lets you see how lxml parses a document when no Beautiful
     Soup code is running.
     """
     from lxml import etree
-    for event, element in etree.iterparse(StringIO(data), html=html):
+    for event, element in etree.iterparse(StringIO(data), html=html, **kwargs):
         print("%s, %4s, %s" % (event, element.tag, element.text))
 
 class AnnouncingParser(HTMLParser):

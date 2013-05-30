@@ -11,6 +11,7 @@ import codecs
 from htmlentitydefs import codepoint2name
 import re
 import logging
+import string
 
 # Import a library to autodetect character encodings.
 chardet_type = None
@@ -175,7 +176,6 @@ class EntitySubstitution(object):
             value = cls.quoted_attribute_value(value)
         return value
 
-
     @classmethod
     def substitute_html(cls, s):
         """Replace certain Unicode characters with named HTML entities.
@@ -190,6 +190,180 @@ class EntitySubstitution(object):
         """
         return cls.CHARACTER_TO_HTML_ENTITY_RE.sub(
             cls._substitute_html_entity, s)
+
+
+class EncodingDetector:
+    """Suggests a number of possible encodings for a bytestring.
+
+    Order of precedence:
+
+    1. Encodings you specifically tell EncodingDetector to try first
+    (the override_encodings argument to the constructor).
+
+    2. An encoding implied by a short substring at the beginning of
+    the bytestring, such as a byte-order mark.
+
+    3. An encoding declared within the bytestring itself, either in an
+    XML declaration (if the bytestring is to be interpreted as an XML
+    document), or in a <meta> tag (if the bytestring is to be
+    interpreted as an HTML document.)
+
+    4. An encoding detected through textual analysis by chardet,
+    cchardet, or a similar external library.
+
+    5. UTF-8.
+
+    6. Windows-1252.
+    """
+    def __init__(self, markup, override_encodings=None, is_html=False):
+        self.markup = markup
+        self.override_encodings = override_encodings or []
+        self.chardet_encoding = None
+        self.is_html = is_html
+        self.declared_encoding = None
+        self.sniffed_encoding = None
+
+    def _yield(self, encoding, tried):
+        if encoding not in tried and encoding is not None:
+            yield encoding
+            tried.add(encoding)
+
+    @property
+    def encodings(self):
+        """Yield a number of encodings that might work for this markup."""
+        tried = set()
+        for e in self.override_encodings:
+            for x in self._yield(e, tried):
+                yield x
+
+        if self.sniffed_encoding is None:
+            (self.markup,
+             self.sniffed_encoding) = self.strip_byte_order_mark(self.markup)
+        for x in self._yield(self.sniffed_encoding, tried):
+            yield x
+
+        if self.declared_encoding is None:
+            self.declared_encoding = self.find_declared_encoding(
+                self.markup, self.is_html)
+
+            if self.sniffed_encoding and self.declared_encoding in (
+                'iso-10646-ucs-2', 'ucs-2', 'csunicode',
+                'iso-10646-ucs-4', 'ucs-4', 'csucs4',
+                'utf-16', 'utf-32', 'utf_16', 'utf_32',
+                'utf16', 'u16'):
+                # We were able to sniff an encoding by looking at the
+                # first part of the document. The declared encoding is redundant
+                # with the sniffed encoding.
+                #
+                # TODO: Is it really? How do we know? What if the BOM
+                # says UTF-32 and the declaration says UTF-16? In real
+                # usage this doesn't matter because this method is
+                # only called if the sniffed encoding didn't work.
+                self.declared_encoding = self.sniffed_encoding
+
+        if self.declared_encoding is not None:
+            for x in self._yield(self.declared_encoding, tried):
+                yield x
+
+        if self.chardet_encoding is None:
+            self.chardet_encoding = chardet_dammit(self.markup)
+        if self.chardet_encoding is not None:
+            for x in self._yield(self.chardet_encoding, tried):
+                yield x
+
+        # As a last-ditch effort, try utf-8 and windows-1252.
+        for e in ('utf-8', 'windows-1252'):
+            for x in self._yield(e, tried):
+                yield x
+
+    @classmethod
+    def strip_byte_order_mark(cls, markup):
+        "Remove a byte-order mark from a document, and guess at its encoding."
+        if markup[:4] == b'\x4c\x6f\xa7\x94':
+            # EBCDIC
+            # There's no 'ebcdic' codec, so just convert the ebsdic to ASCII.
+            markup = self.ebcdic_to_ascii(markup)
+        elif markup[:4] == b'\x00\x3c\x00\x3f':
+            # UTF-16BE
+            sniffed_encoding = 'utf-16be'
+        elif (len(markup) >= 4) and (markup[:2] == b'\xfe\xff') \
+                and (markup[2:4] != b'\x00\x00'):
+            # UTF-16BE with BOM
+            sniffed_encoding = 'utf-16be'
+            markup = markup[2:]
+        elif markup[:4] == b'\x3c\x00\x3f\x00':
+            # UTF-16LE
+            sniffed_encoding = 'utf-16le'
+        elif (len(markup) >= 4) and (markup[:2] == b'\xff\xfe') and \
+                (markup[2:4] != b'\x00\x00'):
+            # UTF-16LE with BOM
+            sniffed_encoding = 'utf-16le'
+            markup = markup[2:]
+        elif markup[:4] == b'\x00\x00\x00\x3c':
+            # UTF-32BE
+            sniffed_encoding = 'utf-32be'
+        elif markup[:4] == b'\x3c\x00\x00\x00':
+            # UTF-32LE
+            sniffed_encoding = 'utf-32le'
+        elif markup[:4] == b'\x00\x00\xfe\xff':
+            # UTF-32BE with BOM
+            sniffed_encoding = 'utf-32be'
+            markup = markup[4:]
+        elif markup[:4] == b'\xff\xfe\x00\x00':
+            # UTF-32LE with BOM
+            sniffed_encoding = 'utf-32le'
+            markup = markup[4:]
+        elif markup[:3] == b'\xef\xbb\xbf':
+            # UTF-8 with BOM
+            sniffed_encoding = 'utf-8'
+            markup = markup[3:]
+        else:
+            # No idea.
+            sniffed_encoding = None
+        return markup, sniffed_encoding
+
+    @classmethod
+    def find_declared_encoding(cls, markup, is_html=False):
+        """Given a document, tries to find its declared encoding.
+
+        An XML encoding is declared at the beginning of the document.
+
+        An HTML encoding is declared in a <meta> tag.
+        """
+        declared_encoding = None
+        declared_encoding_match = xml_encoding_re.match(markup)
+        if not declared_encoding_match and is_html:
+            declared_encoding_match = html_meta_re.search(markup)
+        if declared_encoding_match is not None:
+            declared_encoding = declared_encoding_match.groups()[0].decode(
+                'ascii').lower()
+        return declared_encoding
+
+    EBCDIC_TO_ASCII_MAP = None
+
+    @classmethod
+    def ebcdic_to_ascii(cls, s):
+        if not cls.EBCDIC_TO_ASCII_MAP:
+            emap = (0,1,2,3,156,9,134,127,151,141,142,11,12,13,14,15,
+                    16,17,18,19,157,133,8,135,24,25,146,143,28,29,30,31,
+                    128,129,130,131,132,10,23,27,136,137,138,139,140,5,6,7,
+                    144,145,22,147,148,149,150,4,152,153,154,155,20,21,158,26,
+                    32,160,161,162,163,164,165,166,167,168,91,46,60,40,43,33,
+                    38,169,170,171,172,173,174,175,176,177,93,36,42,41,59,94,
+                    45,47,178,179,180,181,182,183,184,185,124,44,37,95,62,63,
+                    186,187,188,189,190,191,192,193,194,96,58,35,64,39,61,34,
+                    195,97,98,99,100,101,102,103,104,105,196,197,198,199,200,
+                    201,202,106,107,108,109,110,111,112,113,114,203,204,205,
+                    206,207,208,209,126,115,116,117,118,119,120,121,122,210,
+                    211,212,213,214,215,216,217,218,219,220,221,222,223,224,
+                    225,226,227,228,229,230,231,123,65,66,67,68,69,70,71,72,
+                    73,232,233,234,235,236,237,125,74,75,76,77,78,79,80,81,
+                    82,238,239,240,241,242,243,92,159,83,84,85,86,87,88,89,
+                    90,244,245,246,247,248,249,48,49,50,51,52,53,54,55,56,57,
+                    250,251,252,253,254,255)
+            cls.EBCDIC_TO_ASCII_MAP = string.maketrans(
+            ''.join(map(chr, list(range(256)))), ''.join(map(chr, emap)))
+        return s.translate(cls.EBCDIC_TO_ASCII_MAP)
 
 
 class UnicodeDammit:
@@ -224,44 +398,22 @@ class UnicodeDammit:
             self.original_encoding = None
             return
 
-        new_markup, document_encoding, sniffed_encoding = \
-            self._detectEncoding(markup, is_html)
-        self.markup = new_markup
+        self.detector = EncodingDetector(markup, override_encodings, is_html)
+        self.markup, ignore = self.detector.strip_byte_order_mark(markup)
 
         u = None
-        if new_markup != markup:
-            # _detectEncoding modified the markup, then converted it to
-            # Unicode and then to UTF-8. So convert it from UTF-8.
-            u = self._convert_from("utf8")
-            self.original_encoding = sniffed_encoding
+        for encoding in self.detector.encodings:
+            u = self._convert_from(encoding)
+            if u is not None:
+                break
 
         if not u:
-            for proposed_encoding in (
-                override_encodings + [document_encoding, sniffed_encoding]):
-                if proposed_encoding is not None:
-                    u = self._convert_from(proposed_encoding)
-                    if u:
-                        break
+            # None of the encodings worked. As an absolute last resort,
+            # try them again with character replacement.
 
-        # If no luck and we have auto-detection library, try that:
-        if not u and not isinstance(self.markup, unicode):
-            u = self._convert_from(chardet_dammit(self.markup))
-
-        # As a last resort, try utf-8 and windows-1252:
-        if not u:
-            for proposed_encoding in ("utf-8", "windows-1252"):
-                u = self._convert_from(proposed_encoding)
-                if u:
-                    break
-
-        # As an absolute last resort, try the encodings again with
-        # character replacement.
-        if not u:
-            for proposed_encoding in (
-                override_encodings + [
-                    document_encoding, sniffed_encoding, "utf-8", "windows-1252"]):
-                if proposed_encoding != "ascii":
-                    u = self._convert_from(proposed_encoding, "replace")
+            for encoding in self.detector.encodings:
+                if encoding != "ascii":
+                    u = self._convert_from(encoding, "replace")
                 if u is not None:
                     logging.warning(
                             "Some characters could not be decoded, and were "
@@ -269,8 +421,9 @@ class UnicodeDammit:
                     self.contains_replacement_characters = True
                     break
 
-        # We could at this point force it to ASCII, but that would
-        # destroy so much data that I think giving up is better
+        # If none of that worked, we could at this point force it to
+        # ASCII, but that would destroy so much data that I think
+        # giving up is better.
         self.unicode_markup = u
         if not u:
             self.original_encoding = None
@@ -344,72 +497,6 @@ class UnicodeDammit:
         newdata = unicode(data, encoding, errors)
         return newdata
 
-    def _detectEncoding(self, xml_data, is_html=False):
-        """Given a document, tries to detect its XML encoding."""
-        xml_encoding = sniffed_xml_encoding = None
-        try:
-            if xml_data[:4] == b'\x4c\x6f\xa7\x94':
-                # EBCDIC
-                xml_data = self._ebcdic_to_ascii(xml_data)
-            elif xml_data[:4] == b'\x00\x3c\x00\x3f':
-                # UTF-16BE
-                sniffed_xml_encoding = 'utf-16be'
-                xml_data = unicode(xml_data, 'utf-16be').encode('utf-8')
-            elif (len(xml_data) >= 4) and (xml_data[:2] == b'\xfe\xff') \
-                     and (xml_data[2:4] != b'\x00\x00'):
-                # UTF-16BE with BOM
-                sniffed_xml_encoding = 'utf-16be'
-                xml_data = unicode(xml_data[2:], 'utf-16be').encode('utf-8')
-            elif xml_data[:4] == b'\x3c\x00\x3f\x00':
-                # UTF-16LE
-                sniffed_xml_encoding = 'utf-16le'
-                xml_data = unicode(xml_data, 'utf-16le').encode('utf-8')
-            elif (len(xml_data) >= 4) and (xml_data[:2] == b'\xff\xfe') and \
-                     (xml_data[2:4] != b'\x00\x00'):
-                # UTF-16LE with BOM
-                sniffed_xml_encoding = 'utf-16le'
-                xml_data = unicode(xml_data[2:], 'utf-16le').encode('utf-8')
-            elif xml_data[:4] == b'\x00\x00\x00\x3c':
-                # UTF-32BE
-                sniffed_xml_encoding = 'utf-32be'
-                xml_data = unicode(xml_data, 'utf-32be').encode('utf-8')
-            elif xml_data[:4] == b'\x3c\x00\x00\x00':
-                # UTF-32LE
-                sniffed_xml_encoding = 'utf-32le'
-                xml_data = unicode(xml_data, 'utf-32le').encode('utf-8')
-            elif xml_data[:4] == b'\x00\x00\xfe\xff':
-                # UTF-32BE with BOM
-                sniffed_xml_encoding = 'utf-32be'
-                xml_data = unicode(xml_data[4:], 'utf-32be').encode('utf-8')
-            elif xml_data[:4] == b'\xff\xfe\x00\x00':
-                # UTF-32LE with BOM
-                sniffed_xml_encoding = 'utf-32le'
-                xml_data = unicode(xml_data[4:], 'utf-32le').encode('utf-8')
-            elif xml_data[:3] == b'\xef\xbb\xbf':
-                # UTF-8 with BOM
-                sniffed_xml_encoding = 'utf-8'
-                xml_data = unicode(xml_data[3:], 'utf-8').encode('utf-8')
-            else:
-                sniffed_xml_encoding = 'ascii'
-                pass
-        except:
-            xml_encoding_match = None
-        xml_encoding_match = xml_encoding_re.match(xml_data)
-        if not xml_encoding_match and is_html:
-            xml_encoding_match = html_meta_re.search(xml_data)
-        if xml_encoding_match is not None:
-            xml_encoding = xml_encoding_match.groups()[0].decode(
-                'ascii').lower()
-            if is_html:
-                self.declared_html_encoding = xml_encoding
-            if sniffed_xml_encoding and \
-               (xml_encoding in ('iso-10646-ucs-2', 'ucs-2', 'csunicode',
-                                 'iso-10646-ucs-4', 'ucs-4', 'csucs4',
-                                 'utf-16', 'utf-32', 'utf_16', 'utf_32',
-                                 'utf16', 'u16')):
-                xml_encoding = sniffed_xml_encoding
-        return xml_data, xml_encoding, sniffed_xml_encoding
-
     def find_codec(self, charset):
         return self._codec(self.CHARSET_ALIASES.get(charset, charset)) \
                or (charset and self._codec(charset.replace("-", ""))) \
@@ -427,32 +514,6 @@ class UnicodeDammit:
             pass
         return codec
 
-    EBCDIC_TO_ASCII_MAP = None
-
-    def _ebcdic_to_ascii(self, s):
-        c = self.__class__
-        if not c.EBCDIC_TO_ASCII_MAP:
-            emap = (0,1,2,3,156,9,134,127,151,141,142,11,12,13,14,15,
-                    16,17,18,19,157,133,8,135,24,25,146,143,28,29,30,31,
-                    128,129,130,131,132,10,23,27,136,137,138,139,140,5,6,7,
-                    144,145,22,147,148,149,150,4,152,153,154,155,20,21,158,26,
-                    32,160,161,162,163,164,165,166,167,168,91,46,60,40,43,33,
-                    38,169,170,171,172,173,174,175,176,177,93,36,42,41,59,94,
-                    45,47,178,179,180,181,182,183,184,185,124,44,37,95,62,63,
-                    186,187,188,189,190,191,192,193,194,96,58,35,64,39,61,34,
-                    195,97,98,99,100,101,102,103,104,105,196,197,198,199,200,
-                    201,202,106,107,108,109,110,111,112,113,114,203,204,205,
-                    206,207,208,209,126,115,116,117,118,119,120,121,122,210,
-                    211,212,213,214,215,216,217,218,219,220,221,222,223,224,
-                    225,226,227,228,229,230,231,123,65,66,67,68,69,70,71,72,
-                    73,232,233,234,235,236,237,125,74,75,76,77,78,79,80,81,
-                    82,238,239,240,241,242,243,92,159,83,84,85,86,87,88,89,
-                    90,244,245,246,247,248,249,48,49,50,51,52,53,54,55,56,57,
-                    250,251,252,253,254,255)
-            import string
-            c.EBCDIC_TO_ASCII_MAP = string.maketrans(
-            ''.join(map(chr, list(range(256)))), ''.join(map(chr, emap)))
-        return s.translate(c.EBCDIC_TO_ASCII_MAP)
 
     # A partial mapping of ISO-Latin-1 to HTML entities/XML numeric entities.
     MS_CHARS = {b'\x80': ('euro', '20AC'),

@@ -156,13 +156,23 @@ class TestEncodingConversion(SoupTest):
 
     def test_ascii_in_unicode_out(self):
         # ASCII input is converted to Unicode. The original_encoding
-        # attribute is set.
-        ascii = b"<foo>a</foo>"
-        soup_from_ascii = self.soup(ascii)
-        unicode_output = soup_from_ascii.decode()
-        self.assertTrue(isinstance(unicode_output, unicode))
-        self.assertEqual(unicode_output, self.document_for(ascii.decode()))
-        self.assertEqual(soup_from_ascii.original_encoding.lower(), "ascii")
+        # attribute is set to 'utf-8', a superset of ASCII.
+        chardet = bs4.dammit.chardet_dammit
+        logging.disable(logging.WARNING)
+        try:
+            def noop(str):
+                return None
+            # Disable chardet, which will realize that the ASCII is ASCII.
+            bs4.dammit.chardet_dammit = noop
+            ascii = b"<foo>a</foo>"
+            soup_from_ascii = self.soup(ascii)
+            unicode_output = soup_from_ascii.decode()
+            self.assertTrue(isinstance(unicode_output, unicode))
+            self.assertEqual(unicode_output, self.document_for(ascii.decode()))
+            self.assertEqual(soup_from_ascii.original_encoding.lower(), "utf-8")
+        finally:
+            logging.disable(logging.NOTSET)
+            bs4.dammit.chardet_dammit = chardet
 
     def test_unicode_in_unicode_out(self):
         # Unicode input is left alone. The original_encoding attribute
