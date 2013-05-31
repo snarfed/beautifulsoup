@@ -1,9 +1,4 @@
-= 4.3.0 (Unreleased) =
-
-* A NavigableString object now has an immutable '.name' property whose
-  value is always None. This makes it easier to iterate over a mixed
-  list of tags and strings without having to check whether each
-  element is a tag or a string.
+= 4.2.1 (20130531) =
 
 * The default XML formatter will now replace ampersands even if they
   appear to be part of entities. That is, "&lt;" will become

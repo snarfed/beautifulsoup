@@ -1187,13 +1187,6 @@ class TestElementObjects(SoupTest):
         soup = self.soup("foo<!--IGNORE-->bar")
         self.assertEqual(['foo', 'bar'], list(soup.strings))
 
-    def test_string_has_immutable_name_property(self):
-        string = self.soup("s").string
-        self.assertEqual(None, string.name)
-        def t():
-            string.name = 'foo'
-        self.assertRaises(AttributeError, t)
-
 class TestCDAtaListAttributes(SoupTest):
 
     """Testing cdata-list attributes like 'class'.
