@@ -224,9 +224,11 @@ class EncodingDetector:
         self.sniffed_encoding = None
 
     def _usable(self, encoding, tried):
-        if encoding not in tried and encoding is not None:
-            tried.add(encoding)
-            return True
+        if encoding is not None:
+            encoding = encoding.lower()
+            if encoding not in tried:
+                tried.add(encoding)
+                return True
         return False
 
     @property
@@ -386,18 +388,17 @@ class UnicodeDammit:
 
     def __init__(self, markup, override_encodings=[],
                  smart_quotes_to=None, is_html=False):
-        self.declared_html_encoding = None
         self.smart_quotes_to = smart_quotes_to
         self.tried_encodings = []
         self.contains_replacement_characters = False
 
+        self.detector = EncodingDetector(markup, override_encodings, is_html)
         if markup == '' or isinstance(markup, unicode):
             self.markup = markup
             self.unicode_markup = unicode(markup)
             self.original_encoding = None
             return
 
-        self.detector = EncodingDetector(markup, override_encodings, is_html)
         self.markup, ignore = self.detector.strip_byte_order_mark(markup)
 
         u = None
@@ -495,6 +496,16 @@ class UnicodeDammit:
             data = data[4:]
         newdata = unicode(data, encoding, errors)
         return newdata
+
+    @property
+    def declared_html_encoding(self):
+        if not self.is_html:
+            return None
+        return self.detector.declared_encoding
+
+    @property
+    def is_html(self):
+        return self.detector.is_html
 
     def find_codec(self, charset):
         return self._codec(self.CHARSET_ALIASES.get(charset, charset)) \

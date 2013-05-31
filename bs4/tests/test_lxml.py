@@ -4,13 +4,15 @@ import re
 import warnings
 
 try:
-    from bs4.builder import LXMLTreeBuilder, LXMLTreeBuilderForXML
-    LXML_PRESENT = True
     import lxml.etree
+    LXML_PRESENT = True
     LXML_VERSION = lxml.etree.LXML_VERSION
 except ImportError, e:
     LXML_PRESENT = False
     LXML_VERSION = (0,)
+
+if LXML_PRESENT:
+    from bs4.builder import LXMLTreeBuilder, LXMLTreeBuilderForXML
 
 from bs4 import (
     BeautifulSoup,

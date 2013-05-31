@@ -27,7 +27,7 @@ class HTML5TreeBuilder(HTMLTreeBuilder):
     def prepare_markup(self, markup, user_specified_encoding):
         # Store the user-specified encoding for use later on.
         self.user_specified_encoding = user_specified_encoding
-        return markup, None, None, False
+        yield (markup, None, None, False)
 
     # These methods are defined by Beautiful Soup.
     def feed(self, markup):

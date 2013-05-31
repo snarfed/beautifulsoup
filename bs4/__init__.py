@@ -26,7 +26,7 @@ __all__ = ['BeautifulSoup']
 import re
 import warnings
 
-from .builder import builder_registry
+from .builder import builder_registry, ParserRejectedMarkup
 from .dammit import UnicodeDammit
 from .element import (
     CData,
@@ -160,18 +160,17 @@ class BeautifulSoup(Tag):
 
         self.parse_only = parse_only
 
-        self.reset()
-
         if hasattr(markup, 'read'):        # It's a file-type object.
             markup = markup.read()
-        (self.markup, self.original_encoding, self.declared_html_encoding,
-         self.contains_replacement_characters) = (
-            self.builder.prepare_markup(markup, from_encoding))
-
-        try:
-            self._feed()
-        except StopParsing:
-            pass
+        for (self.markup, self.original_encoding, self.declared_html_encoding,
+         self.contains_replacement_characters) in (
+            self.builder.prepare_markup(markup, from_encoding)):
+            self.reset()
+            try:
+                self._feed()
+                break
+            except ParserRejectedMarkup, e:
+                pass
 
         # Clear out the markup and remove the builder's circular
         # reference to this object.
@@ -352,7 +351,6 @@ class BeautifulStoneSoup(BeautifulSoup):
 
 class StopParsing(Exception):
     pass
-
 
 class FeatureNotFound(ValueError):
     pass
