@@ -228,12 +228,14 @@ class HTMLTreeBuilderSmokeTest(object):
         expect = u'<p id="pi\N{LATIN SMALL LETTER N WITH TILDE}ata"></p>'
         self.assertSoupEquals('<p id="pi&#241;ata"></p>', expect)
         self.assertSoupEquals('<p id="pi&#xf1;ata"></p>', expect)
+        self.assertSoupEquals('<p id="pi&#Xf1;ata"></p>', expect)
         self.assertSoupEquals('<p id="pi&ntilde;ata"></p>', expect)
 
     def test_entities_in_text_converted_to_unicode(self):
         expect = u'<p>pi\N{LATIN SMALL LETTER N WITH TILDE}ata</p>'
         self.assertSoupEquals("<p>pi&#241;ata</p>", expect)
         self.assertSoupEquals("<p>pi&#xf1;ata</p>", expect)
+        self.assertSoupEquals("<p>pi&#Xf1;ata</p>", expect)
         self.assertSoupEquals("<p>pi&ntilde;ata</p>", expect)
 
     def test_quot_entity_converted_to_quotation_mark(self):

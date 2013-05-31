@@ -58,6 +58,8 @@ class BeautifulSoupHTMLParser(HTMLParser):
         # it's fixed.
         if name.startswith('x'):
             real_name = int(name.lstrip('x'), 16)
+        elif name.startswith('X'):
+            real_name = int(name.lstrip('X'), 16)
         else:
             real_name = int(name)
 
