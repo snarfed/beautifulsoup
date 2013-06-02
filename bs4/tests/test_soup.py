@@ -15,7 +15,10 @@ from bs4.element import (
     NamespacedAttribute,
     )
 import bs4.dammit
-from bs4.dammit import EntitySubstitution, UnicodeDammit
+from bs4.dammit import (
+    EntitySubstitution,
+    UnicodeDammit,
+)
 from bs4.testing import (
     SoupTest,
     skipIf,
@@ -202,7 +205,7 @@ class TestEncodingConversion(SoupTest):
         self.assertEqual(self.soup(markup).div.encode("utf8"), markup.encode("utf8"))
 
 class TestUnicodeDammit(unittest.TestCase):
-    """Standalone tests of Unicode, Dammit."""
+    """Standalone tests of UnicodeDammit."""
 
     def test_smart_quotes_to_unicode(self):
         markup = b"<foo>\x91\x92\x93\x94</foo>"

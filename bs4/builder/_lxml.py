@@ -224,7 +224,7 @@ class LXMLTreeBuilder(HTMLTreeBuilder, LXMLTreeBuilderForXML):
             self.parser = self.parser_for(encoding)
             self.parser.feed(markup)
             self.parser.close()
-        except (UnicodeDecodeError, LookupError), e:
+        except (UnicodeDecodeError, LookupError, etree.ParserError), e:
             raise ParserRejectedMarkup(str(e))
 
 

@@ -200,20 +200,17 @@ class EncodingDetector:
     1. Encodings you specifically tell EncodingDetector to try first
     (the override_encodings argument to the constructor).
 
-    2. An encoding implied by a short substring at the beginning of
-    the bytestring, such as a byte-order mark.
-
-    3. An encoding declared within the bytestring itself, either in an
+    2. An encoding declared within the bytestring itself, either in an
     XML declaration (if the bytestring is to be interpreted as an XML
     document), or in a <meta> tag (if the bytestring is to be
     interpreted as an HTML document.)
 
-    4. An encoding detected through textual analysis by chardet,
+    3. An encoding detected through textual analysis by chardet,
     cchardet, or a similar external library.
 
-    5. UTF-8.
+    4. UTF-8.
 
-    6. Windows-1252.
+    5. Windows-1252.
     """
     def __init__(self, markup, override_encodings=None, is_html=False):
         self.markup = markup
@@ -239,30 +236,11 @@ class EncodingDetector:
             if self._usable(e, tried):
                 yield e
 
-        if self.sniffed_encoding is None:
-            (self.markup,
-             self.sniffed_encoding) = self.strip_byte_order_mark(self.markup)
-        if self._usable(self.sniffed_encoding, tried):
-            yield self.sniffed_encoding
-
         if self.declared_encoding is None:
+            # Look within the document for an XML or HTML encoding
+            # declaration.
             self.declared_encoding = self.find_declared_encoding(
                 self.markup, self.is_html)
-
-            if self.sniffed_encoding and self.declared_encoding in (
-                'iso-10646-ucs-2', 'ucs-2', 'csunicode',
-                'iso-10646-ucs-4', 'ucs-4', 'csucs4',
-                'utf-16', 'utf-32', 'utf_16', 'utf_32',
-                'utf16', 'u16'):
-                # We were able to sniff an encoding by looking at the
-                # first part of the document. The declared encoding is redundant
-                # with the sniffed encoding.
-                #
-                # TODO: Is it really? How do we know? What if the BOM
-                # says UTF-32 and the declaration says UTF-16? In real
-                # usage this doesn't matter because this method is
-                # only called if the sniffed encoding didn't work.
-                self.declared_encoding = self.sniffed_encoding
 
         if self._usable(self.declared_encoding, tried):
             yield self.declared_encoding
@@ -278,52 +256,6 @@ class EncodingDetector:
                 yield e
 
     @classmethod
-    def strip_byte_order_mark(cls, markup):
-        "Remove a byte-order mark from a document, and guess at its encoding."
-        if markup[:4] == b'\x4c\x6f\xa7\x94':
-            # EBCDIC
-            # There's no 'ebcdic' codec, so just convert the ebsdic to ASCII.
-            markup = self.ebcdic_to_ascii(markup)
-        elif markup[:4] == b'\x00\x3c\x00\x3f':
-            # UTF-16BE
-            sniffed_encoding = 'utf-16be'
-        elif (len(markup) >= 4) and (markup[:2] == b'\xfe\xff') \
-                and (markup[2:4] != b'\x00\x00'):
-            # UTF-16BE with BOM
-            sniffed_encoding = 'utf-16be'
-            markup = markup[2:]
-        elif markup[:4] == b'\x3c\x00\x3f\x00':
-            # UTF-16LE
-            sniffed_encoding = 'utf-16le'
-        elif (len(markup) >= 4) and (markup[:2] == b'\xff\xfe') and \
-                (markup[2:4] != b'\x00\x00'):
-            # UTF-16LE with BOM
-            sniffed_encoding = 'utf-16le'
-            markup = markup[2:]
-        elif markup[:4] == b'\x00\x00\x00\x3c':
-            # UTF-32BE
-            sniffed_encoding = 'utf-32be'
-        elif markup[:4] == b'\x3c\x00\x00\x00':
-            # UTF-32LE
-            sniffed_encoding = 'utf-32le'
-        elif markup[:4] == b'\x00\x00\xfe\xff':
-            # UTF-32BE with BOM
-            sniffed_encoding = 'utf-32be'
-            markup = markup[4:]
-        elif markup[:4] == b'\xff\xfe\x00\x00':
-            # UTF-32LE with BOM
-            sniffed_encoding = 'utf-32le'
-            markup = markup[4:]
-        elif markup[:3] == b'\xef\xbb\xbf':
-            # UTF-8 with BOM
-            sniffed_encoding = 'utf-8'
-            markup = markup[3:]
-        else:
-            # No idea.
-            sniffed_encoding = None
-        return markup, sniffed_encoding
-
-    @classmethod
     def find_declared_encoding(cls, markup, is_html=False):
         """Given a document, tries to find its declared encoding.
 
@@ -337,35 +269,10 @@ class EncodingDetector:
             declared_encoding_match = html_meta_re.search(markup)
         if declared_encoding_match is not None:
             declared_encoding = declared_encoding_match.groups()[0].decode(
-                'ascii').lower()
-        return declared_encoding
-
-    EBCDIC_TO_ASCII_MAP = None
-
-    @classmethod
-    def ebcdic_to_ascii(cls, s):
-        if not cls.EBCDIC_TO_ASCII_MAP:
-            emap = (0,1,2,3,156,9,134,127,151,141,142,11,12,13,14,15,
-                    16,17,18,19,157,133,8,135,24,25,146,143,28,29,30,31,
-                    128,129,130,131,132,10,23,27,136,137,138,139,140,5,6,7,
-                    144,145,22,147,148,149,150,4,152,153,154,155,20,21,158,26,
-                    32,160,161,162,163,164,165,166,167,168,91,46,60,40,43,33,
-                    38,169,170,171,172,173,174,175,176,177,93,36,42,41,59,94,
-                    45,47,178,179,180,181,182,183,184,185,124,44,37,95,62,63,
-                    186,187,188,189,190,191,192,193,194,96,58,35,64,39,61,34,
-                    195,97,98,99,100,101,102,103,104,105,196,197,198,199,200,
-                    201,202,106,107,108,109,110,111,112,113,114,203,204,205,
-                    206,207,208,209,126,115,116,117,118,119,120,121,122,210,
-                    211,212,213,214,215,216,217,218,219,220,221,222,223,224,
-                    225,226,227,228,229,230,231,123,65,66,67,68,69,70,71,72,
-                    73,232,233,234,235,236,237,125,74,75,76,77,78,79,80,81,
-                    82,238,239,240,241,242,243,92,159,83,84,85,86,87,88,89,
-                    90,244,245,246,247,248,249,48,49,50,51,52,53,54,55,56,57,
-                    250,251,252,253,254,255)
-            cls.EBCDIC_TO_ASCII_MAP = string.maketrans(
-            ''.join(map(chr, list(range(256)))), ''.join(map(chr, emap)))
-        return s.translate(cls.EBCDIC_TO_ASCII_MAP)
-
+                'ascii')
+        if declared_encoding:
+            return declared_encoding.lower()
+        return None
 
 class UnicodeDammit:
     """A class for detecting the encoding of a *ML document and
@@ -399,7 +306,7 @@ class UnicodeDammit:
             self.original_encoding = None
             return
 
-        self.markup, ignore = self.detector.strip_byte_order_mark(markup)
+        self.markup = markup
 
         u = None
         for encoding in self.detector.encodings:
@@ -454,7 +361,7 @@ class UnicodeDammit:
         # Convert smart quotes to HTML if coming from an encoding
         # that might have them.
         if (self.smart_quotes_to is not None
-            and proposed.lower() in self.ENCODINGS_WITH_SMART_QUOTES):
+            and proposed in self.ENCODINGS_WITH_SMART_QUOTES):
             smart_quotes_re = b"([\x80-\x9f])"
             smart_quotes_compiled = re.compile(smart_quotes_re)
             markup = smart_quotes_compiled.sub(self._sub_ms_char, markup)
@@ -508,10 +415,15 @@ class UnicodeDammit:
         return self.detector.is_html
 
     def find_codec(self, charset):
-        return self._codec(self.CHARSET_ALIASES.get(charset, charset)) \
-               or (charset and self._codec(charset.replace("-", ""))) \
-               or (charset and self._codec(charset.replace("-", "_"))) \
+        value = (self._codec(self.CHARSET_ALIASES.get(charset, charset))
+               or (charset and self._codec(charset.replace("-", "")))
+               or (charset and self._codec(charset.replace("-", "_")))
+               or (charset and charset.lower())
                or charset
+                )
+        if value:
+            return value.lower()
+        return None
 
     def _codec(self, charset):
         if not charset:
