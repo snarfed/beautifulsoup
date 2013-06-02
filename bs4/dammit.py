@@ -213,12 +213,13 @@ class EncodingDetector:
     5. Windows-1252.
     """
     def __init__(self, markup, override_encodings=None, is_html=False):
-        self.markup = markup
         self.override_encodings = override_encodings or []
         self.chardet_encoding = None
         self.is_html = is_html
         self.declared_encoding = None
-        self.sniffed_encoding = None
+
+        # First order of business: strip a byte-order mark.
+        self.markup, self.sniffed_encoding = self.strip_byte_order_mark(markup)
 
     def _usable(self, encoding, tried):
         if encoding is not None:
@@ -236,15 +237,21 @@ class EncodingDetector:
             if self._usable(e, tried):
                 yield e
 
+        # Did the document originally start with a byte-order mark
+        # that indicated its encoding?
+        if self._usable(self.sniffed_encoding, tried):
+            yield self.sniffed_encoding
+
+        # Look within the document for an XML or HTML encoding
+        # declaration.
         if self.declared_encoding is None:
-            # Look within the document for an XML or HTML encoding
-            # declaration.
             self.declared_encoding = self.find_declared_encoding(
                 self.markup, self.is_html)
-
         if self._usable(self.declared_encoding, tried):
             yield self.declared_encoding
 
+        # Use third-party character set detection to guess at the
+        # encoding.
         if self.chardet_encoding is None:
             self.chardet_encoding = chardet_dammit(self.markup)
         if self._usable(self.chardet_encoding, tried):
@@ -254,6 +261,29 @@ class EncodingDetector:
         for e in ('utf-8', 'windows-1252'):
             if self._usable(e, tried):
                 yield e
+
+    @classmethod
+    def strip_byte_order_mark(cls, data):
+        """If a byte-order mark is present, strip it and return the encoding it implies."""
+        encoding = None
+        if (len(data) >= 4) and (data[:2] == b'\xfe\xff') \
+               and (data[2:4] != '\x00\x00'):
+            encoding = 'utf-16be'
+            data = data[2:]
+        elif (len(data) >= 4) and (data[:2] == b'\xff\xfe') \
+                 and (data[2:4] != '\x00\x00'):
+            encoding = 'utf-16le'
+            data = data[2:]
+        elif data[:3] == b'\xef\xbb\xbf':
+            encoding = 'utf-8'
+            data = data[3:]
+        elif data[:4] == b'\x00\x00\xfe\xff':
+            encoding = 'utf-32be'
+            data = data[4:]
+        elif data[:4] == b'\xff\xfe\x00\x00':
+            encoding = 'utf-32le'
+            data = data[4:]
+        return data, encoding
 
     @classmethod
     def find_declared_encoding(cls, markup, is_html=False):
@@ -298,18 +328,21 @@ class UnicodeDammit:
         self.smart_quotes_to = smart_quotes_to
         self.tried_encodings = []
         self.contains_replacement_characters = False
+        self.is_html = is_html
 
         self.detector = EncodingDetector(markup, override_encodings, is_html)
-        if markup == '' or isinstance(markup, unicode):
+
+        # Is the data in Unicode to begin with?
+        if isinstance(markup, unicode) or markup == '':
             self.markup = markup
             self.unicode_markup = unicode(markup)
-            self.original_encoding = None
-            return
 
-        self.markup = markup
+        # As a first step, the encoding detector may strip a byte-order mark.
+        self.markup = self.detector.markup
 
         u = None
         for encoding in self.detector.encodings:
+            markup = self.detector.markup
             u = self._convert_from(encoding)
             if u is not None:
                 break
@@ -382,37 +415,13 @@ class UnicodeDammit:
     def _to_unicode(self, data, encoding, errors="strict"):
         '''Given a string and its encoding, decodes the string into Unicode.
         %encoding is a string recognized by encodings.aliases'''
-
-        # strip Byte Order Mark (if present)
-        if (len(data) >= 4) and (data[:2] == '\xfe\xff') \
-               and (data[2:4] != '\x00\x00'):
-            encoding = 'utf-16be'
-            data = data[2:]
-        elif (len(data) >= 4) and (data[:2] == '\xff\xfe') \
-                 and (data[2:4] != '\x00\x00'):
-            encoding = 'utf-16le'
-            data = data[2:]
-        elif data[:3] == '\xef\xbb\xbf':
-            encoding = 'utf-8'
-            data = data[3:]
-        elif data[:4] == '\x00\x00\xfe\xff':
-            encoding = 'utf-32be'
-            data = data[4:]
-        elif data[:4] == '\xff\xfe\x00\x00':
-            encoding = 'utf-32le'
-            data = data[4:]
-        newdata = unicode(data, encoding, errors)
-        return newdata
+        return unicode(data, encoding, errors)
 
     @property
     def declared_html_encoding(self):
         if not self.is_html:
             return None
         return self.detector.declared_encoding
-
-    @property
-    def is_html(self):
-        return self.detector.is_html
 
     def find_codec(self, charset):
         value = (self._codec(self.CHARSET_ALIASES.get(charset, charset))

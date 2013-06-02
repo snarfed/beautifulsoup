@@ -306,9 +306,8 @@ class TestUnicodeDammit(unittest.TestCase):
             logging.disable(logging.NOTSET)
             bs4.dammit.chardet_dammit = chardet
 
-    def test_sniffed_xml_encoding(self):
-        # A document written in UTF-16LE will be converted by a different
-        # code path that sniffs the byte order markers.
+    def test_byte_order_mark_removed(self):
+        # A document written in UTF-16LE will have its byte order marker stripped.
         data = b'\xff\xfe<\x00a\x00>\x00\xe1\x00\xe9\x00<\x00/\x00a\x00>\x00'
         dammit = UnicodeDammit(data)
         self.assertEqual(u"<a>áé</a>", dammit.unicode_markup)

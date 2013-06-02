@@ -97,7 +97,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
         try_encodings = [user_specified_encoding, document_declared_encoding]
         detector = EncodingDetector(markup, try_encodings, is_html)
         for encoding in detector.encodings:
-            yield (markup, encoding, document_declared_encoding, False)
+            yield (detector.markup, encoding, document_declared_encoding, False)
 
     def feed(self, markup):
         if isinstance(markup, bytes):
