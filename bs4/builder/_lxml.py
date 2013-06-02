@@ -117,7 +117,7 @@ class LXMLTreeBuilderForXML(TreeBuilder):
                 if len(data) != 0:
                     self.parser.feed(data)
             self.parser.close()
-        except (UnicodeDecodeError, LookupError), e:
+        except (UnicodeDecodeError, LookupError, etree.ParserError), e:
             raise ParserRejectedMarkup(str(e))
 
     def close(self):
