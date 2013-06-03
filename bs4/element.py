@@ -255,8 +255,10 @@ class PageElement(object):
         self.previous_sibling = self.next_sibling = None
         return self
 
-    def _last_descendant(self):
+    def _last_descendant(self, is_initialized=True):
         "Finds the last element beneath this object to be parsed."
+        if is_initialized and self.next_sibling:
+            return self.next_sibling.previous_element
         last_child = self
         while isinstance(last_child, Tag) and last_child.contents:
             last_child = last_child.contents[-1]
@@ -294,11 +296,11 @@ class PageElement(object):
             previous_child = self.contents[position - 1]
             new_child.previous_sibling = previous_child
             new_child.previous_sibling.next_sibling = new_child
-            new_child.previous_element = previous_child._last_descendant()
+            new_child.previous_element = previous_child._last_descendant(False)
         if new_child.previous_element is not None:
             new_child.previous_element.next_element = new_child
 
-        new_childs_last_element = new_child._last_descendant()
+        new_childs_last_element = new_child._last_descendant(False)
 
         if position >= len(self.contents):
             new_child.next_sibling = None
