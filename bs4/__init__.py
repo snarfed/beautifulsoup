@@ -208,7 +208,7 @@ class BeautifulSoup(Tag):
         Tag.__init__(self, self, self.builder, self.ROOT_TAG_NAME)
         self.hidden = 1
         self.builder.reset()
-        self.currentData = []
+        self.current_data = []
         self.currentTag = None
         self.tagStack = []
         self.pushTag(self)
@@ -244,21 +244,21 @@ class BeautifulSoup(Tag):
         self.currentTag = self.tagStack[-1]
 
     def endData(self, containerClass=NavigableString):
-        if self.currentData:
-            currentData = u''.join(self.currentData)
-            if (currentData.translate(self.STRIP_ASCII_SPACES) == '' and
+        if self.current_data:
+            current_data = u''.join(self.current_data)
+            if (current_data.translate(self.STRIP_ASCII_SPACES) == '' and
                 not set([tag.name for tag in self.tagStack]).intersection(
                     self.builder.preserve_whitespace_tags)):
-                if '\n' in currentData:
-                    currentData = '\n'
+                if '\n' in current_data:
+                    current_data = '\n'
                 else:
-                    currentData = ' '
-            self.currentData = []
+                    current_data = ' '
+            self.current_data = []
             if self.parse_only and len(self.tagStack) <= 1 and \
                    (not self.parse_only.text or \
-                    not self.parse_only.search(currentData)):
+                    not self.parse_only.search(current_data)):
                 return
-            o = containerClass(currentData)
+            o = containerClass(current_data)
             self.object_was_parsed(o)
 
     def object_was_parsed(self, o, parent=None, most_recent_element=None):
@@ -328,7 +328,7 @@ class BeautifulSoup(Tag):
         self._popToTag(name, nsprefix)
 
     def handle_data(self, data):
-        self.currentData.append(data)
+        self.current_data.append(data)
 
     def decode(self, pretty_print=False,
                eventual_encoding=DEFAULT_OUTPUT_ENCODING,

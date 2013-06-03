@@ -1,10 +1,15 @@
 """Diagnostic functions, mainly for use when doing tech support."""
+import cProfile
 from StringIO import StringIO
 from HTMLParser import HTMLParser
+import bs4
 from bs4 import BeautifulSoup, __version__
 from bs4.builder import builder_registry
+
 import os
+import pstats
 import random
+import tempfile
 import time
 import traceback
 import sys
@@ -174,5 +179,21 @@ def benchmark_parsers(num_elements=100000):
     b = time.time()
     print "Raw lxml parsed the markup in %.2fs." % (b-a)
 
+def profile(num_elements=100000, parser="lxml"):
+
+    filehandle = tempfile.NamedTemporaryFile()
+    filename = filehandle.name
+
+    data = rdoc(num_elements)
+    vars = dict(bs4=bs4, data=data, parser=parser)
+    cProfile.runctx('bs4.BeautifulSoup(data, parser)' , vars, vars, filename)
+
+    stats = pstats.Stats(filename)
+    stats.strip_dirs()
+    cumulative = stats.sort_stats("cumulative")
+    total = stats.sort_stats("time")
+    import pdb; pdb.set_trace()
+
 if __name__ == '__main__':
-    diagnose(sys.stdin.read())
+    #diagnose(sys.stdin.read())
+    profile()

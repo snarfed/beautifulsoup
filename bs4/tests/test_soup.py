@@ -96,7 +96,6 @@ class TestWarnings(SoupTest):
             soup = self.soup("http://www.crummy.com/ is great")
         self.assertEqual(0, len(w))
 
-
 class TestSelectiveParsing(SoupTest):
 
     def test_parse_with_soupstrainer(self):
