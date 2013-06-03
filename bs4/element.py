@@ -746,7 +746,7 @@ class Tag(PageElement):
         self.prefix = prefix
         if attrs is None:
             attrs = {}
-        elif builder.cdata_list_attributes:
+        elif attrs and builder.cdata_list_attributes:
             attrs = builder._replace_cdata_list_attribute_values(
                 self.name, attrs)
         else:
