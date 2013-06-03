@@ -4,6 +4,8 @@
 import logging
 import unittest
 import sys
+import tempfile
+
 from bs4 import (
     BeautifulSoup,
     BeautifulStoneSoup,
@@ -64,7 +66,31 @@ class TestDeprecatedConstructorArguments(SoupTest):
         with warnings.catch_warnings(record=True) as w:
             soup = BeautifulStoneSoup("<markup>")
             self.assertTrue(isinstance(soup, BeautifulSoup))
-            self.assertTrue("BeautifulStoneSoup class is deprecated")
+            self.assertTrue("BeautifulStoneSoup class is deprecated" in str(w[0].message))
+
+class TestWarnings(SoupTest):
+
+    def test_disk_file_warning(self):
+        filehandle = tempfile.NamedTemporaryFile()
+        filename = filehandle.name
+        try:
+            with warnings.catch_warnings(record=True) as w:
+                soup = self.soup(filename)
+            msg = str(w[0].message)
+            self.assertTrue("looks like a filename" in msg)
+        finally:
+            filehandle.close()
+
+    def test_url_warning(self):
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup("http://www.crummy.com/")
+        msg = str(w[0].message)
+        self.assertTrue("looks like a URL" in msg)
+
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup("http://www.crummy.com/ is great")
+        self.assertEqual(0, len(w))
+
 
 class TestSelectiveParsing(SoupTest):
 

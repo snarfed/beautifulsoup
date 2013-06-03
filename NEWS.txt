@@ -16,6 +16,9 @@
   redundant code has been removed from Unicode, Dammit, and some
   undocumented features have also been removed.
 
+* Beautiful Soup will issue a warning if instead of markup you pass it
+  a URL or the name of a file on disk (a common beginner mistake).
+
 = 4.2.1 (20130531) =
 
 * The default XML formatter will now replace ampersands even if they
