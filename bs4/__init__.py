@@ -75,11 +75,7 @@ class BeautifulSoup(Tag):
     # want, look for one with these features.
     DEFAULT_BUILDER_FEATURES = ['html', 'fast']
 
-    # Used when determining whether a text node is all whitespace and
-    # can be replaced with a single space. A text node that contains
-    # fancy Unicode spaces (usually non-breaking) should be left
-    # alone.
-    STRIP_ASCII_SPACES = {9: None, 10: None, 12: None, 13: None, 32: None, }
+    ASCII_SPACES = '\x20\x09\x0a\x0c\x0d'
 
     def __init__(self, markup="", features=None, builder=None,
                  parse_only=None, from_encoding=None, **kwargs):
@@ -243,10 +239,19 @@ class BeautifulSoup(Tag):
         self.tagStack.append(tag)
         self.currentTag = self.tagStack[-1]
 
+    def _contains_only_ascii_spaces(self, s):
+        """Returns true if the given string contains nothing other than ASCII spaces.
+        The empty string meets this criteria.
+        """
+        for i in s:
+            if i not in self.ASCII_SPACES:
+                return False
+        return True
+
     def endData(self, containerClass=NavigableString):
         if self.current_data:
             current_data = u''.join(self.current_data)
-            if (current_data.translate(self.STRIP_ASCII_SPACES) == '' and
+            if (self._contains_only_ascii_spaces(current_data) and
                 not set([tag.name for tag in self.tagStack]).intersection(
                     self.builder.preserve_whitespace_tags)):
                 if '\n' in current_data:
