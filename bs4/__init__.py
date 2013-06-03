@@ -294,20 +294,17 @@ class BeautifulSoup(Tag):
             # The BeautifulSoup object itself can never be popped.
             return
 
-        num_pops = 0
         most_recently_popped = None
 
         stack_size = len(self.tagStack)
         for i in range(stack_size - 1, 0, -1):
             t = self.tagStack[i]
             if (name == t.name and nsprefix == t.prefix):
-                num_pops = stack_size - i
+                if inclusivePop:
+                    most_recently_popped = self.popTag()
                 break
-        if not inclusivePop:
-            num_pops = num_pops - 1
-
-        for i in range(0, num_pops):
             most_recently_popped = self.popTag()
+
         return most_recently_popped
 
     def handle_starttag(self, name, namespace, nsprefix, attrs):
