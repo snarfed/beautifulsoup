@@ -15,7 +15,10 @@ from bs4.element import (
     NamespacedAttribute,
     )
 import bs4.dammit
-from bs4.dammit import EntitySubstitution, UnicodeDammit
+from bs4.dammit import (
+    EntitySubstitution,
+    UnicodeDammit,
+)
 from bs4.testing import (
     SoupTest,
     skipIf,
@@ -156,13 +159,23 @@ class TestEncodingConversion(SoupTest):
 
     def test_ascii_in_unicode_out(self):
         # ASCII input is converted to Unicode. The original_encoding
-        # attribute is set.
-        ascii = b"<foo>a</foo>"
-        soup_from_ascii = self.soup(ascii)
-        unicode_output = soup_from_ascii.decode()
-        self.assertTrue(isinstance(unicode_output, unicode))
-        self.assertEqual(unicode_output, self.document_for(ascii.decode()))
-        self.assertEqual(soup_from_ascii.original_encoding.lower(), "ascii")
+        # attribute is set to 'utf-8', a superset of ASCII.
+        chardet = bs4.dammit.chardet_dammit
+        logging.disable(logging.WARNING)
+        try:
+            def noop(str):
+                return None
+            # Disable chardet, which will realize that the ASCII is ASCII.
+            bs4.dammit.chardet_dammit = noop
+            ascii = b"<foo>a</foo>"
+            soup_from_ascii = self.soup(ascii)
+            unicode_output = soup_from_ascii.decode()
+            self.assertTrue(isinstance(unicode_output, unicode))
+            self.assertEqual(unicode_output, self.document_for(ascii.decode()))
+            self.assertEqual(soup_from_ascii.original_encoding.lower(), "utf-8")
+        finally:
+            logging.disable(logging.NOTSET)
+            bs4.dammit.chardet_dammit = chardet
 
     def test_unicode_in_unicode_out(self):
         # Unicode input is left alone. The original_encoding attribute
@@ -192,7 +205,7 @@ class TestEncodingConversion(SoupTest):
         self.assertEqual(self.soup(markup).div.encode("utf8"), markup.encode("utf8"))
 
 class TestUnicodeDammit(unittest.TestCase):
-    """Standalone tests of Unicode, Dammit."""
+    """Standalone tests of UnicodeDammit."""
 
     def test_smart_quotes_to_unicode(self):
         markup = b"<foo>\x91\x92\x93\x94</foo>"
@@ -293,9 +306,8 @@ class TestUnicodeDammit(unittest.TestCase):
             logging.disable(logging.NOTSET)
             bs4.dammit.chardet_dammit = chardet
 
-    def test_sniffed_xml_encoding(self):
-        # A document written in UTF-16LE will be converted by a different
-        # code path that sniffs the byte order markers.
+    def test_byte_order_mark_removed(self):
+        # A document written in UTF-16LE will have its byte order marker stripped.
         data = b'\xff\xfe<\x00a\x00>\x00\xe1\x00\xe9\x00<\x00/\x00a\x00>\x00'
         dammit = UnicodeDammit(data)
         self.assertEqual(u"<a>áé</a>", dammit.unicode_markup)

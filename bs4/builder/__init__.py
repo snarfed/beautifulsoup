@@ -296,6 +296,9 @@ def register_treebuilders_from(module):
             # Register the builder while we're at it.
             this_module.builder_registry.register(obj)
 
+class ParserRejectedMarkup(Exception):
+    pass
+
 # Builders are registered in reverse order of priority, so that custom
 # builder registrations will take precedence. In general, we want lxml
 # to take precedence over html5lib, because it's faster. And we only

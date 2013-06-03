@@ -1,3 +1,21 @@
+= 4.3.0 (Unreleased) =
+
+* Instead of converting incoming data to Unicode and feeding it to the
+  lxml tree builder, Beautiful Soup now makes successive guesses at
+  the encoding of the incoming data, and tells lxml to parse the data
+  as that encoding. This improves performance and avoids an issue in
+  which lxml was refusing to parse strings because they were Unicode
+  strings.
+
+  This required a major overhaul of the tree builder architecture. If
+  you wrote your own tree builder and didn't tell me, you'll need to
+  modify your prepare_markup() method.
+
+* The UnicodeDammit code that makes guesses at encodings has been
+  split into its own class, EncodingDetector. A lot of apparently
+  redundant code has been removed from Unicode, Dammit, and some
+  undocumented features have also been removed.
+
 = 4.2.1 (20130531) =
 
 * The default XML formatter will now replace ampersands even if they

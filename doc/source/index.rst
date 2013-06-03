@@ -2478,9 +2478,11 @@ become Unicode::
  dammit.original_encoding
  # 'utf-8'
 
-The more data you give Unicode, Dammit, the more accurately it will
-guess. If you have your own suspicions as to what the encoding might
-be, you can pass them in as a list::
+Unicode, Dammit's guesses will get a lot more accurate if you install
+the ``chardet`` or ``cchardet`` Python libraries. The more data you
+give Unicode, Dammit, the more accurately it will guess. If you have
+your own suspicions as to what the encoding might be, you can pass
+them in as a list::
 
  dammit = UnicodeDammit("Sacr\xe9 bleu!", ["latin-1", "iso-8859-1"])
  print(dammit.unicode_markup)
@@ -2822,16 +2824,6 @@ significantly faster using lxml than using html.parser or html5lib.
 
 You can speed up encoding detection significantly by installing the
 `cchardet <http://pypi.python.org/pypi/cchardet/>`_ library.
-
-Sometimes `Unicode, Dammit`_ can only detect the encoding of a file by
-doing a byte-by-byte examination of the file. This slows Beautiful
-Soup to a crawl. My tests indicate that this only happened on 2.x
-versions of Python, and that it happened most often with documents
-using Russian or Chinese encodings. If this is happening to you, you
-can fix it by installing cchardet, or by using Python 3 for your
-script. If you happen to know a document's encoding, you can pass
-it into the ``BeautifulSoup`` constructor as ``from_encoding``, and
-bypass encoding detection altogether.
 
 `Parsing only part of a document`_ won't save you much time parsing
 the document, but it can save a lot of memory, and it'll make

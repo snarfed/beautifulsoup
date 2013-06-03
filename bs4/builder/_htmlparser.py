@@ -135,13 +135,14 @@ class HTMLParserTreeBuilder(HTMLTreeBuilder):
         replaced with REPLACEMENT CHARACTER).
         """
         if isinstance(markup, unicode):
-            return markup, None, None, False
+            yield (markup, None, None, False)
+            return
 
         try_encodings = [user_specified_encoding, document_declared_encoding]
         dammit = UnicodeDammit(markup, try_encodings, is_html=True)
-        return (dammit.markup, dammit.original_encoding,
-                dammit.declared_html_encoding,
-                dammit.contains_replacement_characters)
+        yield (dammit.markup, dammit.original_encoding,
+               dammit.declared_html_encoding,
+               dammit.contains_replacement_characters)
 
     def feed(self, markup):
         args, kwargs = self.parser_args
