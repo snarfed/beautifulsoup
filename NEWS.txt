@@ -20,7 +20,8 @@
   a URL or the name of a file on disk (a common beginner mistake).
 
 * A number of optimizations improve the performance of the lxml tree
-  builder by about 33%, and the html.parser tree builder by about 20%.
+  builder by about 33%, the html.parser tree builder by about 20%, and
+  the html5lib tree builder by about 15%.
 
 = 4.2.1 (20130531) =
 

@@ -201,6 +201,4 @@ def profile(num_elements=100000, parser="lxml"):
     stats.print_stats('_html5lib|bs4', 50)
 
 if __name__ == '__main__':
-    #diagnose(sys.stdin.read())
-    profile(100000, parser="lxml")
-    # benchmark_parsers()
+    diagnose(sys.stdin.read())
