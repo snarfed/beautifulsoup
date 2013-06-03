@@ -247,7 +247,6 @@ class BeautifulSoup(Tag):
     def endData(self, containerClass=NavigableString):
         if self.current_data:
             current_data = u''.join(self.current_data)
-
             # If whitespace is not preserved, and this string contains
             # nothing but ASCII spaces, replace it with a single space
             # or newline.
@@ -292,22 +291,24 @@ class BeautifulSoup(Tag):
         the given tag."""
         #print "Popping to %s" % name
         if name == self.ROOT_TAG_NAME:
+            # The BeautifulSoup object itself can never be popped.
             return
 
-        numPops = 0
-        mostRecentTag = None
+        num_pops = 0
+        most_recently_popped = None
 
-        for i in range(len(self.tagStack) - 1, 0, -1):
-            if (name == self.tagStack[i].name
-                and nsprefix == self.tagStack[i].prefix):
-                numPops = len(self.tagStack) - i
+        stack_size = len(self.tagStack)
+        for i in range(stack_size - 1, 0, -1):
+            t = self.tagStack[i]
+            if (name == t.name and nsprefix == t.prefix):
+                num_pops = stack_size - i
                 break
         if not inclusivePop:
-            numPops = numPops - 1
+            num_pops = num_pops - 1
 
-        for i in range(0, numPops):
-            mostRecentTag = self.popTag()
-        return mostRecentTag
+        for i in range(0, num_pops):
+            most_recently_popped = self.popTag()
+        return most_recently_popped
 
     def handle_starttag(self, name, namespace, nsprefix, attrs):
         """Push a start tag on to the stack.
