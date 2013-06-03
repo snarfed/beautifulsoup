@@ -244,30 +244,34 @@ class BeautifulSoup(Tag):
         if tag.name in self.builder.preserve_whitespace_tags:
             self.preserve_whitespace_tag_stack.append(tag)
 
-    def _contains_only_ascii_spaces(self, s):
-        """Returns true if the given string contains nothing other than ASCII spaces.
-        The empty string meets this criteria.
-        """
-        for i in s:
-            if i not in self.ASCII_SPACES:
-                return False
-        return True
-
     def endData(self, containerClass=NavigableString):
         if self.current_data:
             current_data = u''.join(self.current_data)
-            if (self._contains_only_ascii_spaces(current_data) and
-                not self.preserve_whitespace_tag_stack):
-                # Time to strip the whitespace.
-                if '\n' in current_data:
-                    current_data = '\n'
-                else:
-                    current_data = ' '
+
+            # If whitespace is not preserved, and this string contains
+            # nothing but ASCII spaces, replace it with a single space
+            # or newline.
+            if not self.preserve_whitespace_tag_stack:
+                strippable = True
+                for i in current_data:
+                    if i not in self.ASCII_SPACES:
+                        strippable = False
+                        break
+                if strippable:
+                    if '\n' in current_data:
+                        current_data = '\n'
+                    else:
+                        current_data = ' '
+
+            # Reset the data collector.
             self.current_data = []
+
+            # Should we add this string to the tree at all?
             if self.parse_only and len(self.tagStack) <= 1 and \
                    (not self.parse_only.text or \
                     not self.parse_only.search(current_data)):
                 return
+
             o = containerClass(current_data)
             self.object_was_parsed(o)
 

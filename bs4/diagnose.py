@@ -192,8 +192,8 @@ def profile(num_elements=100000, parser="lxml"):
     stats.strip_dirs()
     cumulative = stats.sort_stats("cumulative")
     total = stats.sort_stats("time")
-    cumulative.print_stats(50)
+    total.print_stats(50)
 
 if __name__ == '__main__':
     #diagnose(sys.stdin.read())
-    profile()
+    profile(parser="lxml")

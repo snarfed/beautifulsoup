@@ -295,15 +295,15 @@ class EncodingDetector:
         beginning of the document.
         """
         if search_entire_document:
-            xml_endpos = html_endpos = -1
+            xml_endpos = html_endpos = len(markup)
         else:
-            xml_endpos = 1025
+            xml_endpos = 1024
             html_endpos = max(2048, int(len(markup) * 0.05))
             
         declared_encoding = None
-        declared_encoding_match = xml_encoding_re.search(markup, xml_endpos)
+        declared_encoding_match = xml_encoding_re.search(markup, endpos=xml_endpos)
         if not declared_encoding_match and is_html:
-            declared_encoding_match = html_meta_re.search(markup, html_endpos)
+            declared_encoding_match = html_meta_re.search(markup, endpos=html_endpos)
         if declared_encoding_match is not None:
             declared_encoding = declared_encoding_match.groups()[0].decode(
                 'ascii')
