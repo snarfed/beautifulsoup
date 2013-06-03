@@ -129,6 +129,11 @@ class Element(html5lib.treebuilders._base.Node):
             # instead of creating a TextElement object to contain the
             # string.
             string_child = child = node
+        elif isinstance(node, Tag):
+            # Some other piece of code decided to pass in a Tag
+            # instead of creating an Element object to contain the
+            # Tag.
+            child = node
         elif node.element.__class__ == NavigableString:
             string_child = child = node.element
         else:
@@ -202,11 +207,7 @@ class Element(html5lib.treebuilders._base.Node):
         while self.element.contents:
             child = self.element.contents[0]
             child.extract()
-            if isinstance(child, Tag):
-                newParent.appendChild(
-                    Element(child, self.soup, namespaces["html"]))
-            else:
-                newParent.appendChild(child)
+            newParent.appendChild(child)
 
     def cloneNode(self):
         tag = self.soup.new_tag(self.element.name, self.namespace)

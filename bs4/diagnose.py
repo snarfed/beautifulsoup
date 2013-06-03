@@ -197,9 +197,8 @@ def profile(num_elements=100000, parser="lxml"):
 
     stats = pstats.Stats(filename)
     # stats.strip_dirs()
-    cumulative = stats.sort_stats("cumulative")
-    total = stats.sort_stats("time")
-    cumulative.print_stats('_html5lib|bs4', 50)
+    stats.sort_stats("cumulative")
+    stats.print_stats('_html5lib|bs4', 50)
 
 if __name__ == '__main__':
     #diagnose(sys.stdin.read())
