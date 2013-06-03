@@ -258,7 +258,7 @@ class PageElement(object):
     def _last_descendant(self):
         "Finds the last element beneath this object to be parsed."
         last_child = self
-        while hasattr(last_child, 'contents') and last_child.contents:
+        while isinstance(last_child, Tag) and last_child.contents:
             last_child = last_child.contents[-1]
         return last_child
     # BS3: Not part of the API!

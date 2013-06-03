@@ -196,12 +196,12 @@ def profile(num_elements=100000, parser="lxml"):
     cProfile.runctx('bs4.BeautifulSoup(data, parser)' , vars, vars, filename)
 
     stats = pstats.Stats(filename)
-    stats.strip_dirs()
+    # stats.strip_dirs()
     cumulative = stats.sort_stats("cumulative")
     total = stats.sort_stats("time")
-    total.print_stats(50)
+    cumulative.print_stats('_html5lib|bs4', 50)
 
 if __name__ == '__main__':
     #diagnose(sys.stdin.read())
-    profile(1000, parser="html5lib")
+    profile(10000, parser="html5lib")
     # benchmark_parsers()
