@@ -286,17 +286,24 @@ class EncodingDetector:
         return data, encoding
 
     @classmethod
-    def find_declared_encoding(cls, markup, is_html=False):
+    def find_declared_encoding(cls, markup, is_html=False, search_entire_document=False):
         """Given a document, tries to find its declared encoding.
 
         An XML encoding is declared at the beginning of the document.
 
-        An HTML encoding is declared in a <meta> tag.
+        An HTML encoding is declared in a <meta> tag, hopefully near the
+        beginning of the document.
         """
+        if search_entire_document:
+            xml_endpos = html_endpos = -1
+        else:
+            xml_endpos = 1025
+            html_endpos = max(2048, int(len(markup) * 0.05))
+            
         declared_encoding = None
-        declared_encoding_match = xml_encoding_re.match(markup)
+        declared_encoding_match = xml_encoding_re.search(markup, xml_endpos)
         if not declared_encoding_match and is_html:
-            declared_encoding_match = html_meta_re.search(markup)
+            declared_encoding_match = html_meta_re.search(markup, html_endpos)
         if declared_encoding_match is not None:
             declared_encoding = declared_encoding_match.groups()[0].decode(
                 'ascii')
