@@ -81,6 +81,11 @@ class TestWarnings(SoupTest):
         finally:
             filehandle.close()
 
+        # The file no longer exists, so Beautiful Soup will no longer issue the warning.
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup(filename)
+        self.assertEqual(0, len(w))
+
     def test_url_warning(self):
         with warnings.catch_warnings(record=True) as w:
             soup = self.soup("http://www.crummy.com/")
