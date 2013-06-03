@@ -674,6 +674,13 @@ class NavigableString(unicode, PageElement):
         output = self.format_string(self, formatter)
         return self.PREFIX + output + self.SUFFIX
 
+    @property
+    def name(self):
+        return None
+
+    @name.setter
+    def name(self, name):
+        raise AttributeError("A NavigableString cannot be given a name.")
 
 class PreformattedString(NavigableString):
     """A NavigableString not subject to the normal formatting rules.

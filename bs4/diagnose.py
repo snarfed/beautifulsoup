@@ -202,5 +202,5 @@ def profile(num_elements=100000, parser="lxml"):
 
 if __name__ == '__main__':
     #diagnose(sys.stdin.read())
-    profile(10000, parser="html5lib")
+    profile(100000, parser="lxml")
     # benchmark_parsers()

@@ -1219,6 +1219,12 @@ class TestCDAtaListAttributes(SoupTest):
         # attribute for any other tag.
         self.assertEqual('ISO-8859-1 UTF-8', soup.a['accept-charset'])
 
+    def test_string_has_immutable_name_property(self):
+        string = self.soup("s").string
+        self.assertEqual(None, string.name)
+        def t():
+            string.name = 'foo'
+        self.assertRaises(AttributeError, t)
 
 class TestPersistence(SoupTest):
     "Testing features like pickle and deepcopy."
