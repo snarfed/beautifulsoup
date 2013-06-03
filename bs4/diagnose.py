@@ -179,6 +179,13 @@ def benchmark_parsers(num_elements=100000):
     b = time.time()
     print "Raw lxml parsed the markup in %.2fs." % (b-a)
 
+    import html5lib
+    parser = html5lib.HTMLParser()
+    a = time.time()
+    parser.parse(data)
+    b = time.time()
+    print "Raw html5lib parsed the markup in %.2fs." % (b-a)
+
 def profile(num_elements=100000, parser="lxml"):
 
     filehandle = tempfile.NamedTemporaryFile()
@@ -196,4 +203,5 @@ def profile(num_elements=100000, parser="lxml"):
 
 if __name__ == '__main__':
     #diagnose(sys.stdin.read())
-    profile(parser="lxml")
+    profile(1000, parser="html5lib")
+    # benchmark_parsers()

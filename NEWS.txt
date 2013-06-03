@@ -19,6 +19,9 @@
 * Beautiful Soup will issue a warning if instead of markup you pass it
   a URL or the name of a file on disk (a common beginner mistake).
 
+* A number of optimizations improve the performance of the lxml tree
+  builder by about 33%, and the html.parser tree builder by about 20%.
+
 = 4.2.1 (20130531) =
 
 * The default XML formatter will now replace ampersands even if they
