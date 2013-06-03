@@ -75,7 +75,7 @@ class BeautifulSoup(Tag):
     # want, look for one with these features.
     DEFAULT_BUILDER_FEATURES = ['html', 'fast']
 
-    ASCII_SPACES = '\x20\x09\x0a\x0c\x0d'
+    ASCII_SPACES = '\x20\0a\x09\x0c\x0d'
 
     def __init__(self, markup="", features=None, builder=None,
                  parse_only=None, from_encoding=None, **kwargs):
