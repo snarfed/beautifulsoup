@@ -75,7 +75,7 @@ class BeautifulSoup(Tag):
     # want, look for one with these features.
     DEFAULT_BUILDER_FEATURES = ['html', 'fast']
 
-    ASCII_SPACES = '\x20\0a\x09\x0c\x0d'
+    ASCII_SPACES = '\x20\x0a\x09\x0c\x0d'
 
     def __init__(self, markup="", features=None, builder=None,
                  parse_only=None, from_encoding=None, **kwargs):
@@ -207,6 +207,7 @@ class BeautifulSoup(Tag):
         self.current_data = []
         self.currentTag = None
         self.tagStack = []
+        self.preserve_whitespace_tag_stack = []
         self.pushTag(self)
 
     def new_tag(self, name, namespace=None, nsprefix=None, **attrs):
@@ -227,6 +228,8 @@ class BeautifulSoup(Tag):
 
     def popTag(self):
         tag = self.tagStack.pop()
+        if self.preserve_whitespace_tag_stack and tag == self.preserve_whitespace_tag_stack[-1]:
+            self.preserve_whitespace_tag_stack.pop()
         #print "Pop", tag.name
         if self.tagStack:
             self.currentTag = self.tagStack[-1]
@@ -238,6 +241,8 @@ class BeautifulSoup(Tag):
             self.currentTag.contents.append(tag)
         self.tagStack.append(tag)
         self.currentTag = self.tagStack[-1]
+        if tag.name in self.builder.preserve_whitespace_tags:
+            self.preserve_whitespace_tag_stack.append(tag)
 
     def _contains_only_ascii_spaces(self, s):
         """Returns true if the given string contains nothing other than ASCII spaces.
@@ -252,8 +257,8 @@ class BeautifulSoup(Tag):
         if self.current_data:
             current_data = u''.join(self.current_data)
             if (self._contains_only_ascii_spaces(current_data) and
-                not set([tag.name for tag in self.tagStack]).intersection(
-                    self.builder.preserve_whitespace_tags)):
+                not self.preserve_whitespace_tag_stack):
+                # Time to strip the whitespace.
                 if '\n' in current_data:
                     current_data = '\n'
                 else:
