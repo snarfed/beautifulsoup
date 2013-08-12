@@ -115,6 +115,19 @@ class TestFindAll(TreeTest):
         # recursion.
         self.assertEqual([], soup.find_all(l))
 
+    def test_find_all_resultset(self):
+        """All find_all calls return a ResultSet"""
+        soup = self.soup("<a></a>")
+        result = soup.find_all("a")
+        self.assertTrue(hasattr(result, "source"))
+
+        result = soup.find_all(True)
+        self.assertTrue(hasattr(result, "source"))
+
+        result = soup.find_all(text="foo")
+        self.assertTrue(hasattr(result, "source"))
+
+
 class TestFindAllBasicNamespaces(TreeTest):
 
     def test_find_by_namespaced_name(self):

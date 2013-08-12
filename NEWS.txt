@@ -1,14 +1,15 @@
 = 4.3.0 (Unreleased) =
 
 * Instead of converting incoming data to Unicode and feeding it to the
-  lxml tree builder, Beautiful Soup now makes successive guesses at
-  the encoding of the incoming data, and tells lxml to parse the data
-  as that encoding. Giving lxml more control over the parsing process
-  improves performance and avoids a number of bugs and issues with the
-  lxml parser which had previously required elaborate workarounds:
+  lxml tree builder in chunks, Beautiful Soup now makes successive
+  guesses at the encoding of the incoming data, and tells lxml to
+  parse the data as that encoding. Giving lxml more control over the
+  parsing process improves performance and avoids a number of bugs and
+  issues with the lxml parser which had previously required elaborate
+  workarounds:
 
-  - An issue in which lxml refuses to parse Unicode strings.
-    [bug=1180527]
+  - An issue in which lxml refuses to parse Unicode strings on some
+    systems. [bug=1180527]
 
   - A returning bug that truncated documents longer than a (very
     small) size. [bug=963880]
@@ -26,11 +27,14 @@
   undocumented features have also been removed.
 
 * Beautiful Soup will issue a warning if instead of markup you pass it
-  a URL or the name of a file on disk (a common beginner mistake).
+  a URL or the name of a file on disk (a common beginner's mistake).
 
 * A number of optimizations improve the performance of the lxml tree
   builder by about 33%, the html.parser tree builder by about 20%, and
   the html5lib tree builder by about 15%.
+
+* All find_all calls should now return a ResultSet object. Patch by
+  Aaron DeVore. [bug=1194034]
 
 = 4.2.1 (20130531) =
 

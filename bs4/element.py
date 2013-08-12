@@ -477,20 +477,20 @@ class PageElement(object):
 
         if isinstance(name, SoupStrainer):
             strainer = name
-        elif text is None and not limit and not attrs and not kwargs:
+        else:
+            strainer = SoupStrainer(name, attrs, text, **kwargs)
+
+        if text is None and not limit and not attrs and not kwargs:
             # Optimization to find all tags.
             if name is True or name is None:
-                return [element for element in generator
-                        if isinstance(element, Tag)]
+                result = (element for element in generator
+                          if isinstance(element, Tag))
+                ResultSet(strainer, result)
             # Optimization to find all tags with a given name.
             elif isinstance(name, basestring):
-                return [element for element in generator
-                        if isinstance(element, Tag) and element.name == name]
-            else:
-                strainer = SoupStrainer(name, attrs, text, **kwargs)
-        else:
-            # Build a SoupStrainer
-            strainer = SoupStrainer(name, attrs, text, **kwargs)
+                result = (element for element in generator
+                          if isinstance(element, Tag)
+                            and element.name == name)
         results = ResultSet(strainer)
         while True:
             try:
@@ -1602,6 +1602,6 @@ class SoupStrainer(object):
 class ResultSet(list):
     """A ResultSet is just a list that keeps track of the SoupStrainer
     that created it."""
-    def __init__(self, source):
-        list.__init__([])
+    def __init__(self, source, result=()):
+        super(list, self).__init__(result)
         self.source = source
