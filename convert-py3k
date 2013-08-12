@@ -9,7 +9,7 @@ echo "If you've got stuff in there, Ctrl-C out of this script or answer 'n'."
 mkdir -p py3k
 rm -rfI py3k/bs4
 cp -r bs4/ py3k/
-2to3-3.2 -w py3k
+2to3 -w py3k
 echo ""
 echo "OK, conversion is done."
 echo "Now running the unit tests."

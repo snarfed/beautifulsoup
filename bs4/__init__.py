@@ -162,11 +162,11 @@ class BeautifulSoup(Tag):
         elif len(markup) <= 256:
             # Print out warnings for a couple beginner problems
             # involving passing non-markup to Beautiful Soup.
-            # Beautiful Soup will still parse the input as markup, 
+            # Beautiful Soup will still parse the input as markup,
             # just in case that's what the user really wants.
             if os.path.exists(markup):
                 warnings.warn(
-                    '"%s" looks like a filename, not markup. You should probably open a filehandle and pass the filehandle into Beautiful Soup.' % markup)
+                    '"%s" looks like a filename, not markup. You should probably open this file and pass the filehandle into Beautiful Soup.' % markup)
             if markup[:5] == "http:" or markup[:6] == "https:":
                 # TODO: This is ugly but I couldn't get it to work in
                 # Python 3 otherwise.
@@ -182,7 +182,7 @@ class BeautifulSoup(Tag):
             try:
                 self._feed()
                 break
-            except ParserRejectedMarkup, e:
+            except ParserRejectedMarkup:
                 pass
 
         # Clear out the markup and remove the builder's circular

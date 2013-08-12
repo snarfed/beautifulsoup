@@ -3,9 +3,18 @@
 * Instead of converting incoming data to Unicode and feeding it to the
   lxml tree builder, Beautiful Soup now makes successive guesses at
   the encoding of the incoming data, and tells lxml to parse the data
-  as that encoding. This improves performance and avoids an issue in
-  which lxml was refusing to parse strings because they were Unicode
-  strings.
+  as that encoding. Giving lxml more control over the parsing process
+  improves performance and avoids a number of bugs and issues with the
+  lxml parser which had previously required elaborate workarounds:
+
+  - An issue in which lxml refuses to parse Unicode strings.
+    [bug=1180527]
+
+  - A returning bug that truncated documents longer than a (very
+    small) size. [bug=963880]
+
+  - A returning bug in which extra spaces were added to a document if
+    the document defined a charset other than UTF-8. [bug=972466]
 
   This required a major overhaul of the tree builder architecture. If
   you wrote your own tree builder and didn't tell me, you'll need to

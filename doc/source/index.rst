@@ -26,6 +26,9 @@ developed, and that Beautiful Soup 4 is recommended for all new
 projects. If you want to learn about the differences between Beautiful
 Soup 3 and Beautiful Soup 4, see `Porting code to BS4`_.
 
+이 문서는 한국어 번역도 가능합니다. (`외부
+링크`<http://coreapython.hosting.paran.com/etc/beautifulsoup4.html>) 
+
 Getting help
 ------------
 
