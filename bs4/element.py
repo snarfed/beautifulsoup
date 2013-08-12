@@ -1603,5 +1603,5 @@ class ResultSet(list):
     """A ResultSet is just a list that keeps track of the SoupStrainer
     that created it."""
     def __init__(self, source, result=()):
-        super(list, self).__init__(result)
+        super(ResultSet, self).__init__(result)
         self.source = source
