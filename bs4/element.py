@@ -255,13 +255,16 @@ class PageElement(object):
         self.previous_sibling = self.next_sibling = None
         return self
 
-    def _last_descendant(self, is_initialized=True):
+    def _last_descendant(self, is_initialized=True, accept_self=True):
         "Finds the last element beneath this object to be parsed."
         if is_initialized and self.next_sibling:
-            return self.next_sibling.previous_element
-        last_child = self
-        while isinstance(last_child, Tag) and last_child.contents:
-            last_child = last_child.contents[-1]
+            last_child = self.next_sibling.previous_element
+        else:
+            last_child = self
+            while isinstance(last_child, Tag) and last_child.contents:
+                last_child = last_child.contents[-1]
+        if not accept_self and last_child == self:
+            last_child = None
         return last_child
     # BS3: Not part of the API!
     _lastRecursiveChild = _last_descendant

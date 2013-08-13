@@ -279,6 +279,7 @@ class BeautifulSoup(Tag):
         parent = parent or self.currentTag
         most_recent_element = most_recent_element or self._most_recent_element
         o.setup(parent, most_recent_element)
+
         if most_recent_element is not None:
             most_recent_element.next_element = o
         self._most_recent_element = o
