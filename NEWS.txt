@@ -1,8 +1,11 @@
-= 4.3.1 (Unreleased) =
+= 4.3.1 (20130815) =
 
 * Fixed yet another problem with the html5lib tree builder, caused by
   html5lib's tendency to rearrange the tree during
   parsing. [bug=1189267]
+
+* Fixed a bug that caused the optimized version of find_all() to
+  return nothing. [bug=1212655]
 
 = 4.3.0 (20130812) =
 
