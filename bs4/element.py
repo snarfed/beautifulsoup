@@ -484,16 +484,17 @@ class PageElement(object):
             strainer = SoupStrainer(name, attrs, text, **kwargs)
 
         if text is None and not limit and not attrs and not kwargs:
-            # Optimization to find all tags.
             if name is True or name is None:
+                # Optimization to find all tags.
                 result = (element for element in generator
                           if isinstance(element, Tag))
-                ResultSet(strainer, result)
-            # Optimization to find all tags with a given name.
+                return ResultSet(strainer, result)
             elif isinstance(name, basestring):
+                # Optimization to find all tags with a given name.
                 result = (element for element in generator
                           if isinstance(element, Tag)
                             and element.name == name)
+                return ResultSet(strainer, result)
         results = ResultSet(strainer)
         while True:
             try:

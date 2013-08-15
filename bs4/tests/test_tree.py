@@ -70,6 +70,16 @@ class TestFind(TreeTest):
         soup = self.soup(u'<h1>Räksmörgås</h1>')
         self.assertEqual(soup.find(text=u'Räksmörgås'), u'Räksmörgås')
 
+    def test_find_everything(self):
+        """Test an optimization that finds all tags."""
+        soup = self.soup("<a>foo</a><b>bar</b>")
+        self.assertEqual(2, len(soup.find_all()))
+
+    def test_find_everything_with_name(self):
+        """Test an optimization that finds all tags with a given name."""
+        soup = self.soup("<a>foo</a><b>bar</b><a>baz</a>")
+        self.assertEqual(2, len(soup.find_all('a')))
+
 class TestFindAll(TreeTest):
     """Basic tests of the find_all() method."""
 
