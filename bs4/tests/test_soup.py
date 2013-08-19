@@ -59,15 +59,6 @@ class TestDeprecatedConstructorArguments(SoupTest):
         self.assertRaises(
             TypeError, self.soup, "<a>", no_such_argument=True)
 
-    @skipIf(
-        not LXML_PRESENT,
-        "lxml not present, not testing BeautifulStoneSoup.")
-    def test_beautifulstonesoup(self):
-        with warnings.catch_warnings(record=True) as w:
-            soup = BeautifulStoneSoup("<markup>")
-            self.assertTrue(isinstance(soup, BeautifulSoup))
-            self.assertTrue("BeautifulStoneSoup class is deprecated" in str(w[0].message))
-
 class TestWarnings(SoupTest):
 
     def test_disk_file_warning(self):
