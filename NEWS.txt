@@ -1,7 +1,7 @@
 = 4.3.2 (Unreleased) =
 
 * Combined two tests to stop a spurious test failure when tests are
-  run by nodetests. [bug=1212445]
+  run by nosetests. [bug=1212445]
 
 = 4.3.1 (20130815) =
 
