@@ -4,6 +4,9 @@
   ASCII when checking whether or not it was a file on
   disk. [bug=1227016]
 
+* Fixed a crash when a short input contains data not valid in
+  filenames. [bug=1232604]
+
 * Combined two tests to stop a spurious test failure when tests are
   run by nosetests. [bug=1212445]
 

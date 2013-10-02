@@ -43,6 +43,12 @@ class TestConstructor(SoupTest):
         soup = self.soup(data)
         self.assertEqual(u"éé", soup.h1.string)
 
+    def test_embedded_null(self):
+        data = u"<h1>foo\0bar</h1>"
+        soup = self.soup(data)
+        self.assertEqual(u"foo\0bar", soup.h1.string)
+
+
 class TestDeprecatedConstructorArguments(SoupTest):
 
     def test_parseOnlyThese_renamed_to_parse_only(self):
