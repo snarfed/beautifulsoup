@@ -1,7 +1,7 @@
-= 4.3.2 (Unreleased) =
+= 4.3.2 (20131002) =
 
 * Fixed a bug in which short Unicode input was improperly encoded to
-  ASCII when checking whether or not it was a file on
+  ASCII when checking whether or not it was the name of a file on
   disk. [bug=1227016]
 
 * Fixed a crash when a short input contains data not valid in
