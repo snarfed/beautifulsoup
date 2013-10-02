@@ -241,6 +241,11 @@ class TestEncodingConversion(SoupTest):
 class TestUnicodeDammit(unittest.TestCase):
     """Standalone tests of UnicodeDammit."""
 
+    def test_unicode_input(self):
+        markup = u"I'm already Unicode! \N{SNOWMAN}"
+        dammit = UnicodeDammit(markup)
+        self.assertEqual(dammit.unicode_markup, markup)
+
     def test_smart_quotes_to_unicode(self):
         markup = b"<foo>\x91\x92\x93\x94</foo>"
         dammit = UnicodeDammit(markup)

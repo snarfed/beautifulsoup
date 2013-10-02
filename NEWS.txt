@@ -7,6 +7,9 @@
 * Fixed a crash when a short input contains data not valid in
   filenames. [bug=1232604]
 
+* Fixed a bug that caused Unicode data put into UnicodeDammit to
+  return None instead of the original data. [bug=1214983]
+
 * Combined two tests to stop a spurious test failure when tests are
   run by nosetests. [bug=1212445]
 
