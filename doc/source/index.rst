@@ -1213,8 +1213,8 @@ against each tag's 'href' attribute::
 You can filter an attribute based on `a string`_, `a regular
 expression`_, `a list`_, `a function`_, or `the value True`_.
 
-This code finds all tags that have an ``id`` attribute, regardless of
-what the value is::
+This code finds all tags whose ``id`` attribute has a value,
+regardless of what the value is::
 
  soup.find_all(id=True)
  # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,

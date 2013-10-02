@@ -164,7 +164,11 @@ class BeautifulSoup(Tag):
             # involving passing non-markup to Beautiful Soup.
             # Beautiful Soup will still parse the input as markup,
             # just in case that's what the user really wants.
-            if os.path.exists(markup):
+            if isinstance(markup, unicode):
+                possible_filename = markup.encode("utf8")
+            else:
+                possible_filename = markup
+            if os.path.exists(possible_filename):
                 warnings.warn(
                     '"%s" looks like a filename, not markup. You should probably open this file and pass the filehandle into Beautiful Soup.' % markup)
             if markup[:5] == "http:" or markup[:6] == "https:":

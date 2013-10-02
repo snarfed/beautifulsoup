@@ -1,5 +1,9 @@
 = 4.3.2 (Unreleased) =
 
+* Fixed a bug in which short Unicode input was improperly encoded to
+  ASCII when checking whether or not it was a file on
+  disk. [bug=1227016]
+
 * Combined two tests to stop a spurious test failure when tests are
   run by nosetests. [bug=1212445]
 

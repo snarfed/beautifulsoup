@@ -36,6 +36,13 @@ except ImportError, e:
 PYTHON_2_PRE_2_7 = (sys.version_info < (2,7))
 PYTHON_3_PRE_3_2 = (sys.version_info[0] == 3 and sys.version_info < (3,2))
 
+class TestConstructor(SoupTest):
+
+    def test_short_unicode_input(self):
+        data = u"<h1>éé</h1>"
+        soup = self.soup(data)
+        self.assertEqual(u"éé", soup.h1.string)
+
 class TestDeprecatedConstructorArguments(SoupTest):
 
     def test_parseOnlyThese_renamed_to_parse_only(self):
