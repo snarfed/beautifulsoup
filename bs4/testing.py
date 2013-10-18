@@ -254,6 +254,16 @@ class HTMLTreeBuilderSmokeTest(object):
         self.assertEqual("p", soup.h2.string.next_element.name)
         self.assertEqual("p", soup.p.name)
 
+    def test_head_tag_between_head_and_body(self):
+        "Prevent recurrence of a bug in the html5lib treebuilder."
+        content = """<html><head></head>
+  <link></link>
+  <body>foo</body>
+</html>
+"""
+        soup = self.soup(content)
+        self.assertNotEqual(None, soup.html.body)
+
     def test_basic_namespaces(self):
         """Parsers don't need to *understand* namespaces, but at the
         very least they should not choke on namespaces or lose

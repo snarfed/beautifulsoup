@@ -161,6 +161,12 @@ class Element(html5lib.treebuilders._base.Node):
             # immediately after the parent, if it has no children.)
             if self.element.contents:
                 most_recent_element = self.element._last_descendant(False)
+            elif self.element.next_element is not None:
+                # Something from further ahead in the parse tree is
+                # being inserted into this earlier element. This is
+                # very annoying because it means an expensive search
+                # for the last element in the tree.
+                most_recent_element = self.soup._last_descendant()
             else:
                 most_recent_element = self.element
 

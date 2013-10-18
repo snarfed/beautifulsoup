@@ -1,5 +1,8 @@
 = 4.3.3 (Unreleased) =
 
+* Fixed yet another problem that caused the html5lib tree builder to
+  create a disconnected parse tree. [bug=1237763]
+
 * Restored the helpful syntax error that happens when you try to
   import the Python 2 edition of Beautiful Soup under Python
   3. [bug=1213387]
