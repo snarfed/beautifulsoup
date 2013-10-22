@@ -314,7 +314,8 @@ Kinds of objects
 
 Beautiful Soup transforms a complex HTML document into a complex tree
 of Python objects. But you'll only ever have to deal with about four
-`kinds` of objects.
+`kinds` of objects: ``Tag``, ``NavigableString``, ``BeautifulSoup``,
+and ``Comment``.
 
 .. _Tag:
 
