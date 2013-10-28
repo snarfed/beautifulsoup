@@ -1619,10 +1619,9 @@ tag it contains.
 CSS selectors
 -------------
 
-Beautiful Soup supports the most commonly-used `CSS selectors
-<http://www.w3.org/TR/CSS2/selector.html>`_. Just pass a string into
-the ``.select()`` method of a ``Tag`` object or the ``BeautifulSoup``
-object itself.
+Beautiful Soup supports the most commonly-used CSS selectors. Just
+pass a string into the ``.select()`` method of a ``Tag`` object or the
+``BeautifulSoup`` object itself.
 
 You can find tags::
 
@@ -1729,9 +1728,9 @@ Match language codes::
 
 This is a convenience for users who know the CSS selector syntax. You
 can do all this stuff with the Beautiful Soup API. And if CSS
-selectors are all you need, you might as well use lxml directly,
-because it's faster. But this lets you `combine` simple CSS selectors
-with the Beautiful Soup API.
+selectors are all you need, you might as well use lxml directly: it's
+a lot faster, and it supports more CSS selectors . But this lets you
+`combine` simple CSS selectors with the Beautiful Soup API.
 
 
 Modifying the tree
