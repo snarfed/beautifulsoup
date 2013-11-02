@@ -26,9 +26,11 @@ developed, and that Beautiful Soup 4 is recommended for all new
 projects. If you want to learn about the differences between Beautiful
 Soup 3 and Beautiful Soup 4, see `Porting code to BS4`_.
 
-This documentation has been translated into other languages by its users.
+This documentation has been translated into other languages by
+Beautiful Soup users:
 
 * 이 문서는 한국어 번역도 가능합니다. (`외부 링크 <http://coreapython.hosting.paran.com/etc/beautifulsoup4.html>`_)
+* このページは日本語で利用できます(`外部リンク <http://kondou.com/BS4/>`_)
 
 Getting help
 ------------
@@ -1729,7 +1731,7 @@ Match language codes::
 This is a convenience for users who know the CSS selector syntax. You
 can do all this stuff with the Beautiful Soup API. And if CSS
 selectors are all you need, you might as well use lxml directly: it's
-a lot faster, and it supports more CSS selectors . But this lets you
+a lot faster, and it supports more CSS selectors. But this lets you
 `combine` simple CSS selectors with the Beautiful Soup API.
 
 
