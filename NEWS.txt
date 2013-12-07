@@ -7,6 +7,8 @@
   import the Python 2 edition of Beautiful Soup under Python
   3. [bug=1213387]
 
+ * Added a Chinese translation of the documentation by Delong .w.
+
 = 4.3.2 (20131002) =
 
 * Fixed a bug in which short Unicode input was improperly encoded to

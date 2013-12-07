@@ -29,8 +29,9 @@ Soup 3 and Beautiful Soup 4, see `Porting code to BS4`_.
 This documentation has been translated into other languages by
 Beautiful Soup users:
 
-* 이 문서는 한국어 번역도 가능합니다. (`외부 링크 <http://coreapython.hosting.paran.com/etc/beautifulsoup4.html>`_)
+* `这篇文档当然还有中文版. <http://www.crummy.com/software/BeautifulSoup/bs4/doc/index.cn.html>`_
 * このページは日本語で利用できます(`外部リンク <http://kondou.com/BS4/>`_)
+* 이 문서는 한국어 번역도 가능합니다. (`외부 링크 <http://coreapython.hosting.paran.com/etc/beautifulsoup4.html>`_)
 
 Getting help
 ------------
@@ -2858,12 +2859,7 @@ BeautifulSoup``, but your code doesn't work, you installed Beautiful
 Soup 3 by mistake. You need to run ``easy_install beautifulsoup4``.
 
 `The documentation for Beautiful Soup 3 is archived online
-<http://www.crummy.com/software/BeautifulSoup/bs3/documentation.html>`_. If
-your first language is Chinese, it might be easier for you to read
-`the Chinese translation of the Beautiful Soup 3 documentation
-<http://www.crummy.com/software/BeautifulSoup/bs3/documentation.zh.html>`_,
-then read this document to find out about the changes made in
-Beautiful Soup 4.
+<http://www.crummy.com/software/BeautifulSoup/bs3/documentation.html>`_.
 
 Porting code to BS4
 -------------------
