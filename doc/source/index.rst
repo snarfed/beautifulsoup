@@ -68,7 +68,7 @@ Running the "three sisters" document through Beautiful Soup gives us a
 data structure::
 
  from bs4 import BeautifulSoup
- soup = BeautifulSoup(html_doc)
+ soup = BeautifulSoup(html_doc, 'html.parser')
 
  print(soup.prettify())
  # <html>
@@ -270,7 +270,7 @@ This table summarizes the advantages and disadvantages of each parser library:
 | lxml's HTML parser   | ``BeautifulSoup(markup, "lxml")``          | * Very fast                    | * External C dependency  |
 |                      |                                            | * Lenient                      |                          |
 +----------------------+--------------------------------------------+--------------------------------+--------------------------+
-| lxml's XML parser    | ``BeautifulSoup(markup, ["lxml", "xml"])`` | * Very fast                    | * External C dependency  |
+| lxml's XML parser    | ``BeautifulSoup(markup, "lxml-xml")`` | * Very fast                    | * External C dependency  |
 |                      | ``BeautifulSoup(markup, "xml")``           | * The only currently supported |                          |
 |                      |                                            |   XML parser                   |                          |
 +----------------------+--------------------------------------------+--------------------------------+--------------------------+

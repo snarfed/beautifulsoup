@@ -214,9 +214,10 @@ class LXMLTreeBuilderForXML(TreeBuilder):
 
 class LXMLTreeBuilder(HTMLTreeBuilder, LXMLTreeBuilderForXML):
 
-    NAME = [LXML, "lxml-html"]
+    NAME = LXML
+    ALTERNATE_NAMES = ["lxml-html"]
 
-    features = NAME + [HTML, FAST, PERMISSIVE]
+    features = ALTERNATE_NAMES + [NAME, HTML, FAST, PERMISSIVE]
     is_xml = False
 
     def default_parser(self, encoding):

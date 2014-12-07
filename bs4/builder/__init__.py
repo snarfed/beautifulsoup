@@ -81,6 +81,7 @@ class TreeBuilder(object):
     """Turn a document into a Beautiful Soup object tree."""
 
     NAME = "[Unknown tree builder]"
+    ALTERNATE_NAMES = []
     features = []
 
     is_xml = False
