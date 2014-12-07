@@ -22,7 +22,9 @@ from bs4.element import (
 class HTML5TreeBuilder(HTMLTreeBuilder):
     """Use html5lib to build a tree."""
 
-    features = ['html5lib', PERMISSIVE, HTML_5, HTML]
+    NAME = "html5lib"
+
+    features = [NAME, PERMISSIVE, HTML_5, HTML]
 
     def prepare_markup(self, markup, user_specified_encoding):
         # Store the user-specified encoding for use later on.

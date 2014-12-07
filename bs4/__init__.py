@@ -77,6 +77,8 @@ class BeautifulSoup(Tag):
 
     ASCII_SPACES = '\x20\x0a\x09\x0c\x0d'
 
+    NO_PARSER_SPECIFIED_WARNING = 'Parser was not explicitly specified. Using the best available parser for this system ("%s"). The same code on other systems may use a different parser and behave differently.'
+
     def __init__(self, markup="", features=None, builder=None,
                  parse_only=None, from_encoding=None, **kwargs):
         """The Soup object is initialized as the 'root tag', and the
@@ -114,9 +116,9 @@ class BeautifulSoup(Tag):
             del kwargs['isHTML']
             warnings.warn(
                 "BS4 does not respect the isHTML argument to the "
-                "BeautifulSoup constructor. You can pass in features='html' "
-                "or features='xml' to get a builder capable of handling "
-                "one or the other.")
+                "BeautifulSoup constructor. Suggest you use "
+                "features='lxml' for HTML and features='lxml-xml' for "
+                "XML.")
 
         def deprecated_argument(old_name, new_name):
             if old_name in kwargs:
@@ -140,6 +142,7 @@ class BeautifulSoup(Tag):
                 "__init__() got an unexpected keyword argument '%s'" % arg)
 
         if builder is None:
+            original_features = features
             if isinstance(features, basestring):
                 features = [features]
             if features is None or len(features) == 0:
@@ -151,6 +154,11 @@ class BeautifulSoup(Tag):
                     "requested: %s. Do you need to install a parser library?"
                     % ",".join(features))
             builder = builder_class()
+            if not (original_features == builder.NAME or
+                    (not isinstance(builder.NAME, basestring) and
+                     original_features in builder.NAME)):
+                warnings.warn(self.NO_PARSER_SPECIFIED_WARNING % builder.NAME)
+
         self.builder = builder
         self.is_xml = builder.is_xml
         self.builder.soup = self

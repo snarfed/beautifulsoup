@@ -49,7 +49,28 @@ class TestConstructor(SoupTest):
         self.assertEqual(u"foo\0bar", soup.h1.string)
 
 
-class TestDeprecatedConstructorArguments(SoupTest):
+class TestWarnings(SoupTest):
+
+    def _no_parser_specified(self, s, is_there=True):
+        v = s.startswith(BeautifulSoup.NO_PARSER_SPECIFIED_WARNING[:80])
+        self.assertTrue(v)
+
+    def test_warning_if_no_parser_specified(self):
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup("<a><b></b></a>")
+        msg = str(w[0].message)
+        self._assert_no_parser_specified(msg)
+
+    def test_warning_if_parser_specified_too_vague(self):
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup("<a><b></b></a>", "html")
+        msg = str(w[0].message)
+        self._assert_no_parser_specified(msg)
+
+    def test_no_warning_if_explicit_parser_specified(self):
+        with warnings.catch_warnings(record=True) as w:
+            soup = self.soup("<a><b></b></a>", "html.parser")
+        self.assertEquals([], w)
 
     def test_parseOnlyThese_renamed_to_parse_only(self):
         with warnings.catch_warnings(record=True) as w:

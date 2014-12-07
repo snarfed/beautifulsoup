@@ -80,6 +80,7 @@ builder_registry = TreeBuilderRegistry()
 class TreeBuilder(object):
     """Turn a document into a Beautiful Soup object tree."""
 
+    NAME = "[Unknown tree builder]"
     features = []
 
     is_xml = False

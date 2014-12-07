@@ -25,8 +25,10 @@ class LXMLTreeBuilderForXML(TreeBuilder):
 
     is_xml = True
 
+    NAME = "lxml-xml"
+
     # Well, it's permissive by XML parser standards.
-    features = [LXML, XML, FAST, PERMISSIVE]
+    features = [NAME, LXML, XML, FAST, PERMISSIVE]
 
     CHUNK_SIZE = 512
 
@@ -212,7 +214,9 @@ class LXMLTreeBuilderForXML(TreeBuilder):
 
 class LXMLTreeBuilder(HTMLTreeBuilder, LXMLTreeBuilderForXML):
 
-    features = [LXML, HTML, FAST, PERMISSIVE]
+    NAME = [LXML, "lxml-html"]
+
+    features = NAME + [HTML, FAST, PERMISSIVE]
     is_xml = False
 
     def default_parser(self, encoding):

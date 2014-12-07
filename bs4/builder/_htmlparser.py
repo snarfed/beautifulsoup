@@ -128,7 +128,8 @@ class BeautifulSoupHTMLParser(HTMLParser):
 class HTMLParserTreeBuilder(HTMLTreeBuilder):
 
     is_xml = False
-    features = [HTML, STRICT, HTMLPARSER]
+    NAME = HTMLPARSER
+    features = [NAME, HTML, STRICT]
 
     def __init__(self, *args, **kwargs):
         if CONSTRUCTOR_TAKES_STRICT:

@@ -495,7 +495,7 @@ class XMLTreeBuilderSmokeTest(object):
   <script type="text/javascript">
   </script>
 """
-        soup = BeautifulSoup(doc, "xml")
+        soup = BeautifulSoup(doc, "lxml-xml")
         # lxml would have stripped this while parsing, but we can add
         # it later.
         soup.script.string = 'console.log("< < hey > > ");'

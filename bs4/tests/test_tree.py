@@ -688,7 +688,7 @@ class TestTagCreation(SoupTest):
 
     def test_tag_inherits_self_closing_rules_from_builder(self):
         if XML_BUILDER_PRESENT:
-            xml_soup = BeautifulSoup("", "xml")
+            xml_soup = BeautifulSoup("", "lxml-xml")
             xml_br = xml_soup.new_tag("br")
             xml_p = xml_soup.new_tag("p")
 
@@ -697,7 +697,7 @@ class TestTagCreation(SoupTest):
             self.assertEqual(b"<br/>", xml_br.encode())
             self.assertEqual(b"<p/>", xml_p.encode())
 
-        html_soup = BeautifulSoup("", "html")
+        html_soup = BeautifulSoup("", "html.parser")
         html_br = html_soup.new_tag("br")
         html_p = html_soup.new_tag("p")
 
@@ -1366,7 +1366,7 @@ class TestSubstitutions(SoupTest):
    console.log("< < hey > > ");
   </script>
 """
-        encoded = BeautifulSoup(doc).encode()
+        encoded = BeautifulSoup(doc, 'html.parser').encode()
         self.assertTrue(b"< < hey > >" in encoded)
 
     def test_formatter_skips_style_tag_for_html_documents(self):
@@ -1375,7 +1375,7 @@ class TestSubstitutions(SoupTest):
    console.log("< < hey > > ");
   </style>
 """
-        encoded = BeautifulSoup(doc).encode()
+        encoded = BeautifulSoup(doc, 'html.parser').encode()
         self.assertTrue(b"< < hey > >" in encoded)
 
     def test_prettify_leaves_preformatted_text_alone(self):
@@ -1387,7 +1387,7 @@ class TestSubstitutions(SoupTest):
             soup.div.prettify())
 
     def test_prettify_accepts_formatter(self):
-        soup = BeautifulSoup("<html><body>foo</body></html>")
+        soup = BeautifulSoup("<html><body>foo</body></html>", 'html.parser')
         pretty = soup.prettify(formatter = lambda x: x.upper())
         self.assertTrue("FOO" in pretty)
 
@@ -1565,7 +1565,7 @@ class TestSoupSelector(TreeTest):
 """
 
     def setUp(self):
-        self.soup = BeautifulSoup(self.HTML)
+        self.soup = BeautifulSoup(self.HTML, 'html.parser')
 
     def assertSelects(self, selector, expected_ids):
         el_ids = [el['id'] for el in self.soup.select(selector)]
