@@ -2762,13 +2762,15 @@ You'll need to :ref:`have lxml installed <parser-installation>`.
 Other parser problems
 ---------------------
 
-* If your script works on one computer but not another, it's probably
-  because the two computers have different parser libraries
-  available. For example, you may have developed the script on a
-  computer that has lxml installed, and then tried to run it on a
-  computer that only has html5lib installed. See `Differences between
-  parsers`_ for why this matters, and fix the problem by mentioning a
-  specific parser library in the ``BeautifulSoup`` constructor.
+* If your script works on one computer but not another, or in one
+  virtual environment but not another, or outside the virtual
+  environment but not inside, it's probably because the two
+  environments have different parser libraries available. For example,
+  you may have developed the script on a computer that has lxml
+  installed, and then tried to run it on a computer that only has
+  html5lib installed. See `Differences between parsers`_ for why this
+  matters, and fix the problem by mentioning a specific parser library
+  in the ``BeautifulSoup`` constructor.
 
 * Because `HTML tags and attributes are case-insensitive
   <http://www.w3.org/TR/html5/syntax.html#syntax>`_, all three HTML
