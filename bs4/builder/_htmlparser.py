@@ -19,10 +19,8 @@ import warnings
 # At the end of this file, we monkeypatch HTMLParser so that
 # strict=True works well on Python 3.2.2.
 major, minor, release = sys.version_info[:3]
-CONSTRUCTOR_TAKES_STRICT = (
-    major > 3
-    or (major == 3 and minor > 2)
-    or (major == 3 and minor == 2 and release >= 3))
+CONSTRUCTOR_TAKES_STRICT = major == 3 and minor == 2 and release >= 3
+CONSTRUCTOR_TAKES_CONVERT_CHARREFS = major == 3 and minor >= 4
 
 from bs4.element import (
     CData,
@@ -63,7 +61,8 @@ class BeautifulSoupHTMLParser(HTMLParser):
 
     def handle_charref(self, name):
         # XXX workaround for a bug in HTMLParser. Remove this once
-        # it's fixed.
+        # it's fixed in all supported versions.
+        # http://bugs.python.org/issue13633
         if name.startswith('x'):
             real_name = int(name.lstrip('x'), 16)
         elif name.startswith('X'):
@@ -134,6 +133,8 @@ class HTMLParserTreeBuilder(HTMLTreeBuilder):
     def __init__(self, *args, **kwargs):
         if CONSTRUCTOR_TAKES_STRICT:
             kwargs['strict'] = False
+        if CONSTRUCTOR_TAKES_CONVERT_CHARREFS:
+            kwargs['convert_charrefs'] = False
         self.parser_args = (args, kwargs)
 
     def prepare_markup(self, markup, user_specified_encoding=None,

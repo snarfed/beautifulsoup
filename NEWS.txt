@@ -10,6 +10,10 @@
 * Added a warning when you instantiate a BeautifulSoup object without
   explicitly naming a parser. [bug=1398866]
 
+* In Python 3.4 and above, set the new convert_charrefs argument to
+  the html.parser constructor to avoid a warning and future
+  failures. Patch by Stefano Revera. [bug=1375721]
+
 * Added a Chinese translation of the documentation by Delong .w.
 
 = 4.3.2 (20131002) =
