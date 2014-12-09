@@ -2899,12 +2899,12 @@ deprecated and removed in Python 3.0. Beautiful Soup 4 uses
 ``html.parser`` by default, but you can plug in lxml or html5lib and
 use that instead. See `Installing a parser`_ for a comparison.
 
-Since ``html.parser`` is not the same parser as ``SGMLParser``, it
-will treat invalid markup differently. Usually the "difference" is
-that ``html.parser`` crashes. In that case, you'll need to install
-another parser. But sometimes ``html.parser`` just creates a different
-parse tree than ``SGMLParser`` would. If this happens, you may need to
-update your BS3 scraping code to deal with the new tree.
+Since ``html.parser`` is not the same parser as ``SGMLParser``, you
+may find that Beautiful Soup 4 gives you a different parse tree than
+Beautiful Soup 3 for the same markup. If you swap out ``html.parser``
+for lxml or html5lib, you may find that the parse tree changes yet
+again. If this happens, you'll need to update your scraping code to
+deal with the new tree.
 
 Method names
 ^^^^^^^^^^^^
