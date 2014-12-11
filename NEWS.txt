@@ -1,5 +1,7 @@
 = 4.3.3 (Unreleased) =
 
+* Added a Chinese translation of the documentation by Delong .w.
+
 * Fixed yet another problem that caused the html5lib tree builder to
   create a disconnected parse tree. [bug=1237763]
 
@@ -17,7 +19,9 @@
   the html.parser constructor to avoid a warning and future
   failures. Patch by Stefano Revera. [bug=1375721]
 
-* Added a Chinese translation of the documentation by Delong .w.
+* The warning when you pass in a filename or URL as markup will now be
+  displayed correctly even if the filename or URL is a Unicode
+  string. [bug=1268888]
 
 = 4.3.2 (20131002) =
 
