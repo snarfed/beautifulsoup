@@ -1554,6 +1554,14 @@ class TestSoupSelector(TreeTest):
 <span class="span3"></span>
 </span>
 </div>
+<x id="xid">
+<z id="zida"/>
+<z id="zidab"/>
+<z id="zidac"/>
+</x>
+<y id="yid">
+<z id="zidb"/>
+</y>
 <p lang="en" id="lang-en">English</p>
 <p lang="en-gb" id="lang-en-gb">English UK</p>
 <p lang="en-us" id="lang-en-us">English US</p>
@@ -1827,3 +1835,41 @@ class TestSoupSelector(TreeTest):
 
     def test_sibling_combinator_wont_select_same_tag_twice(self):
         self.assertSelects('p[lang] ~ p', ['lang-en-gb', 'lang-en-us', 'lang-fr'])
+
+    # Test the selector grouping operator (the comma)
+    def test_multiple_select(self):
+        self.assertSelects('x, y',['xid','yid'])
+
+    def test_multiple_select_with_no_space(self):
+        self.assertSelects('x,y',['xid','yid'])
+
+    def test_multiple_select_with_more_space(self):
+        self.assertSelects('x,    y',['xid', 'yid'])
+
+    def test_multiple_select_sibling(self):
+        self.assertSelects('x, y ~ p[lang=fr]',['lang-fr'])
+
+    def test_multiple_select(self):
+        self.assertSelects('x, y > z', ['zida', 'zidb', 'zidab', 'zidac'])
+
+    def test_multiple_select_direct_descendant(self):
+        self.assertSelects('div > x, y, z', ['xid', 'yid'])
+
+    def test_multiple_select_indirect_descendant(self):
+        self.assertSelects('div x,y,  z', ['xid', 'yid', 'zida', 'zidb', 'zidab', 'zidac'])
+
+    def test_invalid_multiple_select(self):
+        self.assertRaises(ValueError, self.soup.select, ',x, y')
+        self.assertRaises(ValueError, self.soup.select, 'x,,y')
+
+    def test_multiple_select(self):
+        self.assertSelects('p[lang=en], p[lang=en-gb]',['lang-en','lang-en-gb'])
+
+    def test_multiple_select_ids(self):
+        self.assertSelects('x, y > z[id=zida], z[id=zidab], z[id=zidb]', ['zida', 'zidb','zidab'])
+
+    def test_multiple_select_nested(self):
+        self.assertSelects('body > div > x, y > z', ['zida', 'zidb', 'zidab', 'zidac'])
+
+
+

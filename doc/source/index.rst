@@ -552,7 +552,7 @@ Here's the "Three sisters" HTML document again::
  """
 
  from bs4 import BeautifulSoup
- soup = BeautifulSoup(html_doc)
+ soup = BeautifulSoup(html_doc, 'html.parser')
 
 I'll use this as an example to show you how to move from one part of
 a document to another.
@@ -1009,7 +1009,7 @@ Once again, I'll be using the "three sisters" document as an example::
  """
 
  from bs4 import BeautifulSoup
- soup = BeautifulSoup(html_doc)
+ soup = BeautifulSoup(html_doc, 'html.parser')
 
 By passing in a filter to an argument like ``find_all()``, you can
 zoom in on the parts of the document you're interested in.
@@ -1692,6 +1692,12 @@ Find tags by ID::
  soup.select("a#link2")
  # [<a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>]
 
+Find tags that match any selector from a list of selectors:
+
+ soup.select("#link1,#link2")
+ # [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+ #  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>]
+
 Test for the existence of an attribute::
 
  soup.select('a[href]')
@@ -1729,7 +1735,8 @@ Match language codes::
  #  <p lang="en-us">Howdy, y'all</p>,
  #  <p lang="en-gb">Pip-pip, old fruit</p>]
 
-This is a convenience for users who know the CSS selector syntax. You
+
+This is all a convenience for users who know the CSS selector syntax. You
 can do all this stuff with the Beautiful Soup API. And if CSS
 selectors are all you need, you might as well use lxml directly: it's
 a lot faster, and it supports more CSS selectors. But this lets you
