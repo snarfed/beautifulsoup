@@ -11,6 +11,9 @@
 * The select() method can now find tags whose names contain
   dashes. Patch by Francisco Canas [bug=1276211]
 
+* Improved the lxml tree builder's handling of processing
+  instructions. [bug=1294645]
+
 * Restored the helpful syntax error that happens when you try to
   import the Python 2 edition of Beautiful Soup under Python
   3. [bug=1213387]

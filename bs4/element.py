@@ -707,7 +707,7 @@ class CData(PreformattedString):
 class ProcessingInstruction(PreformattedString):
 
     PREFIX = u'<?'
-    SUFFIX = u'?>'
+    SUFFIX = u'>'
 
 class Comment(PreformattedString):
 
