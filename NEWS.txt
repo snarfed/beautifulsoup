@@ -8,6 +8,9 @@
 * The select() method now supports selector grouping. Patch by
   Francisco Canas [bug=1191917]
 
+* The select() method can now find tags whose names contain
+  dashes. Patch by Francisco Canas [bug=1276211]
+
 * Restored the helpful syntax error that happens when you try to
   import the Python 2 edition of Beautiful Soup under Python
   3. [bug=1213387]

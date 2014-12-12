@@ -1534,7 +1534,7 @@ class TestSoupSelector(TreeTest):
 <link rel="stylesheet" href="blah.css" type="text/css" id="l1">
 </head>
 <body>
-
+<custom-dashed-tag class="dashed" id="dash1">Hello there.</custom-dashed-tag>
 <div id="main" class="fancy">
 <div id="inner">
 <h1 id="header1">An H1</h1>
@@ -1552,6 +1552,7 @@ class TestSoupSelector(TreeTest):
 <a href="#" id="s2a1">span2a1</a>
 </span>
 <span class="span3"></span>
+<custom-dashed-tag class="dashed" id="dash2"/>
 </span>
 </div>
 <x id="xid">
@@ -1616,6 +1617,20 @@ class TestSoupSelector(TreeTest):
 
     def test_invalid_tag(self):
         self.assertRaises(ValueError, self.soup.select, 'tag%t')
+
+    def test_select_dashed_tag_ids(self):
+        self.assertSelects('custom-dashed-tag', ['dash1', 'dash2'])
+
+    def test_select_dashed_by_id(self):
+        dashed = self.soup.select('custom-dashed-tag[id=\"dash2\"]')
+        self.assertEqual(dashed[0].name, 'custom-dashed-tag')
+        self.assertEqual(dashed[0]['id'], 'dash2')
+
+    def test_dashed_tag_text(self):
+        self.assertEqual(self.soup.select('body > custom-dashed-tag')[0].text, u'Hello there.')
+
+    def test_select_dashed_matches_find_all(self):
+        self.assertEqual(self.soup.select('custom-dashed-tag'), self.soup.find_all('custom-dashed-tag'))
 
     def test_header_tags(self):
         self.assertSelectMultiple(
@@ -1724,7 +1739,7 @@ class TestSoupSelector(TreeTest):
             ('[href$=".css"]', ['l1']),
             ('link[href$=".css"]', ['l1']),
             ('link[id$="1"]', ['l1']),
-            ('[id$="1"]', ['l1', 'p1', 'header1', 's1a1', 's2a1', 's1a2s1']),
+            ('[id$="1"]', ['l1', 'p1', 'header1', 's1a1', 's2a1', 's1a2s1', 'dash1']),
             ('div[id$="1"]', []),
             ('[id$="noending"]', []),
         )
@@ -1738,7 +1753,6 @@ class TestSoupSelector(TreeTest):
             ('[rel*="notstyle"]', []),
             ('link[rel*="notstyle"]', []),
             ('link[href*="bla"]', ['l1']),
-            ('a[href*="http://"]', ['bob', 'me']),
             ('[href*="http://"]', ['bob', 'me']),
             ('[id*="p"]', ['pmulti', 'p1']),
             ('div[id*="m"]', ['main']),
@@ -1747,7 +1761,7 @@ class TestSoupSelector(TreeTest):
             ('[href*=".css"]', ['l1']),
             ('link[href*=".css"]', ['l1']),
             ('link[id*="1"]', ['l1']),
-            ('[id*="1"]', ['l1', 'p1', 'header1', 's1a1', 's1a2', 's2a1', 's1a2s1']),
+            ('[id*="1"]', ['l1', 'p1', 'header1', 's1a1', 's1a2', 's2a1', 's1a2s1', 'dash1']),
             ('div[id*="1"]', []),
             ('[id*="noending"]', []),
             # New for this test

@@ -548,17 +548,17 @@ class PageElement(object):
 
     # Methods for supporting CSS selectors.
 
-    tag_name_re = re.compile('^[a-z0-9]+$')
+    tag_name_re = re.compile('^[a-zA-Z0-9][-.a-zA-Z0-9:_]*$')
 
-    # /^(\w+)\[(\w+)([=~\|\^\$\*]?)=?"?([^\]"]*)"?\]$/
-    #   \---/  \---/\-------------/    \-------/
-    #     |      |         |               |
-    #     |      |         |           The value
-    #     |      |    ~,|,^,$,* or =
-    #     |   Attribute
+    # /^([a-zA-Z0-9][-.a-zA-Z0-9:_]*)\[(\w+)([=~\|\^\$\*]?)=?"?([^\]"]*)"?\]$/
+    #   \---------------------------/  \---/\-------------/    \-------/
+    #     |                              |         |               |
+    #     |                              |         |           The value
+    #     |                              |    ~,|,^,$,* or =
+    #     |                           Attribute
     #    Tag
     attribselect_re = re.compile(
-        r'^(?P<tag>\w+)?\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)' +
+        r'^(?P<tag>[a-zA-Z0-9][-.a-zA-Z0-9:_]*)?\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)' +
         r'=?"?(?P<value>[^\]"]*)"?\]$'
         )
 
